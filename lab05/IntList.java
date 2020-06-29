@@ -173,8 +173,14 @@ public class IntList {
      * @return The sum of squares of all elements.
      */
     public int squaredSum() {
-        // YOUR CODE HERE
-        return -1;
+        IntList p = this;
+        int sum = 0;
+
+        while (p != null) {
+            sum = sum + p.item * p.item;
+            p = p.next;
+        }
+        return sum;
     }
 
     /**
