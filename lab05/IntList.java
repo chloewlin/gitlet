@@ -143,7 +143,11 @@ public class IntList {
      * @param value, the int to be added.
      */
     public void add(int value) {
-        // YOUR CODE HERE
+        IntList p = this; 
+        while (p.next != null) { 
+            p = p.next; 
+        } 
+        p.next = new IntList(value);
     }
 
     /**
