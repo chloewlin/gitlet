@@ -96,8 +96,45 @@ public class IntList {
      * @return Whether the two lists are equal.
      */
     public boolean equals(Object obj) {
-        IntList pointer = this;
+        if (!this.getClass().isInstance(obj)) return false;
+        if (!(obj instanceof IntList)) return false;
+        IntList p = this;
+        IntList q = (IntList) obj;
+        int lengthP = getListLength(this);
+        int lengthQ = getListLength(q);
+        if (lengthP != lengthQ) {
+            return false;
+        }
 
+        while (p != null && q != null) {
+            int currValue = p.item;
+            int objValue = q.item;
+            if (currValue != objValue) {
+                return false;
+            } else {
+                p = p.next;
+                q = q.next;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns length of list.
+     *
+     * @param L the list
+     * @return length of the list
+     */
+    private static int getListLength(IntList L) {
+        int length = 0;
+
+        while (L != null) {
+            length++;
+            L = L.next;
+        }
+
+        return length;
     }
 
     /**
