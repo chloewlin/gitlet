@@ -96,6 +96,13 @@ public class IntListTest {
     }
 
     @Test
+    public void testEquals2() {
+        int[] a = {1, 2, 3};
+        IntList b = IntList.of(1, 2, 3, 4, 5);
+        assertFalse("List should not equal array", b.equals(a));
+    }
+
+    @Test
     public void testAdd() {
         IntList a = IntList.of(1, 2, 3);
         assertEquals(a, IntList.of(1, 2, 3));
