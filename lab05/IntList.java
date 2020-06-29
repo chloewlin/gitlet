@@ -258,7 +258,37 @@ public class IntList {
      * @return new list with A followed by B.
      */
      public static IntList catenate(IntList A, IntList B) {
-        // YOUR CODE HERE
-         return null;
+         if (A == null) {
+             return B;
+         }
+         return new IntList(A.item, catenate(A.next, B));
+     }
+
+    /**
+     * Returns a new IntList consisting of A followed by B,
+     * non-destructively using iterative solution.
+     */
+     private static IntList catenateIterative(IntList A, IntList B) {
+         if (B == null) return copyList(A);
+         if (A == null) return B;
+         IntList copy = copyList(A);
+         IntList p = copy;
+         while (p.next != null) {
+             p = p.next;
+         }
+         p.next = B;
+         return copy;
+     }
+
+     private static IntList copyList(IntList L) {
+         IntList head = new IntList(L.item);
+         IntList p = head;
+         L = L.next;
+         while (L != null) {
+             p.next = new IntList(L.item);
+             L = L.next;
+             p = p.next;
+         }
+         return head;
      }
 }
