@@ -79,8 +79,14 @@ public class IntList {
      * @return The String representation of the list.
      */
     public String toString() {
-        // YOUR CODE HERE
-        return null;
+        String s = "";
+        IntList p = this;
+        while (p != null) {
+            s = s + p.item + " ";
+            p = p.next;
+        }
+        s = s.trim();
+        return s;
     }
 
     /**
@@ -90,8 +96,8 @@ public class IntList {
      * @return Whether the two lists are equal.
      */
     public boolean equals(Object obj) {
-        // YOUR CODE HERE
-        return false;
+        IntList pointer = this;
+
     }
 
     /**
