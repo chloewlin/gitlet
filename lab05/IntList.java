@@ -48,8 +48,27 @@ public class IntList {
      * @param position, the position of element.
      * @return The element at [position]
      */
+
     public int get(int position) {
-        // YOUR CODE HERE
+        if (position < 0) {
+            throw new IllegalArgumentException();
+        }
+        int count = 0;
+        IntList p = this;
+
+         while (p != null) {
+            if (count == position) {
+                return p.item;
+            } else {
+                count++;
+                p = p.next;
+            }
+        }
+
+        if (count <= position) {
+            throw new IllegalArgumentException();
+        }
+
         return -1;
     }
 
