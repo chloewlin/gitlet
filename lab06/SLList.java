@@ -118,7 +118,28 @@ public class SLList {
 
     /** Adds x to the list at the specified index. */
     public void add(int index, int x) {
-        // TODO
+        if (index >= size) {
+            index = size;
+        }
+        if (index == 0) {
+            addFirst(x);
+            return;
+        }
+        int count = 0;
+        int prevIndex = index - 1;
+        IntListNode p = sentinel.next;
+        while (p != null) {
+            if (count != prevIndex) {
+                count++;
+            } else {
+                IntListNode temp = p.next;
+                p.next = new IntListNode(x, null);
+                p.next.next = temp;
+                this.size++;
+                break;
+            }
+            p = p.next;
+        }
     }
 
     /** Destructively reverses this list. */
