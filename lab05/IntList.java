@@ -291,4 +291,19 @@ public class IntList {
          }
          return head;
      }
+
+     public static IntList reverse(IntList L) {
+        IntList prev = null;
+        IntList curr = L;
+        IntList next = null;
+
+        while (curr != null) {
+            next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+        }
+
+        return prev;
+     }
 }
