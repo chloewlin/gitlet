@@ -144,6 +144,25 @@ public class SLList {
 
     /** Destructively reverses this list. */
     public void reverse() {
-        // TODO
+//        sentinel.next = helper(sentinel.next);
+//        IntListNode startReverse = null;
+//        IntListNode needToBeAdd = sentinel.next;
+//        while (needToBeAdd != null) {
+//            IntListNode rest = needToBeAdd.next;
+//            startReverse = needToBeAdd;
+//            needToBeAdd = rest;
+//        }
+//        sentinel.next = startReverse;
+//    }
+//    private IntListNode helper(IntListNode curr) {
+//        if (curr == null || curr.next == null) {
+//            return curr;
+//        }
+//        else {
+//            IntListNode reverse = helper(curr.next);
+//            curr.next.next = curr;
+//            curr.next = null;
+//            return reverse;
+//        }
     }
 }
