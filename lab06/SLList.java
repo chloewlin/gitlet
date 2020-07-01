@@ -144,25 +144,19 @@ public class SLList {
 
     /** Destructively reverses this list. */
     public void reverse() {
-//        sentinel.next = helper(sentinel.next);
-//        IntListNode startReverse = null;
-//        IntListNode needToBeAdd = sentinel.next;
-//        while (needToBeAdd != null) {
-//            IntListNode rest = needToBeAdd.next;
-//            startReverse = needToBeAdd;
-//            needToBeAdd = rest;
-//        }
-//        sentinel.next = startReverse;
-//    }
-//    private IntListNode helper(IntListNode curr) {
-//        if (curr == null || curr.next == null) {
-//            return curr;
-//        }
-//        else {
-//            IntListNode reverse = helper(curr.next);
-//            curr.next.next = curr;
-//            curr.next = null;
-//            return reverse;
-//        }
+        IntListNode first = sentinel.next;
+        IntListNode second = sentinel.next.next;
+        sentinel.next = helper(second, sentinel, first);
+    }
+
+    private IntListNode helper(IntListNode curr, IntListNode sentinel, IntListNode first) {
+        if (curr.next.equals(sentinel)) {
+            return curr;
+        }
+        IntListNode temp = helper(curr.next, sentinel, first);
+        curr.next.next = curr;
+        curr.next = first;
+        first.next = sentinel;
+        return temp;
     }
 }
