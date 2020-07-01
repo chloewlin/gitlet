@@ -146,17 +146,41 @@ public class SLList {
     public void reverse() {
         IntListNode first = sentinel.next;
         IntListNode second = sentinel.next.next;
-        sentinel.next = helper(second, sentinel, first);
+        IntListNode currTail = findReversedHead(sentinel.next);
+        /** find the section we want to reverse */
+        currTail.next = null;
+        first.next = null;
+        /** reverse the section */
+        IntListNode reversedHead = reverseHelper(second);
+        /** find the last node of the reversed list */
+        IntListNode reversedTail = findLast(reversedHead);
+        /** reverse the pointers to first and sentinel */
+        reversedTail.next = first;
+        first.next = sentinel;
+        sentinel.next = reversedHead;
     }
 
-    private IntListNode helper(IntListNode curr, IntListNode sentinel, IntListNode first) {
-        if (curr.next.equals(sentinel)) {
+    private IntListNode findReversedHead(IntListNode L) {
+        while (!L.next.equals(sentinel)) {
+            L = L.next;
+        }
+        return L;
+    }
+
+    private IntListNode reverseHelper(IntListNode curr) {
+        if (curr.next == null) {
             return curr;
         }
-        IntListNode temp = helper(curr.next, sentinel, first);
+        IntListNode temp = reverseHelper(curr.next);
         curr.next.next = curr;
-        curr.next = first;
-        first.next = sentinel;
+        curr.next = null;
         return temp;
+    }
+
+    private IntListNode findLast(IntListNode L) {
+        while (L.next != null) {
+            L = L.next;
+        }
+        return L;
     }
 }

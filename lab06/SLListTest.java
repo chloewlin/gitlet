@@ -32,9 +32,13 @@ public class SLListTest {
 
         test1.reverse();
         assertEquals(SLList.of(5, 3, 1), test1);
-        assertEquals(3, test1.get(1));
         assertEquals(5, test1.get(0));
+        assertEquals(3, test1.get(1));
         assertEquals(1, test1.get(2));
+        assertEquals(42, test1.get(3));
+        assertEquals(5, test1.get(4));
+        assertEquals(3, test1.get(5));
+        assertEquals(1, test1.get(6));
 
         test2.reverse();
         assertEquals(0, test2.size());
