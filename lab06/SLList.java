@@ -65,7 +65,7 @@ public class SLList {
         IntListNode l1 = sentinel.next;
         IntListNode l2 = slList.sentinel.next;
 
-        while (l1 != sentinel && l2 != slList.sentinel) {
+        while (l1 != sentinel || l2 != slList.sentinel) {
             if (!l1.equals(l2)) return false;
             l1 = l1.next;
             l2 = l2.next;
