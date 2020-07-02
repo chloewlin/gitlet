@@ -17,6 +17,16 @@ public class LinkedListDeque<T> {
     private int size;
 
     /**
+     * Constructor which creates an empty linked list deque
+     */
+    public LinkedListDeque() {
+        this.sentinel = new ListNode(42, null, null);
+        this.sentinel.prev = this.sentinel;
+        this.sentinel.next = this.sentinel;
+        size = 0;
+    }
+
+    /**
      * Adds an item of type T to the front of the deque.
      */
     public void addFirst(T item) {
@@ -83,12 +93,6 @@ public class LinkedListDeque<T> {
         return this.placeholder;
     }
 
-    /**
-     * Constructor which creates an empty linked list deque
-     */
-    public LinkedListDeque() {
-
-    }
 
     /**
      * Same as get, but this method should be implemented using recursion
@@ -96,6 +100,4 @@ public class LinkedListDeque<T> {
     public T getRecursive(int index) {
         return this.placeholder;
     }
-
-
 }
