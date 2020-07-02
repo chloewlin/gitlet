@@ -35,7 +35,10 @@ public class LinkedListDeque<T> {
      * Adds an item of type T to the front of the deque.
      */
     public void addFirst(T item) {
-
+        ListNode first = new ListNode(item, sentinel, sentinel.next);
+        first.next.prev = first;
+        first.prev.next = first;
+        this.size++;
     }
 
 
