@@ -1,11 +1,11 @@
 public class LinkedListDeque<T> {
 
-    private static class ListNode<T> {
+    private static class TNode<T> {
         public T item;
-        public ListNode prev;
-        public ListNode next;
+        public TNode prev;
+        public TNode next;
 
-        public ListNode(T item,  ListNode prev, ListNode next) {
+        public TNode(T item,  TNode prev, TNode next) {
             this.item = item;
             this.prev = prev;
             this.next = next;
@@ -13,20 +13,20 @@ public class LinkedListDeque<T> {
     }
 
     private T placeholder;
-    private ListNode sentinel;
+    private TNode sentinel;
     private int size;
 
     /** Constructor which creates an empty linked list deque */
     public LinkedListDeque() {
-        this.sentinel = new ListNode(42, null, null);
+        this.sentinel = new TNode(42, null, null);
         this.sentinel.prev = this.sentinel;
         this.sentinel.next = this.sentinel;
         this.size = 0;
     }
 
     public LinkedListDeque(T item) {
-        this.sentinel = new ListNode(42, null, null);
-        this.sentinel.next = new ListNode(item, null, null);
+        this.sentinel = new TNode(42, null, null);
+        this.sentinel.next = new TNode(item, null, null);
         this.sentinel.next.next = this.sentinel;
         this.size++;
     }
@@ -35,7 +35,7 @@ public class LinkedListDeque<T> {
      * Adds an item of type T to the front of the deque.
      */
     public void addFirst(T item) {
-        ListNode first = new ListNode(item, sentinel, sentinel.next);
+        TNode first = new TNode(item, sentinel, sentinel.next);
         first.next.prev = first;
         first.prev.next = first;
         this.size++;
