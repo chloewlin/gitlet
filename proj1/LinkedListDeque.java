@@ -12,7 +12,6 @@ public class LinkedListDeque<T> implements Deque<T> {
         }
     }
 
-    private T placeholder;
     private Node sentinel;
     private int size;
 
@@ -165,7 +164,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         if (count == 0) {
             return (T)node.item;
         } else {
-            return getRecursiveHelper(node.next,  count--);
+            return getRecursiveHelper(node.next, --count);
         }
     }
 }
