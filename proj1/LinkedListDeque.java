@@ -2,10 +2,12 @@ public class LinkedListDeque<T> {
 
     private static class ListNode<T> {
         public T item;
+        public ListNode prev;
         public ListNode next;
 
-        public ListNode(T item, ListNode next) {
+        public ListNode(T item,  ListNode prev, ListNode next) {
             this.item = item;
+            this.prev = prev;
             this.next = next;
         }
     }
