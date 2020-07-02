@@ -72,18 +72,14 @@ public class LinkedListDeque<T> implements Deque<T> {
      * This method should be deleted and migrated to Deque.java
      */
     public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.size == 0 ? true : false;
     }
 
     /**
      * Returns the number of items in the deque.
      */
     public int size() {
-        return size;
+        return this.size;
     }
 
     /**
