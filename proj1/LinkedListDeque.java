@@ -1,9 +1,9 @@
 public class LinkedListDeque<T> {
-
+    private T placeholder;
     /**
      * Adds an item of type T to the front of the deque.
      */
-    public void addFirst(T item){
+    public void addFirst(T item) {
 
     }
 
@@ -19,22 +19,22 @@ public class LinkedListDeque<T> {
      * Returns true if deque is empty, false otherwise.
      * This method should be deleted and migrated to Deque.java
      */
-    public boolean isEmpty(){
-
+    public boolean isEmpty() {
+        return false;
     }
 
     /**
      * Returns the number of items in the deque.
      */
     public int size() {
-
+        return 0;
     }
 
     /**
      * Prints the items in the deque from first to last, separated by a space.
      * Once all the items have been printed, print out a new line.
      */
-    public void printDeque(){
+    public void printDeque() {
 
     }
 
@@ -42,8 +42,8 @@ public class LinkedListDeque<T> {
      * Removes and returns the item at the front of the deque.
      * If no such item exists, returns null
      */
-    public T removeFirst(){
-
+    public T removeFirst() {
+        return this.placeholder;
     }
 
     /**
@@ -51,7 +51,7 @@ public class LinkedListDeque<T> {
      * If no such item exists, returns null
      */
     public T removeLast() {
-
+        return this.placeholder;
     }
 
     /**
@@ -59,22 +59,22 @@ public class LinkedListDeque<T> {
      * 1 is the next item, and so forth. If no such item exists,
      * returns null. Must not alter the deque
      */
-    public T get(int index){
-
+    public T get(int index) {
+        return this.placeholder;
     }
 
     /**
      * Constructor which creates an empty linked list deque
      */
-    public LinkedListDeque(){
+    public LinkedListDeque() {
 
     }
 
     /**
      * Same as get, but this method should be implemented using recursion
      */
-    public T getRecursive(int index){
-
+    public T getRecursive(int index) {
+        return this.placeholder;
     }
 
 
