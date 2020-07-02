@@ -4,7 +4,9 @@ import static org.junit.Assert.*;
 public class ArrayDequeTest {
 
     @Test
-    public void yourTestHere() {
+    public void arrayLengthTest() {
 
+        ArrayDeque<String> strArray = new ArrayDeque<>();
+        assertEquals(8, strArray.size());
     }
 }

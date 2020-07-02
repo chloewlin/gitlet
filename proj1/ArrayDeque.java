@@ -1,9 +1,21 @@
-public class ArrayDeque<T> implements Deque<T> {
+import java.util.Objects;
 
+public class ArrayDeque<T> implements Deque<T> {
+    private T placeholder;
     private int size;
     private int frontIndex;
     private int backIndex;
-    private T[] Array;
+    private T[] array;
+
+    /**
+     *Creates an empty array deque, again the starting size should be 8
+     */
+    public ArrayDeque(){
+        this.array = (T[]) new Object[8];
+        this.size = this.array.length;
+    }
+
+
     /**
      * Adds an item of type T to the front of the deque.
      */
@@ -35,7 +47,7 @@ public class ArrayDeque<T> implements Deque<T> {
      * Returns the number of items in the deque.
      */
     public int size() {
-        return size;
+        return this.size;
     }
 
     /**
@@ -71,10 +83,4 @@ public class ArrayDeque<T> implements Deque<T> {
         return this.placeholder;
     }
 
-    /**
-     *Creates an empty array deque, again the starting size should be 8
-     */
-    public ArrayDeque(){
-
-    }
 }
