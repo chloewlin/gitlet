@@ -100,7 +100,17 @@ public class LinkedListDeque<T> implements Deque<T> {
      * If no such item exists, returns null
      */
     public T removeFirst() {
-        return this.placeholder;
+        if (this.isEmpty()) {
+            return null;
+        }
+        Node oldHead = this.sentinel.next;
+        this.sentinel.next = oldHead.next;
+        Node newHead = this.sentinel.next;
+        newHead.prev = this.sentinel;
+        oldHead.next = null;
+        oldHead.prev = null;
+        this.size--;
+        return (T)oldHead.item;
     }
 
     /**

@@ -60,7 +60,7 @@ public class LinkedListDequeTest {
     public void addRemoveTest() {
         System.out.println("Running add/remove test.");
         System.out.println("Make sure to uncomment the lines below (and delete this line).");
-        /*
+
         LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
 
         try {
@@ -71,10 +71,13 @@ public class LinkedListDequeTest {
 
             lld1.removeFirst();
             assertTrue(lld1.isEmpty());
+
+            lld1.addFirst(10);
+            assertFalse(lld1.isEmpty());
         } finally {
             System.out.println("Printing out deque: ");
             lld1.printDeque();
         }
-        */
+
     }
 }
