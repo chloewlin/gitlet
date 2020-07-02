@@ -137,7 +137,16 @@ public class LinkedListDeque<T> implements Deque<T> {
      * returns null. Must not alter the deque
      */
     public T get(int index) {
-        return this.placeholder;
+        if (this.isEmpty() || (index > this.size - 1) || (index < 0)) {
+            return null;
+        }
+        int count = 0;
+        Node curr = this.sentinel.next;
+        while (count != index) {
+            curr = curr.next;
+            count++;
+        }
+        return (T)curr.item;
     }
 
 
