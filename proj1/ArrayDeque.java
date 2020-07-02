@@ -1,6 +1,9 @@
 public class ArrayDeque<T> implements Deque<T> {
-    private T placeholder;
+
     private int size;
+    private int frontIndex;
+    private int backIndex;
+    private T[] Array;
     /**
      * Adds an item of type T to the front of the deque.
      */
