@@ -24,11 +24,11 @@ public class LinkedListDequeTest {
             assertEquals(1, lld1.size());
             assertFalse(lld1.isEmpty());
 
-//            lld1.addLast("middle");
-//            assertEquals(2, lld1.size());
-//
-//            lld1.addLast("back");
-//            assertEquals(3, lld1.size());
+            lld1.addLast("middle");
+            assertEquals(2, lld1.size());
+
+            lld1.addLast("back");
+            assertEquals(3, lld1.size());
 
         } finally {
             // The deque will be printed at the end of this test
@@ -49,6 +49,10 @@ public class LinkedListDequeTest {
         assertFalse(lld1.isEmpty());
         lld1.addFirst(2);
         assertEquals(2, lld1.size());
+        lld1.addLast(3);
+        assertEquals(3, lld1.size());
+        lld1.addLast(4);
+        assertEquals(4, lld1.size());
     }
 
     /** Adds an item, then removes an item, and ensures that deque is empty afterwards. */
