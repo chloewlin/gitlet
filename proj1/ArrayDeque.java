@@ -1,5 +1,6 @@
 public class ArrayDeque<T> {
     private T placeholder;
+    private int size;
     /**
      * Adds an item of type T to the front of the deque.
      */
@@ -20,14 +21,18 @@ public class ArrayDeque<T> {
      * This method should be deleted and migrated to Deque.java
      */
     public boolean isEmpty() {
-        return false;
+        if (size == 0) {
+            return true;
+        }else {
+            return false;
+        }
     }
 
     /**
      * Returns the number of items in the deque.
      */
     public int size() {
-        return 0;
+        return size;
     }
 
     /**

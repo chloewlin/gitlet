@@ -34,14 +34,18 @@ public class LinkedListDeque<T> {
      * This method should be deleted and migrated to Deque.java
      */
     public boolean isEmpty() {
-        return false;
+        if (size == 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
      * Returns the number of items in the deque.
      */
     public int size() {
-        return 0;
+        return size;
     }
 
     /**
