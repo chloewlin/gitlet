@@ -2,8 +2,70 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
-/** Performs some basic linked list tests. */
+
 public class LinkedListDequeTest {
+
+    private static class Obj<T> {
+        public int item;
+        public static String string = new String("object");
+
+        public Obj(int item) {
+            this.item = item;
+        }
+    }
+
+    /** ensure all the methods work for doubles */
+    @Test
+    public void typeDoubleTest() {
+        LinkedListDeque<Double> doubles = new LinkedListDeque<>();
+
+        assertTrue(doubles.isEmpty());
+        doubles.addFirst(0.0012);
+        assertEquals(1, doubles.size());
+        double value = doubles.get(0);
+        assertEquals(0.0012, value, 0.0002);
+    }
+
+    /** ensure all the methods work for booleans */
+    @Test
+    public void typeBooleanTest() {
+        LinkedListDeque<Boolean> booleans = new LinkedListDeque<>();
+
+        assertTrue(booleans.isEmpty());
+        booleans.addFirst(true);
+        assertEquals(1, booleans.size());
+        assertTrue(booleans.get(0));
+        booleans.addLast(true);
+        booleans.addLast(false);
+        assertFalse(booleans.getRecursive(2));
+        booleans.removeFirst();
+        booleans.removeLast();
+        assertEquals(1, booleans.size());
+        assertNull(booleans.get(-5));
+        assertNull(booleans.get(100));
+    }
+
+    /** ensure all the methods work for generic objects */
+    @Test
+    public void typeObjTest() {
+        LinkedListDeque<Obj> objects = new LinkedListDeque<>();
+
+        assertTrue(objects.isEmpty());
+        objects.addFirst(new Obj(99));
+        assertEquals(1, objects.size());
+        Obj value = objects.get(0);
+        assertEquals(99, value.item);
+        assertEquals("object", value.string);
+        objects.addLast(new Obj(199));
+        objects.addLast(new Obj(1999));
+        objects.addLast(new Obj(19999));
+        Obj removedLast1 = objects.removeLast();
+        assertEquals(19999, removedLast1.item);
+        Obj removedFirst1 = objects.removeFirst();
+        assertEquals(99, removedFirst1.item);
+        assertNull(objects.get(-5));
+        assertNull(objects.get(100));
+    }
 
     /** Adds a few things to the deque, checking isEmpty() and size() are correct,
      * finally printing the results. */
@@ -39,7 +101,7 @@ public class LinkedListDequeTest {
         }
     }
 
-    /** Adds an item while the list is not empty*/
+    /** add items with addFirst() and addLast(), ensure size() is correct */
     @Test
     public void addIsNotEmptySizeTest() {
         LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
@@ -56,9 +118,9 @@ public class LinkedListDequeTest {
         assertEquals(4, lld1.size());
     }
 
-    /** Adds an item, then removes an item, and ensures that deque is empty afterwards. */
+    /** add item with addFirst() and addLast(), remove item with removeFirst() and removeLast(), ensure size() is correct */
     @Test
-    public void addRemoveTest() {
+    public void addAndRemoveIntegerTest() {
         System.out.println("Running add/remove test.");
         System.out.println("Make sure to uncomment the lines below (and delete this line).");
 
@@ -131,7 +193,8 @@ public class LinkedListDequeTest {
             nums.printDeque();
         }
     }
-    /** get the item at the given index */
+
+    /** get the item at the given index recursively */
     @Test
     public void getRecursiveTest() {
         LinkedListDeque<Integer> nums = new LinkedListDeque<>();
@@ -151,28 +214,28 @@ public class LinkedListDequeTest {
             nums.addLast(4);
 
             assertEquals(0, (int) nums.getRecursive(0));
-//            assertEquals(1, (int) nums.getRecursive(1));
-//            assertEquals(2, (int) nums.getRecursive(2));
-//            assertEquals(3, (int) nums.getRecursive(3));
-//            assertEquals(4, (int) nums.getRecursive(4));
+            assertEquals(1, (int) nums.getRecursive(1));
+            assertEquals(2, (int) nums.getRecursive(2));
+            assertEquals(3, (int) nums.getRecursive(3));
+            assertEquals(4, (int) nums.getRecursive(4));
 
-//            int removedFirst1 = nums.removeFirst();
-//            assertEquals("removedLast() should return the item removed", 0, removedFirst1);
-//            assertEquals("removeFirst() should remove from the front", 1, (int) nums.getRecursive(0));
-//
-//            int removedLast2 = nums.removeLast();
-//            assertEquals("removeLast() should remove from the back", 3, (int) nums.getRecursive(2));
-//            assertEquals("removeLast() should reduce size by 1", 3, nums.size());
-//
-//            int removedLast3 = nums.removeLast();
-//            assertEquals("removeLast() should return the item removed", 3, removedLast3);
-//
-//            int removedFirst2 = nums.removeFirst();
-//            assertEquals("removedLast() should return the item removed", 1, removedFirst2);
-//            nums.removeLast();
-//
-//            assertEquals(0, nums.size());
-//            assertEquals("removeFirst() return null when the deque is empty", null, nums.removeFirst());
+            int removedFirst1 = nums.removeFirst();
+            assertEquals("removedLast() should return the item removed", 0, removedFirst1);
+            assertEquals("removeFirst() should remove from the front", 1, (int) nums.getRecursive(0));
+
+            int removedLast2 = nums.removeLast();
+            assertEquals("removeLast() should remove from the back", 3, (int) nums.getRecursive(2));
+            assertEquals("removeLast() should reduce size by 1", 3, nums.size());
+
+            int removedLast3 = nums.removeLast();
+            assertEquals("removeLast() should return the item removed", 3, removedLast3);
+
+            int removedFirst2 = nums.removeFirst();
+            assertEquals("removedLast() should return the item removed", 1, removedFirst2);
+            nums.removeLast();
+
+            assertEquals(0, nums.size());
+            assertEquals("removeFirst() return null when the deque is empty", null, nums.removeFirst());
         } finally {
             System.out.println("Printing out deque: ");
             nums.printDeque();
