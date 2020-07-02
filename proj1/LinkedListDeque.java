@@ -32,8 +32,6 @@ public class LinkedListDeque<T> implements Deque<T> {
         this.size++;
     }
 
-
-     // s -> 0 -> 1 - > 2
     /**
      * Adds an item of type T to the front of the deque.
      */
@@ -50,12 +48,23 @@ public class LinkedListDeque<T> implements Deque<T> {
         this.size++;
     }
 
-
     /**
      * Adds an item of type T to the back of the deque.
      */
     public void addLast(T item) {
-
+        Node last = new Node(item, null, null);
+        if (this.size == 0) {
+            last.prev = this.sentinel;
+            last.next = this.sentinel;
+            this.sentinel.prev = last;
+            this.sentinel.next = last;
+        } else {
+            last.next = this.sentinel;
+            last.prev = this.sentinel.prev;
+            this.sentinel.prev.next = last;
+            this.sentinel.prev = last;
+        }
+        this.size++;
     }
 
     /**
