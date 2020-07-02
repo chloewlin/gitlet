@@ -154,6 +154,18 @@ public class LinkedListDeque<T> implements Deque<T> {
      * Same as get, but this method should be implemented using recursion
      */
     public T getRecursive(int index) {
-        return this.placeholder;
+        if (this.isEmpty() || (index > this.size - 1) || (index < 0)) {
+            return null;
+        } else {
+            return getRecursiveHelper(this.sentinel.next, index);
+        }
+    }
+
+    private T getRecursiveHelper(Node node, int count) {
+        if (count == 0) {
+            return (T)node.item;
+        } else {
+            return getRecursiveHelper(node.next,  count--);
+        }
     }
 }
