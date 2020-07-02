@@ -87,7 +87,12 @@ public class LinkedListDeque<T> implements Deque<T> {
      * Once all the items have been printed, print out a new line.
      */
     public void printDeque() {
-
+        Node node = sentinel.next;
+        while (!node.equals(sentinel)) {
+            System.out.print(node.item + " ");
+            node = node.next;
+        }
+        System.out.println("");
     }
 
     /**
