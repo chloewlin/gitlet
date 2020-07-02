@@ -118,7 +118,17 @@ public class LinkedListDeque<T> implements Deque<T> {
      * If no such item exists, returns null
      */
     public T removeLast() {
-        return this.placeholder;
+        if (this.isEmpty()) {
+            return null;
+        }
+        Node oldTail = this.sentinel.prev;
+        this.sentinel.prev = oldTail.prev;
+        Node newTail = this.sentinel.prev;
+        newTail.next = this.sentinel;
+        oldTail.next = null;
+        oldTail.prev = null;
+        this.size--;
+        return (T)oldTail.item;
     }
 
     /**
