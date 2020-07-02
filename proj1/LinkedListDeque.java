@@ -1,5 +1,19 @@
 public class LinkedListDeque<T> {
+
+    private static class ListNode<T> {
+        public T item;
+        public ListNode next;
+
+        public ListNode(T item, ListNode next) {
+            this.item = item;
+            this.next = next;
+        }
+    }
+
     private T placeholder;
+    private ListNode sentinel;
+    private int size;
+
     /**
      * Adds an item of type T to the front of the deque.
      */
