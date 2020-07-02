@@ -1,11 +1,11 @@
-public class LinkedListDeque<T> {
+public class LinkedListDeque<T> implements Deque<T> {
 
-    private static class TNode<T> {
+    private static class Node<T> {
         public T item;
-        public TNode prev;
-        public TNode next;
+        public Node prev;
+        public Node next;
 
-        public TNode(T item,  TNode prev, TNode next) {
+        public Node(T item,  Node prev, Node next) {
             this.item = item;
             this.prev = prev;
             this.next = next;
@@ -13,31 +13,40 @@ public class LinkedListDeque<T> {
     }
 
     private T placeholder;
-    private TNode sentinel;
+    private Node sentinel;
     private int size;
 
     /** Constructor which creates an empty linked list deque */
     public LinkedListDeque() {
-        this.sentinel = new TNode(42, null, null);
+        this.sentinel = new Node(42, null, null);
         this.sentinel.prev = this.sentinel;
         this.sentinel.next = this.sentinel;
         this.size = 0;
     }
 
     public LinkedListDeque(T item) {
-        this.sentinel = new TNode(42, null, null);
-        this.sentinel.next = new TNode(item, null, null);
-        this.sentinel.next.next = this.sentinel;
+        this.sentinel = new Node(42, null, null);
+        Node newNode = new Node(item, this.sentinel, this.sentinel);
+        this.sentinel.next = newNode;
+        this.sentinel.prev = newNode;
         this.size++;
     }
 
+
+     // s -> 0 -> 1 - > 2
     /**
      * Adds an item of type T to the front of the deque.
      */
     public void addFirst(T item) {
-        TNode first = new TNode(item, sentinel, sentinel.next);
-        first.next.prev = first;
-        first.prev.next = first;
+        Node first = new Node(item, this.sentinel, null);
+        if (this.size == 0) {
+            first.next = this.sentinel;
+            this.sentinel.prev = first;
+        } else {
+            first.next = this.sentinel.next;
+            this.sentinel.next.prev = first;
+        }
+        this.sentinel.next = first;
         this.size++;
     }
 
