@@ -16,14 +16,19 @@ public class LinkedListDeque<T> {
     private ListNode sentinel;
     private int size;
 
-    /**
-     * Constructor which creates an empty linked list deque
-     */
+    /** Constructor which creates an empty linked list deque */
     public LinkedListDeque() {
         this.sentinel = new ListNode(42, null, null);
         this.sentinel.prev = this.sentinel;
         this.sentinel.next = this.sentinel;
-        size = 0;
+        this.size = 0;
+    }
+
+    public LinkedListDeque(T item) {
+        this.sentinel = new ListNode(42, null, null);
+        this.sentinel.next = new ListNode(item, null, null);
+        this.sentinel.next.next = this.sentinel;
+        this.size++;
     }
 
     /**
