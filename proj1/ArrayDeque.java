@@ -24,7 +24,7 @@ public class ArrayDeque<T> implements Deque<T> {
         if (this.get(0) == null) {
             this.array[0] = item;
         } else if (this.get(0) != null) {
-            for (int i = this.array.length - 1; i > this.backIndex; i--) {
+            for (int i = this.array.length - 1; i >= this.backIndex; i--) {
                 if (this.get(i) == null) {
                     this.array[i] = item;
                     this.frontIndex = i;
