@@ -1,7 +1,6 @@
 import java.util.Objects;
 
 public class ArrayDeque<T> implements Deque<T> {
-    private T placeholder;
     private int size;
     private int frontIndex;
     private int backIndex;
@@ -111,7 +110,18 @@ public class ArrayDeque<T> implements Deque<T> {
      * If no such item exists, returns null
      */
     public T removeLast() {
-        return this.placeholder;
+        if (this.array[this.backIndex] == null) {
+            return null;
+        } else {
+            T backValue = this.array[this.backIndex];
+            this.array[this.backIndex] = null;
+            if (this.backIndex == 0) {
+                this.backIndex = this.array.length - 1;
+            } else {
+                this.backIndex = this.backIndex - 1;
+            }
+            return backValue;
+        }
     }
 
     /**
