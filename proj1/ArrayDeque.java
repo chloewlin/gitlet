@@ -13,6 +13,8 @@ public class ArrayDeque<T> implements Deque<T> {
     public ArrayDeque(){
         this.array = (T[]) new Object[8];
         this.size = this.array.length;
+        this.frontIndex = 0;
+        this.backIndex = 1;
     }
 
 
@@ -20,7 +22,17 @@ public class ArrayDeque<T> implements Deque<T> {
      * Adds an item of type T to the front of the deque.
      */
     public void addFirst(T item) {
-
+        if (this.get(0) == null) {
+            this.array[0] = item;
+        } else if (this.get(0) != null) {
+            for (int i = this.array.length - 1; i > this.backIndex; i--) {
+                if (this.get(i) == null) {
+                    this.array[i] = item;
+                    this.frontIndex = i;
+                    break;
+                }
+            }
+        }
     }
 
 
@@ -55,7 +67,10 @@ public class ArrayDeque<T> implements Deque<T> {
      * Once all the items have been printed, print out a new line.
      */
     public void printDeque() {
-
+        for (int i = 0; i < this.array.length; i++) {
+            System.out.print(this.get(i) + " ");
+        }
+        System.out.println(" ");
     }
 
     /**
@@ -80,7 +95,10 @@ public class ArrayDeque<T> implements Deque<T> {
      * returns null. Must not alter the deque
      */
     public T get(int index) {
-        return this.placeholder;
+        if (index > this.array.length - 1 || index < 0) {
+            return null;
+        }
+        return this.array[index];
     }
 
 }
