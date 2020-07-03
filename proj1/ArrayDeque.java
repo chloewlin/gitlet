@@ -62,9 +62,9 @@ public class ArrayDeque<T> implements Deque<T> {
      */
     public void printDeque() {
         for (int i = 0; i < this.arrayLength; i++) {
-//            if (this.array[i] != null) {
+            if (this.array[i] != null) {
                 System.out.print(this.get(i) + " ");
-//            }
+            }
         }
         System.out.println(" ");
     }
@@ -96,18 +96,21 @@ public class ArrayDeque<T> implements Deque<T> {
      * If no such item exists, returns null
      */
     public T removeLast() {
-        if (this.array[this.nextBack] == null) {
+        T backValue = null;
+        if (this.isEmpty()) {
             return null;
-        } else {
-            T nextBackValue = this.array[this.nextBack];
-            this.array[this.nextBack] = null;
-            if (this.nextBack == 0) {
-                this.nextBack = this.array.length - 1;
-            } else {
-                this.nextBack = this.nextBack - 1;
-            }
-            return nextBackValue;
         }
+        if (this.nextBack == 0) {
+            backValue = this.array[this.arrayLength - 1];
+            this.array[this.arrayLength - 1] = null;
+            this.nextBack = 0;
+        } else {
+            backValue = this.array[this.nextBack - 1];
+            this.array[this.nextBack - 1] = null;
+            this.nextBack = (this.nextBack - 1) % this.array.length;
+        }
+        this.size--;
+        return backValue;
     }
 
     /**

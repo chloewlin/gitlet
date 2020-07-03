@@ -76,6 +76,7 @@ public class ArrayDequeTest {
             strArray2.addLast("B");
         }
         assertEquals("B", strArray2.removeLast());
+        assertEquals(7, strArray2.size());
         assertEquals(null, strArray2.get(0));
         assertEquals("B", strArray2.removeLast());
         assertEquals(null, strArray2.get(7));
