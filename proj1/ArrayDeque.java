@@ -40,6 +40,20 @@ public class ArrayDeque<T> implements Deque<T> {
      * Adds an item of type T to the back of the deque.
      */
     public void addLast(T item) {
+        if (this.get(1) == null) {
+            this.array[1] = item;
+
+//        if (this.backIndex == this.array.length - 1 && ) {
+
+        } else if (this.get(1) != null) {
+            for (int i = 2; i < this.array.length; i++) {
+                if (this.get(i) == null) {
+                    this.array[i] = item;
+                    this.backIndex = i;
+                    break;
+                }
+            }
+        }
 
     }
 

@@ -20,4 +20,16 @@ public class ArrayDequeTest {
         strArray.addFirst("two");
         strArray.printDeque();
     }
+
+    @Test
+    public void addLastTest() {
+        ArrayDeque<String> strArray = new ArrayDeque<>();
+        assertEquals(8, strArray.size());
+        strArray.addLast("zero");
+        strArray.printDeque();
+        strArray.addLast("one");
+        strArray.printDeque();
+        strArray.addLast("two");
+        strArray.printDeque();
+    }
 }
