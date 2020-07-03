@@ -5,7 +5,6 @@ public class ArrayDeque<T> implements Deque<T> {
     private int nextFront;
     private int nextBack;
     private T[] array;
-    private int arrayLength;
 
     /**
      *Creates an empty array deque, again the starting size should be 8
@@ -15,17 +14,31 @@ public class ArrayDeque<T> implements Deque<T> {
         this.size = 0;
         this.nextFront = 0;
         this.nextBack = 1;
-        this.arrayLength = this.array.length;
+    }
+
+    /**
+     * Resizes array
+     */
+    private void resize(int capacity) {
+        T[] a = (T[]) new Object[capacity];
+        System.arraycopy(this.array, 0, a, 0, this.size);
+        this.array = a;
+        this.nextFront = this.array.length - 1;
+        this.nextBack = this.size;
     }
 
     /**
      * Adds an item of type T to the nextFront of the deque.
      */
     public void addFirst(T item) {
-        if (this.size < this.arrayLength) {
+        if (this.size == this.array.length) {
+            resize(this.array.length * 2);
+        }
+
+        if (this.size < this.array.length) {
             this.array[this.nextFront] = item;
             this.size++;
-            this.nextFront = (this.nextFront - 1 + this.arrayLength) % this.arrayLength;
+            this.nextFront = (this.nextFront - 1 + this.array.length) % this.array.length;
         }
     }
 
@@ -34,10 +47,10 @@ public class ArrayDeque<T> implements Deque<T> {
      * Adds an item of type T to the nextBack of the deque.
      */
     public void addLast(T item) {
-        if (this.size < this.arrayLength) {
+        if (this.size < this.array.length) {
             this.array[this.nextBack] = item;
             this.size++;
-            this.nextBack = (this.nextBack + 1) % this.arrayLength;
+            this.nextBack = (this.nextBack + 1) % this.array.length;
         }
     }
 
@@ -61,10 +74,10 @@ public class ArrayDeque<T> implements Deque<T> {
      * Once all the items have been printed, print out a new line.
      */
     public void printDeque() {
-        for (int i = 0; i < this.arrayLength; i++) {
-            if (this.array[i] != null) {
+        for (int i = 0; i < this.array.length; i++) {
+//            if (this.array[i] != null) {
                 System.out.print(this.get(i) + " ");
-            }
+//            }
         }
         System.out.println(" ");
     }
@@ -78,7 +91,7 @@ public class ArrayDeque<T> implements Deque<T> {
         if (this.isEmpty()) {
             return null;
         }
-        if (this.nextFront == this.arrayLength - 1) {
+        if (this.nextFront == this.array.length - 1) {
             frontValue = this.array[0];
             this.array[0] = null;
             this.nextFront = 0;
@@ -101,8 +114,8 @@ public class ArrayDeque<T> implements Deque<T> {
             return null;
         }
         if (this.nextBack == 0) {
-            backValue = this.array[this.arrayLength - 1];
-            this.array[this.arrayLength - 1] = null;
+            backValue = this.array[this.array.length - 1];
+            this.array[this.array.length - 1] = null;
             this.nextBack = 0;
         } else {
             backValue = this.array[this.nextBack - 1];

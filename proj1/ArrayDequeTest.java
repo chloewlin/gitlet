@@ -81,4 +81,14 @@ public class ArrayDequeTest {
         assertEquals("B", strArray2.removeLast());
         assertEquals(null, strArray2.get(7));
     }
+
+    @Test
+    public void resizeArrayTest() {
+        ArrayDeque<String> strArray = new ArrayDeque<>();
+        for (int i = 0; i < 10; i++) {
+            strArray.addFirst("F");
+        }
+        assertEquals(10, strArray.size());
+        assertEquals("F", strArray.get(7));
+    }
 }
