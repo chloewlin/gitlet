@@ -2,8 +2,8 @@ import java.util.Objects;
 
 public class ArrayDeque<T> implements Deque<T> {
     private int size;
-    private int frontIndex;
-    private int backIndex;
+    private int front;
+    private int back;
     private T[] array;
 
     /**
@@ -12,10 +12,9 @@ public class ArrayDeque<T> implements Deque<T> {
     public ArrayDeque(){
         this.array = (T[]) new Object[8];
         this.size = this.array.length;
-        this.frontIndex = 0;
-        this.backIndex = 1;
+        this.front = 0;
+        this.back = 1;
     }
-
 
     /**
      * Adds an item of type T to the front of the deque.
@@ -25,21 +24,21 @@ public class ArrayDeque<T> implements Deque<T> {
         if (this.get(0) == null) {
             this.array[0] = item;
         } else if (this.get(0) != null) {
-            for (int i = currLength - 1; i >= this.backIndex; i--) {
+            for (int i = currLength - 1; i >= this.back; i--) {
                 if (this.get(i) == null) {
                     this.array[i] = item;
-                    this.frontIndex = i;
+                    this.front = i;
                     break;
                 }
             }
-            if (this.frontIndex - this.backIndex == 1 ||
-                    this.backIndex - this.frontIndex == currLength - 1) {
+            if (this.front - this.back == 1 ||
+                    this.back - this.front == currLength - 1) {
 
                 T[] expanded = (T[]) new Object[currLength * 2];
 
 //                 for (int i = 0; i < 8; i++) {
-//                     expanded[i] = this.array[this.frontIndex];
-//                     this.frontIndex++;
+//                     expanded[i] = this.array[this.front];
+//                     this.front++;
 //
 //                 }
                 //front -> back do right copying/
@@ -55,14 +54,14 @@ public class ArrayDeque<T> implements Deque<T> {
     public void addLast(T item) {
         if (this.get(1) == null) {
             this.array[1] = item;
-        } else if (this.get(0) == null && this.backIndex == this.array.length - 1) {
+        } else if (this.get(0) == null && this.back == this.array.length - 1) {
             this.array[0] = item;
-            this.backIndex = 0;
+            this.back = 0;
         } else if (this.get(1) != null) {
             for (int i = 2; i < this.array.length; i++) {
                 if (this.get(i) == null) {
                     this.array[i] = item;
-                    this.backIndex = i;
+                    this.back = i;
                     break;
                 }
             }
@@ -75,11 +74,7 @@ public class ArrayDeque<T> implements Deque<T> {
      * This method should be deleted and migrated to Deque.java
      */
     public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        }else {
-            return false;
-        }
+        return this.size == 0;
     }
 
     /**
@@ -105,15 +100,15 @@ public class ArrayDeque<T> implements Deque<T> {
      * If no such item exists, returns null
      */
     public T removeFirst() {
-        if (this.array[this.frontIndex] == null) {
+        if (this.array[this.front] == null) {
             return null;
         } else {
-            T frontValue = this.array[this.frontIndex];
-            this.array[this.frontIndex] = null;
-            if (this.frontIndex == this.array.length - 1) {
-                this.frontIndex = 0;
+            T frontValue = this.array[this.front];
+            this.array[this.front] = null;
+            if (this.front == this.array.length - 1) {
+                this.front = 0;
             } else {
-                this.frontIndex = this.frontIndex + 1;
+                this.front = this.front + 1;
             }
             return frontValue;
         }
@@ -124,15 +119,15 @@ public class ArrayDeque<T> implements Deque<T> {
      * If no such item exists, returns null
      */
     public T removeLast() {
-        if (this.array[this.backIndex] == null) {
+        if (this.array[this.back] == null) {
             return null;
         } else {
-            T backValue = this.array[this.backIndex];
-            this.array[this.backIndex] = null;
-            if (this.backIndex == 0) {
-                this.backIndex = this.array.length - 1;
+            T backValue = this.array[this.back];
+            this.array[this.back] = null;
+            if (this.back == 0) {
+                this.back = this.array.length - 1;
             } else {
-                this.backIndex = this.backIndex - 1;
+                this.back = this.back - 1;
             }
             return backValue;
         }
@@ -149,5 +144,4 @@ public class ArrayDeque<T> implements Deque<T> {
         }
         return this.array[index];
     }
-
 }
