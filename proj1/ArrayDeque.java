@@ -92,7 +92,18 @@ public class ArrayDeque<T> implements Deque<T> {
      * If no such item exists, returns null
      */
     public T removeFirst() {
-        return this.placeholder;
+        if (this.array[this.frontIndex] == null) {
+            return null;
+        } else {
+            T frontValue = this.array[this.frontIndex];
+            this.array[this.frontIndex] = null;
+            if (this.frontIndex == this.array.length - 1) {
+                this.frontIndex = 0;
+            } else {
+                this.frontIndex = this.frontIndex + 1;
+            }
+            return frontValue;
+        }
     }
 
     /**

@@ -52,4 +52,26 @@ public class ArrayDequeTest {
         assertEquals("F", strArray.get(7));
         strArray.printDeque();
     }
+
+    @Test
+    public void removeFirstTest() {
+        ArrayDeque<String> strArray = new ArrayDeque<>();
+        assertEquals(8, strArray.size());
+        assertEquals(null, strArray.removeFirst());
+        strArray.printDeque();
+
+        ArrayDeque<String> strArray1 = new ArrayDeque<>();
+        assertEquals(8, strArray1.size());
+        strArray.addFirst("F");
+        assertEquals("F", strArray.removeFirst());
+        strArray.printDeque();
+
+        ArrayDeque<String> strArray3 = new ArrayDeque<>();
+        assertEquals(8, strArray1.size());
+        strArray.addFirst("F");
+        strArray.addLast("B");
+        strArray.addFirst("F");
+        assertEquals("F", strArray.removeFirst());
+        strArray.printDeque();
+    }
 }
