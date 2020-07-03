@@ -25,11 +25,31 @@ public class ArrayDequeTest {
     public void addLastTest() {
         ArrayDeque<String> strArray = new ArrayDeque<>();
         assertEquals(8, strArray.size());
-        strArray.addLast("zero");
+        strArray.addLast("0");
+        strArray.addLast("1");
+        strArray.addLast("2");
+        strArray.addLast("3");
+        strArray.addLast("4");
+        strArray.addLast("5");
+        strArray.addLast("6");
+        strArray.addLast("7");
         strArray.printDeque();
-        strArray.addLast("one");
-        strArray.printDeque();
-        strArray.addLast("two");
+    }
+
+    @Test
+    public void addFrontAndLastTest() {
+        ArrayDeque<String> strArray = new ArrayDeque<>();
+        assertEquals(8, strArray.size());
+        for (int i = 0; i < 8; i++) {
+            if (i % 2 == 0) {
+                strArray.addLast("B");
+            } else {
+                strArray.addFirst("F");
+            }
+        }
+        assertEquals("F", strArray.get(0));
+        assertEquals("B", strArray.get(1));
+        assertEquals("F", strArray.get(7));
         strArray.printDeque();
     }
 }

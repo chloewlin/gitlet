@@ -42,9 +42,9 @@ public class ArrayDeque<T> implements Deque<T> {
     public void addLast(T item) {
         if (this.get(1) == null) {
             this.array[1] = item;
-
-//        if (this.backIndex == this.array.length - 1 && ) {
-
+        } else if (this.get(0) == null && this.backIndex == this.array.length - 1) {
+            this.array[0] = item;
+            this.backIndex = 0;
         } else if (this.get(1) != null) {
             for (int i = 2; i < this.array.length; i++) {
                 if (this.get(i) == null) {
