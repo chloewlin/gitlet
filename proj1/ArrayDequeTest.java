@@ -51,6 +51,7 @@ public class ArrayDequeTest {
         strArray3.addFirst("F");
         strArray3.addLast("B");
         strArray3.addFirst("F");
+        strArray3.printDeque();
         assertEquals("F", strArray3.removeFirst());
 
         ArrayDeque<String> strArray4 = new ArrayDeque<>();

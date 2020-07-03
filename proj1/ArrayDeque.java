@@ -74,18 +74,21 @@ public class ArrayDeque<T> implements Deque<T> {
      * If no such item exists, returns null
      */
     public T removeFirst() {
-        if (this.array[this.nextFront] == null) {
+        T frontValue = null;
+        if (this.isEmpty()) {
             return null;
-        } else {
-            T nextFrontValue = this.array[this.nextFront];
-            this.array[this.nextFront] = null;
-            if (this.nextFront == this.array.length - 1) {
-                this.nextFront = 0;
-            } else {
-                this.nextFront = this.nextFront + 1;
-            }
-            return nextFrontValue;
         }
+        if (this.nextFront == this.arrayLength - 1) {
+            frontValue = this.array[0];
+            this.array[0] = null;
+            this.nextFront = 0;
+        } else {
+            frontValue = this.array[this.nextFront - 1];
+            this.array[this.nextFront - 1] = null;
+            this.nextFront = (this.nextFront + 1) % this.array.length;
+        }
+        this.size--;
+        return frontValue;
     }
 
     /**
