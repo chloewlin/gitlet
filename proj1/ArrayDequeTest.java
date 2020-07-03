@@ -74,4 +74,26 @@ public class ArrayDequeTest {
         assertEquals("F", strArray.removeFirst());
         strArray.printDeque();
     }
+
+    @Test
+    public void removeLastTest() {
+        ArrayDeque<String> strArray = new ArrayDeque<>();
+        assertEquals(8, strArray.size());
+        assertEquals(null, strArray.removeLast());
+
+        ArrayDeque<String> strArray1 = new ArrayDeque<>();
+        assertEquals(8, strArray1.size());
+        strArray1.addLast("B");
+        assertEquals("B", strArray1.removeLast());
+
+        ArrayDeque<String> strArray2 = new ArrayDeque<>();
+        assertEquals(8, strArray2.size());
+        for (int i = 0; i < 8; i++) {
+            strArray2.addLast("B");
+        }
+        assertEquals("B", strArray2.removeLast());
+        assertEquals(null, strArray2.get(0));
+        assertEquals("B", strArray2.removeLast());
+        assertEquals(null, strArray2.get(7));
+    }
 }
