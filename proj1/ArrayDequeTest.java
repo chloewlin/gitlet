@@ -16,17 +16,11 @@ public class ArrayDequeTest {
 
     @Test
     public void addLastTest() {
-        ArrayDeque<String> strArray = new ArrayDeque<>();
-        assertEquals(8, strArray.size());
-        strArray.addLast("0");
-        strArray.addLast("1");
-        strArray.addLast("2");
-        strArray.addLast("3");
-        strArray.addLast("4");
-        strArray.addLast("5");
-        strArray.addLast("6");
-        strArray.addLast("7");
-        strArray.printDeque();
+        ArrayDeque<Integer> nums = new ArrayDeque<>();
+        for (int i = 0; i < 8; i++) {
+            nums.addLast(i);
+        }
+        nums.printDeque();
     }
 
     @Test
