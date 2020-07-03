@@ -90,5 +90,13 @@ public class ArrayDequeTest {
         }
         assertEquals(10, strArray.size());
         assertEquals("F", strArray.get(7));
+
+        ArrayDeque<String> strArray1 = new ArrayDeque<>();
+        for (int i = 0; i < 10; i++) {
+            strArray1.addLast("B");
+        }
+        assertEquals(10, strArray1.size());
+        assertEquals("B", strArray1.get(7));
+        assertEquals("B", strArray1.get(9));
     }
 }

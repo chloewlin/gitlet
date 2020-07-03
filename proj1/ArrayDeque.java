@@ -1,6 +1,7 @@
 import java.util.Objects;
 
 public class ArrayDeque<T> implements Deque<T> {
+//    private float R;
     private int size;
     private int nextFront;
     private int nextBack;
@@ -47,6 +48,10 @@ public class ArrayDeque<T> implements Deque<T> {
      * Adds an item of type T to the nextBack of the deque.
      */
     public void addLast(T item) {
+        if (this.size == this.array.length) {
+            resize(this.array.length * 2);
+        }
+
         if (this.size < this.array.length) {
             this.array[this.nextBack] = item;
             this.size++;
