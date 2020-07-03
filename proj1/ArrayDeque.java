@@ -62,9 +62,9 @@ public class ArrayDeque<T> implements Deque<T> {
      */
     public void printDeque() {
         for (int i = 0; i < this.arrayLength; i++) {
-            if (this.array[i] != null) {
+//            if (this.array[i] != null) {
                 System.out.print(this.get(i) + " ");
-            }
+//            }
         }
         System.out.println(" ");
     }
@@ -83,8 +83,8 @@ public class ArrayDeque<T> implements Deque<T> {
             this.array[0] = null;
             this.nextFront = 0;
         } else {
-            frontValue = this.array[this.nextFront - 1];
-            this.array[this.nextFront - 1] = null;
+            frontValue = this.array[this.nextFront + 1];
+            this.array[this.nextFront + 1] = null;
             this.nextFront = (this.nextFront + 1) % this.array.length;
         }
         this.size--;

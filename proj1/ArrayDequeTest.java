@@ -41,25 +41,25 @@ public class ArrayDequeTest {
     @Test
     public void removeFirstTest() {
         ArrayDeque<String> strArray = new ArrayDeque<>();
-        assertEquals(null, strArray.removeFirst());
+        assertEquals("should return null when array is emtpy", null, strArray.removeFirst());
 
         ArrayDeque<String> strArray1 = new ArrayDeque<>();
         strArray1.addFirst("F");
-        assertEquals("F", strArray1.removeFirst());
+        assertEquals("should return first item","F", strArray1.removeFirst());
 
         ArrayDeque<String> strArray3 = new ArrayDeque<>();
         strArray3.addFirst("F");
         strArray3.addLast("B");
         strArray3.addFirst("F");
         strArray3.printDeque();
-        assertEquals("F", strArray3.removeFirst());
+        assertEquals("should return first item", "F", strArray3.removeFirst());
 
         ArrayDeque<String> strArray4 = new ArrayDeque<>();
         for (int i = 0; i < 8; i++) {
             strArray4.addFirst("F");
         }
-        assertEquals("F", strArray4.removeFirst());
-        assertEquals(null, strArray4.get(1));
+        assertEquals("should return first item","F", strArray4.removeFirst());
+        assertEquals("should set item at old front to null",null, strArray4.get(1));
     }
 
     @Test
