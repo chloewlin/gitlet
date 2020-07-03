@@ -56,38 +56,36 @@ public class ArrayDequeTest {
     @Test
     public void removeFirstTest() {
         ArrayDeque<String> strArray = new ArrayDeque<>();
-        assertEquals(8, strArray.size());
         assertEquals(null, strArray.removeFirst());
-        strArray.printDeque();
 
         ArrayDeque<String> strArray1 = new ArrayDeque<>();
-        assertEquals(8, strArray1.size());
-        strArray.addFirst("F");
-        assertEquals("F", strArray.removeFirst());
-        strArray.printDeque();
+        strArray1.addFirst("F");
+        assertEquals("F", strArray1.removeFirst());
 
         ArrayDeque<String> strArray3 = new ArrayDeque<>();
-        assertEquals(8, strArray1.size());
-        strArray.addFirst("F");
-        strArray.addLast("B");
-        strArray.addFirst("F");
-        assertEquals("F", strArray.removeFirst());
-        strArray.printDeque();
+        strArray3.addFirst("F");
+        strArray3.addLast("B");
+        strArray3.addFirst("F");
+        assertEquals("F", strArray3.removeFirst());
+
+        ArrayDeque<String> strArray4 = new ArrayDeque<>();
+        for (int i = 0; i < 8; i++) {
+            strArray4.addFirst("F");
+        }
+        assertEquals("F", strArray4.removeFirst());
+        assertEquals(null, strArray4.get(1));
     }
 
     @Test
     public void removeLastTest() {
         ArrayDeque<String> strArray = new ArrayDeque<>();
-        assertEquals(8, strArray.size());
         assertEquals(null, strArray.removeLast());
 
         ArrayDeque<String> strArray1 = new ArrayDeque<>();
-        assertEquals(8, strArray1.size());
         strArray1.addLast("B");
         assertEquals("B", strArray1.removeLast());
 
         ArrayDeque<String> strArray2 = new ArrayDeque<>();
-        assertEquals(8, strArray2.size());
         for (int i = 0; i < 8; i++) {
             strArray2.addLast("B");
         }
