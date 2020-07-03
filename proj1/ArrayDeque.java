@@ -21,15 +21,29 @@ public class ArrayDeque<T> implements Deque<T> {
      * Adds an item of type T to the front of the deque.
      */
     public void addFirst(T item) {
+        int currLength = this.array.length;
         if (this.get(0) == null) {
             this.array[0] = item;
         } else if (this.get(0) != null) {
-            for (int i = this.array.length - 1; i >= this.backIndex; i--) {
+            for (int i = currLength - 1; i >= this.backIndex; i--) {
                 if (this.get(i) == null) {
                     this.array[i] = item;
                     this.frontIndex = i;
                     break;
                 }
+            }
+            if (this.frontIndex - this.backIndex == 1 ||
+                    this.backIndex - this.frontIndex == currLength - 1) {
+
+                T[] expanded = (T[]) new Object[currLength * 2];
+
+//                 for (int i = 0; i < 8; i++) {
+//                     expanded[i] = this.array[this.frontIndex];
+//                     this.frontIndex++;
+//
+//                 }
+                //front -> back do right copying/
+
             }
         }
     }
