@@ -7,26 +7,24 @@ public class ArrayDequeTest {
     public void addFirstTest() {
         ArrayDeque<String> strArray = new ArrayDeque<>();
         strArray.addFirst("zero");
-        strArray.printDeque();
         strArray.addFirst("one");
-        strArray.printDeque();
         strArray.addFirst("two");
-        strArray.printDeque();
+        assertEquals("Array size should be correctly incremented", 3, strArray.size());
     }
 
     @Test
     public void addLastTest() {
-        ArrayDeque<Integer> nums = new ArrayDeque<>();
+        ArrayDeque<Integer> numsArray = new ArrayDeque<>();
         for (int i = 0; i < 8; i++) {
-            nums.addLast(i);
+            numsArray.addLast(i);
         }
-        nums.printDeque();
+        assertEquals("Array size should be correctly incremented", 8, numsArray.size());
+        numsArray.printDeque();
     }
 
     @Test
-    public void addnextFrontAndLastTest() {
+    public void addNextFrontAndLastTest() {
         ArrayDeque<String> strArray = new ArrayDeque<>();
-        assertEquals(8, strArray.size());
         for (int i = 0; i < 8; i++) {
             if (i % 2 == 0) {
                 strArray.addLast("B");

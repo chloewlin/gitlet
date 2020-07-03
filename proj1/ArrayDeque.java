@@ -36,7 +36,7 @@ public class ArrayDeque<T> implements Deque<T> {
     public void addLast(T item) {
         if (this.size < this.arrayLength) {
             this.array[this.nextBack] = item;
-            this.size--;
+            this.size++;
             this.nextBack = (this.nextBack + 1) % this.arrayLength;
         }
     }
