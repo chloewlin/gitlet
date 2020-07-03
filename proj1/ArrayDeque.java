@@ -11,7 +11,7 @@ public class ArrayDeque<T> implements Deque<T> {
      */
     public ArrayDeque(){
         this.array = (T[]) new Object[8];
-        this.size = this.array.length;
+        this.size = 0;
         this.front = 0;
         this.back = 1;
     }
