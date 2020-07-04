@@ -179,7 +179,7 @@ public class ArrayDeque<T> implements Deque<T> {
             return null;
         }
         int frontIndex = addOne(this.nextFront);
-        int actualIndex = (frontIndex + index) % this.array.length;g
+        int actualIndex = (frontIndex + index) % this.array.length;
         return this.array[actualIndex];
     }
 }
