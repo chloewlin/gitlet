@@ -94,7 +94,7 @@ public class ArrayDeque<T> implements Deque<T> {
         for (int i = 0; i < this.array.length; i++) {
             System.out.print(this.array[i] + " ");
         }
-        System.out.println(" ");
+        System.out.println();
     }
 
     /**
