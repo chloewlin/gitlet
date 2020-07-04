@@ -82,10 +82,13 @@ public class ArrayDeque<T> implements Deque<T> {
      */
     public void printDeque() {
         int index = addOne(nextFront);
+        String result = new String();
         for (int i = 0; i < this.size; i++) {
-                System.out.print(this.array[index] + " ");
+                result += this.array[index] + " ";
                 index = addOne(index);
         }
+        result = result.trim();
+        System.out.print(result);
         System.out.println(" ");
     }
 
