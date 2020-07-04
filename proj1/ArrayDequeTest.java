@@ -98,14 +98,13 @@ public class ArrayDequeTest {
         assertEquals(10, strArray1.size());
         assertEquals("B", strArray1.get(7));
         assertEquals("B", strArray1.get(9));
-
     }
 
     @Test
     public void shrinkArrayTest() {
-        ArrayDeque<String> strArray = new ArrayDeque<>();
+        ArrayDeque strArray = new ArrayDeque();
         for (int i = 0; i < 5; i++) {
-            strArray.addFirst("F");
+            strArray.addFirst(  "F");
         }
         for (int i = 0; i < 5; i++) {
             strArray.addLast("B");

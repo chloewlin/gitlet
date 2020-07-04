@@ -94,8 +94,8 @@ public class ArrayDeque<T> implements Deque<T> {
         this.array = a;
         this.nextFront = this.array.length - 1;
         this.nextBack = this.size;
-//        System.out.println(this.nextFront);
-//        System.out.println(this.nextBack);
+        System.out.println(this.nextFront); // run shrinkArrayTest to see result!
+        System.out.println(this.nextBack); // run shrinkArrayTest to see result!
     }
     /**
      * Removes and returns the item at the nextFront of the deque.
@@ -107,7 +107,6 @@ public class ArrayDeque<T> implements Deque<T> {
             return null;
         }
         if (this.array.length >= 16 && this.size <= this.array.length * 0.25) {
-//            resize(this.array.length / 2);
             shrink();
         }
         if (this.nextFront == this.array.length - 1) {
@@ -132,8 +131,8 @@ public class ArrayDeque<T> implements Deque<T> {
         if (this.isEmpty()) {
             return null;
         }
-        if (this.array.length >= 16 && this.size < (this.array.length/4)) {
-            resize(this.array.length / 2);
+        if (this.array.length >= 16 && this.size <= this.array.length * 0.25) {
+            shrink();
         }
         if (this.nextBack == 0) {
             backValue = this.array[this.array.length - 1];
