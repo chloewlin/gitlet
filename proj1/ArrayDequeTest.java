@@ -115,6 +115,9 @@ public class ArrayDequeTest {
             strArray.removeFirst();
         }
         strArray.printDeque();
+        assertEquals(3, strArray.size());
+//        strArray.addFirst("X");
+//        strArray.printDeque();
 //        assertEquals(10, strArray.size());
 //        assertEquals("F", strArray.get(7));
 //

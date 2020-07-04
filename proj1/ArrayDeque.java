@@ -1,7 +1,6 @@
 import java.util.Objects;
 
 public class ArrayDeque<T> implements Deque<T> {
-//    private float R;
     private int size;
     private int nextFront;
     private int nextBack;
@@ -91,26 +90,24 @@ public class ArrayDeque<T> implements Deque<T> {
      */
     private void shrink() {
         T[] a = (T[]) new Object[this.array.length / 2];
-        System.arraycopy(this.array, 0, a, 0, this.size);
+        System.arraycopy(this.array, this.nextFront + 1, a,0, this.size);
         this.array = a;
-//        this.nextFront = this.array.length - 1;
-//        this.nextBack = this.size;
-        System.out.println(this.nextFront);
-        System.out.println((this.nextBack));
+        this.nextFront = this.array.length - 1;
+        this.nextBack = this.size;
+//        System.out.println(this.nextFront);
+//        System.out.println(this.nextBack);
     }
     /**
      * Removes and returns the item at the nextFront of the deque.
      * If no such item exists, returns null
      */
     public T removeFirst() {
-        if (this.array.length >= 16 && this.size < (this.array.length/4)) {
-            resize(this.array.length / 2);
-        }
         T frontValue = null;
         if (this.isEmpty()) {
             return null;
         }
-        if (this.size == this.array.length / 4) {
+        if (this.array.length >= 16 && this.size <= this.array.length * 0.25) {
+//            resize(this.array.length / 2);
             shrink();
         }
         if (this.nextFront == this.array.length - 1) {
@@ -131,12 +128,12 @@ public class ArrayDeque<T> implements Deque<T> {
      * If no such item exists, returns null
      */
     public T removeLast() {
-        if (this.array.length >= 16 && this.size < (this.array.length/4)) {
-            resize(this.array.length / 2);
-        }
         T backValue = null;
         if (this.isEmpty()) {
             return null;
+        }
+        if (this.array.length >= 16 && this.size < (this.array.length/4)) {
+            resize(this.array.length / 2);
         }
         if (this.nextBack == 0) {
             backValue = this.array[this.array.length - 1];
