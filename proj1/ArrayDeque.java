@@ -45,8 +45,8 @@ public class ArrayDeque<T> implements Deque<T> {
             resize(this.array.length * 2);
         }
         this.array[this.nextFront] = item;
-        this.size++;
         this.nextFront = minusOne(this.nextFront);
+        this.size++;
     }
 
     /**
@@ -57,8 +57,8 @@ public class ArrayDeque<T> implements Deque<T> {
             resize(this.array.length * 2);
         }
         this.array[this.nextBack] = item;
-        this.size++;
         this.nextBack = addOne(this.nextBack);
+        this.size++;
     }
 
     /**
@@ -89,6 +89,14 @@ public class ArrayDeque<T> implements Deque<T> {
         System.out.println(" ");
     }
 
+    // delete after project is complete
+    public void printWholeDeque() {
+        for (int i = 0; i < this.array.length; i++) {
+            System.out.print(this.array[i] + " ");
+        }
+        System.out.println(" ");
+    }
+
     /**
      * Shrinks array
      */
@@ -98,8 +106,6 @@ public class ArrayDeque<T> implements Deque<T> {
         this.array = a;
         this.nextFront = this.array.length - 1;
         this.nextBack = this.size;
-        System.out.println(this.nextFront);
-        System.out.println(this.nextBack);
     }
     /**
      * Removes and returns the item at the nextFront of the deque.

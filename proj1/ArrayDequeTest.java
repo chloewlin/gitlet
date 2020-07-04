@@ -20,9 +20,11 @@ public class ArrayDequeTest {
             numsArray.addLast(i);
         }
         assertEquals("Array size should increment correctly", 8, numsArray.size());
+        assertTrue("nextFront should still be at index 0 before resizing", numsArray.get(0) == 7); // failing
+
+        numsArray.addLast(9);
         int nextFront = numsArray.get(0);
-        numsArray.printDeque();
-        assertEquals("nextFront should still be at index 0 before resizing", 7, nextFront); // failing
+        assertEquals("nextFront should still be at index 0 after resizing", 0, nextFront);
     }
 
     @Test
@@ -147,22 +149,43 @@ public class ArrayDequeTest {
         assertTrue("should get next item", nums.get(1) == 1);
     }
 
-//
-//    @Test
-//    public void shrinkArrayTest() {
-//        ArrayDeque strArray = new ArrayDeque();
+    @Test
+    public void shrinkArrayTest1() {
+        ArrayDeque strArray = new ArrayDeque();
+        for (int i = 5; i > 0; i--) {
+            strArray.addFirst(Integer.toString(i));
+        }
+        for (int i = 6; i < 10; i++) {
+            strArray.addLast(Integer.toString(i));
+        }
+        for (int i = 0; i < 5; i++) {
+            strArray.removeFirst();
+        }
+        assertEquals("should correctly resize", 4, strArray.size());
+        assertTrue("should return correct front after shrinking", strArray.get(0).equals("6"));
+    }
+
+    @Test
+    public void shrinkArrayTest2() {
+        ArrayDeque strArray = new ArrayDeque();
+        for (int i = 16; i > 0; i--) {
+            strArray.addFirst(Integer.toString(i));
+        }
+        for (int i = 0; i < 12; i++) {
+            strArray.removeLast();
+        }
+        assertEquals("should shrink array when use ration is <= 25%", 4, strArray.size());
+        strArray.printWholeDeque();
+        strArray.addLast("X");
+        strArray.addLast("X2");
+        strArray.addLast("X3");
+        strArray.addLast("X4");
+        strArray.addLast("X5"); // tests error
 //        for (int i = 0; i < 5; i++) {
-//            strArray.addFirst(  "F");
+//            strArray.addLast(Integer.toString(i));
 //        }
-//        for (int i = 0; i < 5; i++) {
-//            strArray.addLast("B");
-//        }
-//        strArray.printDeque();
-//        for (int i = 0; i < 7; i++) {
-//            strArray.removeFirst();
-//            strArray.printDeque();
-//        }
-//        strArray.printDeque();
-//        assertEquals(3, strArray.size());
-//    }
+        strArray.printWholeDeque();
+
+//        assertTrue("should return correct front after shrinking", strArray.get(0).equals("6"));
+    }
 }
