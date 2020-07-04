@@ -84,48 +84,40 @@ public class ArrayDequeTest {
 
     @Test
     public void resizeArrayTest() {
-        ArrayDeque<String> strArray = new ArrayDeque<>();
-        for (int i = 0; i < 10; i++) {
-            strArray.addFirst("F");
+        /** create an ArrayDeque: [4, 5, 6, 7, 8, 1, 2, 3]
+         *  array should expend when we add 9, and resize to become
+         *  [1, 2, 3, 4, 5, 6, 7, 8, 9, null, null, null, null, null, null, null]
+         * */
+        ArrayDeque<Integer> nums = new ArrayDeque<>();
+        for (int i = 4; i > 0; i--) {
+            nums.addFirst(i);
         }
-        assertEquals(10, strArray.size());
-        assertEquals("F", strArray.get(7));
+        for (int i = 0; i < 5; i++) {
+            nums.addLast(i + 5);
+        }
+        assertEquals(9, nums.size());
 
-        ArrayDeque<String> strArray1 = new ArrayDeque<>();
-        for (int i = 0; i < 10; i++) {
-            strArray1.addLast("B");
+        for (int i = 0; i < 9; i++) {
+            int curr = nums.get(i);
+            assertEquals(i + 1, curr);
         }
-        assertEquals(10, strArray1.size());
-        assertEquals("B", strArray1.get(7));
-        assertEquals("B", strArray1.get(9));
     }
-
-    @Test
-    public void shrinkArrayTest() {
-        ArrayDeque strArray = new ArrayDeque();
-        for (int i = 0; i < 5; i++) {
-            strArray.addFirst(  "F");
-        }
-        for (int i = 0; i < 5; i++) {
-            strArray.addLast("B");
-        }
-        strArray.printDeque();
-        for (int i = 0; i < 7; i++) {
-            strArray.removeFirst();
-        }
-        strArray.printDeque();
-        assertEquals(3, strArray.size());
-//        strArray.addFirst("X");
-//        strArray.printDeque();
-//        assertEquals(10, strArray.size());
-//        assertEquals("F", strArray.get(7));
 //
-//        ArrayDeque<String> strArray1 = new ArrayDeque<>();
-//        for (int i = 0; i < 10; i++) {
-//            strArray1.addLast("B");
+//    @Test
+//    public void shrinkArrayTest() {
+//        ArrayDeque strArray = new ArrayDeque();
+//        for (int i = 0; i < 5; i++) {
+//            strArray.addFirst(  "F");
 //        }
-//        assertEquals(10, strArray1.size());
-//        assertEquals("B", strArray1.get(7));
-//        assertEquals("B", strArray1.get(9));
-    }
+//        for (int i = 0; i < 5; i++) {
+//            strArray.addLast("B");
+//        }
+//        strArray.printDeque();
+//        for (int i = 0; i < 7; i++) {
+//            strArray.removeFirst();
+//            strArray.printDeque();
+//        }
+//        strArray.printDeque();
+//        assertEquals(3, strArray.size());
+//    }
 }
