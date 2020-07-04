@@ -18,7 +18,7 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     /**
-     * Resizes array
+     * Expands array
      */
     private void resize(int capacity) {
         T[] a = (T[]) new Object[capacity];
@@ -42,7 +42,6 @@ public class ArrayDeque<T> implements Deque<T> {
             this.nextFront = (this.nextFront - 1 + this.array.length) % this.array.length;
         }
     }
-
 
     /**
      * Adds an item of type T to the nextBack of the deque.
@@ -88,6 +87,18 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     /**
+     * Shrinks array
+     */
+    private void shrink() {
+        T[] a = (T[]) new Object[this.array.length / 2];
+        System.arraycopy(this.array, 0, a, 0, this.size);
+        this.array = a;
+//        this.nextFront = this.array.length - 1;
+//        this.nextBack = this.size;
+        System.out.println(this.nextFront);
+        System.out.println((this.nextBack));
+    }
+    /**
      * Removes and returns the item at the nextFront of the deque.
      * If no such item exists, returns null
      */
@@ -95,6 +106,9 @@ public class ArrayDeque<T> implements Deque<T> {
         T frontValue = null;
         if (this.isEmpty()) {
             return null;
+        }
+        if (this.size == this.array.length / 4) {
+            shrink();
         }
         if (this.nextFront == this.array.length - 1) {
             frontValue = this.array[0];
