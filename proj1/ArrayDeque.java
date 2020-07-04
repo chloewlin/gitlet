@@ -92,6 +92,9 @@ public class ArrayDeque<T> implements Deque<T> {
      * If no such item exists, returns null
      */
     public T removeFirst() {
+        if (this.array.length >= 16 && this.size < (this.array.length/4)) {
+            resize(this.array.length / 2);
+        }
         T frontValue = null;
         if (this.isEmpty()) {
             return null;
@@ -114,6 +117,9 @@ public class ArrayDeque<T> implements Deque<T> {
      * If no such item exists, returns null
      */
     public T removeLast() {
+        if (this.array.length >= 16 && this.size < (this.array.length/4)) {
+            resize(this.array.length / 2);
+        }
         T backValue = null;
         if (this.isEmpty()) {
             return null;
@@ -128,6 +134,7 @@ public class ArrayDeque<T> implements Deque<T> {
             this.nextBack = (this.nextBack - 1) % this.array.length;
         }
         this.size--;
+
         return backValue;
     }
 

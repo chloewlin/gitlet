@@ -98,5 +98,6 @@ public class ArrayDequeTest {
         assertEquals(10, strArray1.size());
         assertEquals("B", strArray1.get(7));
         assertEquals("B", strArray1.get(9));
+
     }
 }
