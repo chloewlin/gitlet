@@ -14,6 +14,15 @@ public class ArrayDequeTest {
     }
 
     @Test
+    public void addFirstTest2() {
+        ArrayDeque<Integer> nums = new ArrayDeque<>();
+        for (int i = 0; i < 8; i++) {
+            nums.addFirst(i);
+        }
+        nums.printWholeDeque(); // array is not resizing
+    }
+
+    @Test
     public void addLastTest() {
         ArrayDeque<Integer> numsArray = new ArrayDeque<>();
         for (int i = 0; i < 8; i++) {
