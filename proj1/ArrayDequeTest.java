@@ -9,8 +9,8 @@ public class ArrayDequeTest {
         strArray.addFirst("zero");
         strArray.addFirst("one");
         strArray.addFirst("two");
-        assertEquals("Array size should increment correctly", 3, strArray.size());
-        assertTrue("addFirst should wrap around the array", strArray.get(0).equals("two"));
+        assertEquals("should increment array size correctly", 3, strArray.size());
+        assertTrue("should wrap around the array", strArray.get(0).equals("two"));
     }
 
     @Test
@@ -19,21 +19,25 @@ public class ArrayDequeTest {
         for (int i = 0; i < 8; i++) {
             nums.addFirst(i);
         }
-        nums.printWholeDeque(); // array is not resizing
+        assertEquals("should hold up to 8 items", 8, nums.size());
+        assertTrue("should return the first element", nums.get(0).equals(7));
+
+        nums.addFirst(8);
+        assertEquals("should resize the array", 9, nums.size());
+        assertTrue("should return the new first element", nums.get(0).equals(8));
     }
 
     @Test
     public void addLastTest() {
-        ArrayDeque<Integer> numsArray = new ArrayDeque<>();
+        ArrayDeque<Integer> nums = new ArrayDeque<>();
         for (int i = 0; i < 8; i++) {
-            numsArray.addLast(i);
+            nums.addLast(i);
         }
-        assertEquals("Array size should increment correctly", 8, numsArray.size());
-        assertTrue("nextFront should still be at index 0 before resizing", numsArray.get(0) == 7); // failing
+        assertEquals("should increment array size", 8, nums.size());
 
-        numsArray.addLast(9);
-        int nextFront = numsArray.get(0);
-        assertEquals("nextFront should still be at index 0 after resizing", 0, nextFront);
+        for (int i = 0; i < 8; i++) {
+            assertTrue("should return the elements in correct order", nums.get(i) == i);;
+        }
     }
 
     @Test
@@ -82,23 +86,23 @@ public class ArrayDequeTest {
     @Test
     public void removeLastTest() {
         ArrayDeque<String> strArray = new ArrayDeque<>();
-        assertEquals(null, strArray.removeLast());
+        assertEquals("should return null when array is empty",null, strArray.removeLast());
 
         ArrayDeque<String> strArray1 = new ArrayDeque<>();
         strArray1.addLast("B");
-        assertEquals("B", strArray1.removeLast());
+        assertEquals("should return the last element", "B", strArray1.removeLast());
 
-        ArrayDeque<String> strArray2 = new ArrayDeque<>();
+        ArrayDeque strArray2 = new ArrayDeque();
         for (int i = 0; i < 8; i++) {
-            strArray2.addLast("B");
+            strArray2.addLast(i);
         }
+        assertEquals("should return the last element", 7, strArray2.removeLast());
+        assertEquals("should return the first element", 0, strArray2.get(0));
 
-        assertEquals("B", strArray2.removeLast());
-        assertEquals(7, strArray2.size());
-        strArray2.printDeque();
-        assertEquals("should return current front", null, strArray2.get(0)); // failing
-//        assertEquals("B", strArray2.removeLast());
-//        assertEquals(null, strArray2.get(7));
+        for (int i = 6; i > 0; i--) {
+            assertEquals("should return the last element", i, strArray2.removeLast());
+        }
+        assertEquals("should return the first element", 0, strArray2.get(0));
     }
 
     @Test
@@ -154,6 +158,7 @@ public class ArrayDequeTest {
             nums.addFirst(i + 1);
         }
         nums.addFirst(9);
+        nums.printWholeDeque();
         assertTrue("should get new front", nums.get(0) == 9);
         assertTrue("should get next item", nums.get(1) == 1);
     }
@@ -181,26 +186,41 @@ public class ArrayDequeTest {
         for (int i = 16; i > 0; i--) {
             strArray.addFirst(Integer.toString(i));
         }
-        strArray.printWholeDeque();
 
         /** remove items to test if array shrinks to [1 2 3 4 null null null null] */
         for (int i = 0; i < 12; i++) {
             strArray.removeLast();
         }
-        assertEquals("should shrink array when use ration is <= 25%", 4, strArray.size());
-        strArray.printWholeDeque();
+        assertEquals("should not shrink array when use ration is exactly 25%", 4, strArray.size());
 
         /** add items to array from the back to test if array doubles when it is full */
-        strArray.addLast("X");
-        strArray.addLast("X2");
-        strArray.addLast("X3");
-        strArray.addLast("X4"); // our array so far: [1 2 3 4 X X2 X3 X4]
+        for (int i = 0; i < 4; i++) {
+            strArray.addLast(Integer.toString(i + 5));
+        }
         assertEquals("should hold up to 8 items", 8, strArray.size());
 
-        strArray.addLast("X5"); // error happens here!
-        strArray.printWholeDeque(); // [null null null null null null null null X5 null null null null null null null]
+        strArray.addLast("9");
+        assertEquals("should expand when array has more than 8 items", 9, strArray.size());
+        assertTrue("should return the first element of the expanded array", strArray.get(0).equals("1"));
+    }
 
-        assertEquals("should expand array when it has more than items", 9, strArray.size());
-        assertTrue("should expand array when it has more than items", strArray.get(0).equals(1));
+    @Test
+    public void shrinkArrayTest3() {
+        ArrayDeque strArray = new ArrayDeque();
+        for (int i = 5; i > 0; i--) {
+            strArray.addFirst(i);
+        }
+        for (int i = 6; i < 10; i++) {
+            strArray.addLast(i);
+        }
+        for (int i = 0; i < 5; i++) {
+            strArray.removeFirst();
+        }
+        assertEquals("should not shrink array when use ration is exactly 25%", 4, strArray.size());
+        assertTrue("should return the first element of the current array", strArray.get(0).equals(6));
+
+        strArray.removeFirst();
+        assertEquals("should only shrink array when use ration is below 25%", 3, strArray.size());
+        assertTrue("should return the first element of the downsized array", strArray.get(0).equals(7));
     }
 }

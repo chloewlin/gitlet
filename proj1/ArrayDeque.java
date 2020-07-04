@@ -15,7 +15,7 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     /**
-     *Creates an empty array deque, again the starting size should be 8
+     * Creates an empty array deque, again the starting size should be 8
      */
     public ArrayDeque(){
         this.array = (T[]) new Object[8];
@@ -29,9 +29,15 @@ public class ArrayDeque<T> implements Deque<T> {
      */
     private void resize(int capacity) {
         T[] a = (T[]) new Object[capacity];
+
+        /** copy elements from the front to end of array */
         int tailSize = this.array.length - this.nextFront - 1;
-        System.arraycopy(this.array, this.nextFront + 1, a, 0, tailSize);
-        System.arraycopy(this.array, 0, a, tailSize, this.nextBack);
+        System.arraycopy(this.array, addOne(this.nextFront), a, 0, tailSize);
+
+        /** copy elements from index 0 to the back */
+        int headSize = minusOne(this.nextBack) + 1;
+        System.arraycopy(this.array, 0, a, tailSize, headSize);
+
         this.array = a;
         this.nextFront = this.array.length - 1;
         this.nextBack = this.size;
@@ -123,7 +129,7 @@ public class ArrayDeque<T> implements Deque<T> {
             this.array[newFront] = null;
             size--;
             this.nextFront = newFront;
-            if (this.array.length > 8 && this.size <= this.array.length * 0.25) {
+            if (this.array.length > 8 && this.size < this.array.length * 0.25) {
                 shrink();
             }
             return frontValue;
@@ -143,7 +149,7 @@ public class ArrayDeque<T> implements Deque<T> {
             this.array[newBack] = null;
             size--;
             this.nextBack = newBack;
-            if (this.array.length > 8 && this.size <= this.array.length * 0.25) {
+            if (this.array.length > 8 && this.size < this.array.length * 0.25) {
                 shrink();
             }
             return backValue;
