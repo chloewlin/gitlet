@@ -81,10 +81,10 @@ public class ArrayDeque<T> implements Deque<T> {
      * Once all the items have been printed, print out a new line.
      */
     public void printDeque() {
-        for (int i = 0; i < this.array.length; i++) {
-//            if (this.array[i] != null) {
-                System.out.print(this.array[i] + " ");
-//            }
+        int index = addOne(nextFront);
+        for (int i = 0; i < this.size; i++) {
+                System.out.print(this.array[index] + " ");
+                index = addOne(index);
         }
         System.out.println(" ");
     }
@@ -118,20 +118,6 @@ public class ArrayDeque<T> implements Deque<T> {
                 shrink();
             }
             return frontValue;
-
-//        if (this.nextFront == this.array.length - 1) {
-//           frontValue = this.array[0];
-//           this.array[0] = null;
-//           this.nextFront = 0;
-//        } else {
-//            frontValue = this.array[this.nextFront + 1];
-//            this.array[this.nextFront + 1] = null;
-//            this.nextFront = addOne(this.nextFront); //addOne
-//        }
-//            this.size--;
-//        if (this.array.length > 8 && this.size <= this.array.length * 0.25) {
-//            resize(this.array.length / 2);
-//            shrink();
        }
     }
 
@@ -153,21 +139,6 @@ public class ArrayDeque<T> implements Deque<T> {
             }
             return backValue;
         }
-//        if (this.array.length >= 16 && this.size < (this.array.length/4)) {
-//            resize(this.array.length / 2);
-//        }
-//        if (this.nextBack == 0) {
-//            backValue = this.array[this.array.length - 1];
-//            this.array[this.array.length - 1] = null;
-//            this.nextBack = 0;
-//        } else {
-//            backValue = this.array[this.nextBack - 1];
-//            this.array[this.nextBack - 1] = null;
-//            this.nextBack = (this.nextBack - 1) % this.array.length;
-//        }
-//        this.size--;
-//
-//        return backValue;
     }
 
     /**
