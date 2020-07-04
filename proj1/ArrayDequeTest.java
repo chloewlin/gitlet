@@ -9,7 +9,8 @@ public class ArrayDequeTest {
         strArray.addFirst("zero");
         strArray.addFirst("one");
         strArray.addFirst("two");
-        assertEquals("Array size should be correctly incremented", 3, strArray.size());
+        assertEquals("Array size should increment correctly", 3, strArray.size());
+        assertTrue("addFirst should wrap around the array", strArray.get(0).equals("two"));
     }
 
     @Test
@@ -18,12 +19,17 @@ public class ArrayDequeTest {
         for (int i = 0; i < 8; i++) {
             numsArray.addLast(i);
         }
-        assertEquals("Array size should be correctly incremented", 8, numsArray.size());
+        assertEquals("Array size should increment correctly", 8, numsArray.size());
+        int nextFront = numsArray.get(0);
         numsArray.printDeque();
+        assertEquals("nextFront should still be at index 0 before resizing", 7, nextFront); // failing
     }
 
     @Test
     public void addNextFrontAndLastTest() {
+        /** create an ArrayDeque using addFirst and addLast: [F, B, B, B, B, F, F, F]
+         *  get() should return items in the correct order
+         * */
         ArrayDeque<String> strArray = new ArrayDeque<>();
         for (int i = 0; i < 8; i++) {
             if (i % 2 == 0) {
@@ -32,10 +38,12 @@ public class ArrayDequeTest {
                 strArray.addFirst("F");
             }
         }
-        assertEquals("F", strArray.get(0));
-        assertEquals("B", strArray.get(1));
-        assertEquals("F", strArray.get(7));
-        strArray.printDeque();
+        for (int i = 0; i < 4; i++) {
+            assertEquals("should get item 1 to 4", "F", strArray.get(i));
+        }
+        for (int i = 4; i < 8; i++) {
+            assertEquals("should get item 5 to 6","B", strArray.get(i));
+        }
     }
 
     @Test
@@ -51,15 +59,13 @@ public class ArrayDequeTest {
         strArray3.addFirst("F");
         strArray3.addLast("B");
         strArray3.addFirst("F");
-        strArray3.printDeque();
         assertEquals("should return first item", "F", strArray3.removeFirst());
 
         ArrayDeque<String> strArray4 = new ArrayDeque<>();
-        for (int i = 0; i < 8; i++) {
-            strArray4.addFirst("F");
+        for (int i = 0; i < 9; i++) {
+            strArray4.addFirst(Integer.toString(i));
         }
-        assertEquals("should return first item","F", strArray4.removeFirst());
-        assertEquals("should set item at old front to null",null, strArray4.get(1));
+        assertEquals("should return current front after resizing","8", strArray4.removeFirst());
     }
 
     @Test
@@ -75,11 +81,13 @@ public class ArrayDequeTest {
         for (int i = 0; i < 8; i++) {
             strArray2.addLast("B");
         }
+
         assertEquals("B", strArray2.removeLast());
         assertEquals(7, strArray2.size());
-        assertEquals(null, strArray2.get(0));
-        assertEquals("B", strArray2.removeLast());
-        assertEquals(null, strArray2.get(7));
+        strArray2.printDeque();
+        assertEquals("should return current front", null, strArray2.get(0)); // failing
+//        assertEquals("B", strArray2.removeLast());
+//        assertEquals(null, strArray2.get(7));
     }
 
     @Test
@@ -101,6 +109,8 @@ public class ArrayDequeTest {
             int curr = nums.get(i);
             assertEquals(i + 1, curr);
         }
+        assertTrue("should get new front", nums.get(0) == 1);
+        assertTrue("should get next item", nums.get(1) == 2);
     }
 
     @Test
@@ -117,6 +127,9 @@ public class ArrayDequeTest {
             int curr = nums.get(i);
             assertEquals(i + 1, curr);
         }
+
+        assertTrue("should get new front", nums.get(0) == 1);
+        assertTrue("should get next item", nums.get(1) == 2);
     }
 
     @Test
@@ -130,13 +143,8 @@ public class ArrayDequeTest {
             nums.addFirst(i + 1);
         }
         nums.addFirst(9);
-
-        for (int i = 0; i < 8; i++) {
-            int curr = nums.get(i);
-            assertEquals(i + 1, curr);
-        }
-        int newFront = nums.get(15);
-        assertEquals(9, newFront);
+        assertTrue("should get new front", nums.get(0) == 9);
+        assertTrue("should get next item", nums.get(1) == 1);
     }
 
 //
