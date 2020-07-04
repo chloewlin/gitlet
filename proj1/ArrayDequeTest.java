@@ -83,7 +83,7 @@ public class ArrayDequeTest {
     }
 
     @Test
-    public void resizeArrayTest() {
+    public void resizeArrayTest1() {
         /** create an ArrayDeque: [4, 5, 6, 7, 8, 1, 2, 3]
          *  array should expend when we add 9, and resize to become
          *  [1, 2, 3, 4, 5, 6, 7, 8, 9, null, null, null, null, null, null, null]
@@ -102,6 +102,43 @@ public class ArrayDequeTest {
             assertEquals(i + 1, curr);
         }
     }
+
+    @Test
+    public void resizeArrayTest2() {
+        /** ArrayDeque should not correctly update the nextBack index
+         *  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, null, null, null, null]
+         * */
+        ArrayDeque<Integer> nums = new ArrayDeque<>();
+        for (int i = 0; i < 12; i++) {
+            nums.addLast(i + 1);
+        }
+
+        for (int i = 0; i < 12; i++) {
+            int curr = nums.get(i);
+            assertEquals(i + 1, curr);
+        }
+    }
+
+    @Test
+    public void resizeArrayTest3() {
+        /** create an ArrayDeque using addFirst: [8, 1, 2, 3, 4, 5, 6, 7]
+         *  array should expend when we add 9, and resize to become
+         *  [1, 2, 3, 4, 5, 6, 7, 8, null, null, null, null, null, null, null, 9]
+         * */
+        ArrayDeque<Integer> nums = new ArrayDeque<>();
+        for (int i = 7; i >= 0; i--) {
+            nums.addFirst(i + 1);
+        }
+        nums.addFirst(9);
+
+        for (int i = 0; i < 8; i++) {
+            int curr = nums.get(i);
+            assertEquals(i + 1, curr);
+        }
+        int newFront = nums.get(15);
+        assertEquals(9, newFront);
+    }
+
 //
 //    @Test
 //    public void shrinkArrayTest() {
