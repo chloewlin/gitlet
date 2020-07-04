@@ -177,24 +177,30 @@ public class ArrayDequeTest {
     @Test
     public void shrinkArrayTest2() {
         ArrayDeque strArray = new ArrayDeque();
+        /** create array [9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8] */
         for (int i = 16; i > 0; i--) {
             strArray.addFirst(Integer.toString(i));
         }
+        strArray.printWholeDeque();
+
+        /** remove items to test if array shrinks to [1 2 3 4 null null null null] */
         for (int i = 0; i < 12; i++) {
             strArray.removeLast();
         }
         assertEquals("should shrink array when use ration is <= 25%", 4, strArray.size());
         strArray.printWholeDeque();
+
+        /** add items to array from the back to test if array doubles when it is full */
         strArray.addLast("X");
         strArray.addLast("X2");
         strArray.addLast("X3");
-        strArray.addLast("X4");
-        strArray.addLast("X5"); // tests error
-//        for (int i = 0; i < 5; i++) {
-//            strArray.addLast(Integer.toString(i));
-//        }
-        strArray.printWholeDeque();
+        strArray.addLast("X4"); // our array so far: [1 2 3 4 X X2 X3 X4]
+        assertEquals("should hold up to 8 items", 8, strArray.size());
 
-//        assertTrue("should return correct front after shrinking", strArray.get(0).equals("6"));
+        strArray.addLast("X5"); // error happens here!
+        strArray.printWholeDeque(); // [null null null null null null null null X5 null null null null null null null]
+
+        assertEquals("should expand array when it has more than items", 9, strArray.size());
+        assertTrue("should expand array when it has more than items", strArray.get(0).equals(1));
     }
 }
