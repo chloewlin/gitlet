@@ -1,4 +1,5 @@
 public interface Deque<T> {
+
     /**
      * Adds an item of type T to the front of the deque.
      */
@@ -13,7 +14,9 @@ public interface Deque<T> {
      * Returns true if deque is empty, false otherwise.
      * This method should be deleted and migrated to Deque.java
      */
-    public boolean isEmpty();
+    default public boolean isEmpty() {
+        return size() == 0;
+    }
 
     /**
      * Returns the number of items in the deque.

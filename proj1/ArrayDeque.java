@@ -47,6 +47,7 @@ public class ArrayDeque<T> implements Deque<T> {
     /**
      * Adds an item of type T to the nextFront of the deque.
      */
+    @Override
     public void addFirst(T item) {
         if (this.size == this.array.length) {
             resize(this.array.length * RFACTOR);
@@ -59,6 +60,7 @@ public class ArrayDeque<T> implements Deque<T> {
     /**
      * Adds an item of type T to the nextBack of the deque.
      */
+    @Override
     public void addLast(T item) {
         if (this.size == this.array.length) {
             resize(this.array.length * RFACTOR);
@@ -69,16 +71,9 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     /**
-     * Returns true if deque is empty, false otherwise.
-     * This method should be deleted and migrated to Deque.java
-     */
-    public boolean isEmpty() {
-        return this.size == 0;
-    }
-
-    /**
      * Returns the number of items in the deque.
      */
+    @Override
     public int size() {
         return this.size;
     }
@@ -87,6 +82,7 @@ public class ArrayDeque<T> implements Deque<T> {
      * Prints the items in the deque from first to last, separated by a space.
      * Once all the items have been printed, print out a new line.
      */
+    @Override
     public void printDeque() {
         int index = addOne(nextFront);
         String result = new String();
@@ -109,14 +105,16 @@ public class ArrayDeque<T> implements Deque<T> {
         this.nextFront = this.array.length - 1;
         this.nextBack = this.size;
     }
+
     /**
      * Removes and returns the item at the nextFront of the deque.
      * If no such item exists, returns null
      */
+    @Override
     public T removeFirst() {
         if (isEmpty()) {
             return null;
-       } else {
+        } else {
             int newFront = addOne(this.nextFront);
             T frontValue = this.array[newFront];
             this.array[newFront] = null;
@@ -126,13 +124,14 @@ public class ArrayDeque<T> implements Deque<T> {
                 shrink();
             }
             return frontValue;
-       }
+        }
     }
 
     /**
      * Removes and returns the item at the nextBack of the deque.
      * If no such item exists, returns null
      */
+    @Override
     public T removeLast() {
         if (this.isEmpty()) {
             return null;
@@ -154,6 +153,7 @@ public class ArrayDeque<T> implements Deque<T> {
      * 1 is the next item, and so forth. If no such item exists,
      * returns null. Must not alter the deque
      */
+    @Override
     public T get(int index) {
         if (index >= this.size || index < 0) {
             return null;
