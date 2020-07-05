@@ -38,7 +38,6 @@ public class ArrayDequeTest {
 
         for (int i = 0; i < 8; i++) {
             assertTrue("should return the elements in order", nums.get(i) == i);
-            ;
         }
     }
 
