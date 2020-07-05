@@ -23,6 +23,7 @@ public class DequeTest {
         }
         assertEquals("arr should have the correct size", r1, arr.size());
         assertEquals("arr should return the first item", r1 - 1, arr.get(0));
+        assertEquals("arr should return the last item", 0, arr.get(r1 - 1));
         assertEquals("list should have the correct size", r1, lld.size());
         assertEquals("list should return the first item", r1 - 1, lld.get(0));
         assertEquals("list should return the last item", 0, lld.get(r1 - 1));
