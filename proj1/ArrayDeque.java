@@ -71,6 +71,14 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     /**
+     * Returns the number of items in the deque.
+     */
+    @Override
+    public int size() {
+        return this.size;
+    }
+
+    /**
      * Prints the items in the deque from first to last, separated by a space.
      * Once all the items have been printed, print out a new line.
      */
@@ -106,17 +114,17 @@ public class ArrayDeque<T> implements Deque<T> {
     public T removeFirst() {
         if (isEmpty()) {
             return null;
+        } else {
+            int newFront = addOne(this.nextFront);
+            T frontValue = this.array[newFront];
+            this.array[newFront] = null;
+            size--;
+            this.nextFront = newFront;
+            if (this.array.length > 8 && this.size < this.array.length * 0.25) {
+                shrink();
+            }
+            return frontValue;
         }
-        if (this.array.length > 8 && this.size < this.array.length * 0.25) {
-            resize(this.array.length/2);
-        }
-        int newFront = addOne(this.nextFront);
-        T frontValue = this.array[newFront];
-        this.array[newFront] = null;
-        size--;
-        this.nextFront = newFront;
-        return frontValue;
-
     }
 
     /**
@@ -127,16 +135,17 @@ public class ArrayDeque<T> implements Deque<T> {
     public T removeLast() {
         if (this.isEmpty()) {
             return null;
+        } else {
+            int newBack = minusOne(this.nextBack);
+            T backValue = this.array[newBack];
+            this.array[newBack] = null;
+            size--;
+            this.nextBack = newBack;
+            if (this.array.length > 8 && this.size < this.array.length * 0.25) {
+                shrink();
+            }
+            return backValue;
         }
-        if (this.array.length > 8 && this.size < this.array.length * 0.25) {
-            resize(this.array.length/2);
-        }
-        int newBack = minusOne(this.nextBack);
-        T backValue = this.array[newBack];
-        this.array[newBack] = null;
-        size--;
-        this.nextBack = newBack;
-        return backValue;
     }
 
     /**
