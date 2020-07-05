@@ -13,12 +13,16 @@ public interface Deque<T> {
      * Returns true if deque is empty, false otherwise.
      * This method should be deleted and migrated to Deque.java
      */
-    public boolean isEmpty();
+    public default boolean isEmpty() {
+        return this.size() == 0;
+    }
 
     /**
      * Returns the number of items in the deque.
      */
-    public int size();
+    public default int size() {
+        return this.size();
+    }
 
     /**
      * Prints the items in the deque from first to last, separated by a space.

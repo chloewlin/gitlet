@@ -97,6 +97,7 @@ public class ArrayDeque<T> implements Deque<T> {
         this.nextFront = this.array.length - 1;
         this.nextBack = this.size;
     }
+
     /**
      * Removes and returns the item at the nextFront of the deque.
      * If no such item exists, returns null
@@ -105,17 +106,17 @@ public class ArrayDeque<T> implements Deque<T> {
     public T removeFirst() {
         if (isEmpty()) {
             return null;
-       } else {
-            int newFront = addOne(this.nextFront);
-            T frontValue = this.array[newFront];
-            this.array[newFront] = null;
-            size--;
-            this.nextFront = newFront;
-            if (this.array.length > 8 && this.size < this.array.length * 0.25) {
-                shrink();
-            }
-            return frontValue;
-       }
+        }
+        if (this.array.length > 8 && this.size < this.array.length * 0.25) {
+            resize(this.array.length/2);
+        }
+        int newFront = addOne(this.nextFront);
+        T frontValue = this.array[newFront];
+        this.array[newFront] = null;
+        size--;
+        this.nextFront = newFront;
+        return frontValue;
+
     }
 
     /**
@@ -126,17 +127,16 @@ public class ArrayDeque<T> implements Deque<T> {
     public T removeLast() {
         if (this.isEmpty()) {
             return null;
-        } else {
-            int newBack = minusOne(this.nextBack);
-            T backValue = this.array[newBack];
-            this.array[newBack] = null;
-            size--;
-            this.nextBack = newBack;
-            if (this.array.length > 8 && this.size < this.array.length * 0.25) {
-                shrink();
-            }
-            return backValue;
         }
+        if (this.array.length > 8 && this.size < this.array.length * 0.25) {
+            resize(this.array.length/2);
+        }
+        int newBack = minusOne(this.nextBack);
+        T backValue = this.array[newBack];
+        this.array[newBack] = null;
+        size--;
+        this.nextBack = newBack;
+        return backValue;
     }
 
     /**

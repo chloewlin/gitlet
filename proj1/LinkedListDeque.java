@@ -31,6 +31,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         this.size++;
     }
 
+    @Override
     /**
      * Adds an item of type T to the front of the deque.
      */
@@ -47,6 +48,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         this.size++;
     }
 
+    @Override
     /**
      * Adds an item of type T to the back of the deque.
      */
@@ -66,21 +68,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         this.size++;
     }
 
-    /**
-     * Returns true if deque is empty, false otherwise.
-     * This method should be deleted and migrated to Deque.java
-     */
-    public boolean isEmpty() {
-        return this.size == 0 ? true : false;
-    }
-
-    /**
-     * Returns the number of items in the deque.
-     */
-    public int size() {
-        return this.size;
-    }
-
+    @Override
     /**
      * Prints the items in the deque from first to last, separated by a space.
      * Once all the items have been printed, print out a new line.
@@ -94,6 +82,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         System.out.println("");
     }
 
+    @Override
     /**
      * Removes and returns the item at the front of the deque.
      * If no such item exists, returns null
@@ -112,6 +101,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         return (T)oldHead.item;
     }
 
+    @Override
     /**
      * Removes and returns the item at the back of the deque.
      * If no such item exists, returns null
@@ -130,6 +120,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         return (T)oldTail.item;
     }
 
+    @Override
     /**
      * Gets the item at the given index, where 0 is the front,
      * 1 is the next item, and so forth. If no such item exists,
