@@ -23,14 +23,6 @@ public class LinkedListDeque<T> implements Deque<T> {
         this.size = 0;
     }
 
-    public LinkedListDeque(T item) {
-        this.sentinel = new Node(42, null, null);
-        Node newNode = new Node(item, this.sentinel, this.sentinel);
-        this.sentinel.next = newNode;
-        this.sentinel.prev = newNode;
-        this.size++;
-    }
-
     /**
      * Adds an item of type T to the front of the deque.
      */
