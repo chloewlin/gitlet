@@ -5,6 +5,7 @@ public class ArrayDeque<T> implements Deque<T> {
     private int nextFront;
     private int nextBack;
     private T[] array;
+    private static int RFACTOR = 2;
 
     private int addOne(int i) {
         return (i + 1) % this.array.length;
@@ -15,9 +16,9 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     /**
-     * Creates an empty array deque, again the starting size should be 8
+     * Creates an empty array deque. The starting size should be 8
      */
-    public ArrayDeque(){
+    public ArrayDeque() {
         this.array = (T[]) new Object[8];
         this.size = 0;
         this.nextFront = 0;
@@ -25,7 +26,7 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     /**
-     * Expands array
+     * Expands array when array is full
      */
     private void resize(int capacity) {
         T[] a = (T[]) new Object[capacity];
@@ -48,7 +49,7 @@ public class ArrayDeque<T> implements Deque<T> {
      */
     public void addFirst(T item) {
         if (this.size == this.array.length) {
-            resize(this.array.length * 2);
+            resize(this.array.length * RFACTOR);
         }
         this.array[this.nextFront] = item;
         this.nextFront = minusOne(this.nextFront);
@@ -60,7 +61,7 @@ public class ArrayDeque<T> implements Deque<T> {
      */
     public void addLast(T item) {
         if (this.size == this.array.length) {
-            resize(this.array.length * 2);
+            resize(this.array.length * RFACTOR);
         }
         this.array[this.nextBack] = item;
         this.nextBack = addOne(this.nextBack);
@@ -98,6 +99,7 @@ public class ArrayDeque<T> implements Deque<T> {
         System.out.println(" ");
     }
 
+<<<<<<< HEAD
     // delete after project is complete
     public void printWholeDeque() {
         for (int i = 0; i < this.array.length; i++) {
@@ -106,16 +108,17 @@ public class ArrayDeque<T> implements Deque<T> {
         System.out.println();
     }
 
-//    /**
-//     * Shrinks array
-//     */
-//    private void shrink(int capacity) {
-//        T[] a = (T[]) new Object[capacity];
-//        System.arraycopy(this.array, addOne(this.nextFront), a,0, this.size);
-//        this.array = a;
-//        this.nextFront = this.array.length - 1;
-//        this.nextBack = this.size;
-//    }
+    /**
+     * Shrinks array
+     */
+    private void shrink() {
+        T[] a = (T[]) new Object[this.array.length / RFACTOR];
+        System.arraycopy(this.array, addOne(this.nextFront), a, 0, this.size);
+        this.array = a;
+        this.nextFront = this.array.length - 1;
+        this.nextBack = this.size;
+    }
+
     /**
      * Removes and returns the item at the nextFront of the deque.
      * If no such item exists, returns null
