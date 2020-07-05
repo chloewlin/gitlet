@@ -2,6 +2,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+@SuppressWarnings("unchecked")
+
 public class ArrayDequeTest {
 
     @Test

@@ -1,5 +1,7 @@
 import java.util.Objects;
 
+@SuppressWarnings("unchecked")
+
 public class ArrayDeque<T> implements Deque<T> {
     private int size;
     private int nextFront;
