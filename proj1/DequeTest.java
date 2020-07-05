@@ -42,7 +42,7 @@ public class DequeTest {
             arr.addLast(i);
             lld.addLast(i);
         }
-        assertEquals("arr should resize when it has a large number of insertions", r2, arr.size());
+        assertEquals("arr should resize with a large number of insertions", r2, arr.size());
         assertEquals("arr should return the first item", 0, arr.get(0));
         assertEquals("list should hold a large number of insertions", r2, lld.size());
         assertEquals("list should return the first item", 0, lld.get(0));
