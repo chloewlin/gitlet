@@ -1,4 +1,5 @@
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 public class ArrayDequeTest {
@@ -9,7 +10,7 @@ public class ArrayDequeTest {
         strArray.addFirst("zero");
         strArray.addFirst("one");
         strArray.addFirst("two");
-        assertEquals("should increment array size correctly", 3, strArray.size());
+        assertEquals("should increment array size", 3, strArray.size());
         assertTrue("should wrap around the array", strArray.get(0).equals("two"));
     }
 
@@ -36,7 +37,8 @@ public class ArrayDequeTest {
         assertEquals("should increment array size", 8, nums.size());
 
         for (int i = 0; i < 8; i++) {
-            assertTrue("should return the elements in correct order", nums.get(i) == i);;
+            assertTrue("should return the elements in order", nums.get(i) == i);
+            ;
         }
     }
 
@@ -57,18 +59,18 @@ public class ArrayDequeTest {
             assertEquals("should get item 1 to 4", "F", strArray.get(i));
         }
         for (int i = 4; i < 8; i++) {
-            assertEquals("should get item 5 to 6","B", strArray.get(i));
+            assertEquals("should get item 5 to 6", "B", strArray.get(i));
         }
     }
 
     @Test
     public void removeFirstTest() {
         ArrayDeque<String> strArray = new ArrayDeque<String>();
-        assertEquals("should return null when array is emtpy", null, strArray.removeFirst());
+        assertEquals("should return null", null, strArray.removeFirst());
 
         ArrayDeque<String> strArray1 = new ArrayDeque<String>();
         strArray1.addFirst("F");
-        assertEquals("should return first item","F", strArray1.removeFirst());
+        assertEquals("should return first item", "F", strArray1.removeFirst());
 
         ArrayDeque<String> strArray3 = new ArrayDeque<String>();
         strArray3.addFirst("F");
@@ -80,17 +82,18 @@ public class ArrayDequeTest {
         for (int i = 0; i < 9; i++) {
             strArray4.addFirst(Integer.toString(i));
         }
-        assertEquals("should return current front after resizing","8", strArray4.removeFirst());
+        String front = strArray4.removeFirst();
+        assertEquals("should return front after resizing", "8", front);
     }
 
     @Test
     public void removeLastTest() {
         ArrayDeque<String> strArray = new ArrayDeque<String>();
-        assertEquals("should return null when array is empty",null, strArray.removeLast());
+        assertEquals("should return null", null, strArray.removeLast());
 
         ArrayDeque<String> strArray1 = new ArrayDeque<String>();
         strArray1.addLast("B");
-        assertEquals("should return the last element", "B", strArray1.removeLast());
+        assertEquals("should return the last item", "B", strArray1.removeLast());
 
         ArrayDeque strArray2 = new ArrayDeque();
         for (int i = 0; i < 8; i++) {
@@ -175,7 +178,7 @@ public class ArrayDequeTest {
             strings.removeFirst();
         }
         assertEquals("should correctly resize", 4, strings.size());
-        assertTrue("should return correct front after shrinking", strings.get(0).equals("6"));
+        assertTrue("should return front after shrinking", strings.get(0).equals("6"));
     }
 
     @Test
@@ -190,7 +193,7 @@ public class ArrayDequeTest {
         for (int i = 0; i < 12; i++) {
             strings.removeLast();
         }
-        assertEquals("should not shrink array when use ration is exactly 25%", 4, strings.size());
+        assertEquals("should not shrink when use ratio is 25%", 4, strings.size());
 
         /** add items to array from the back to test if array doubles when it is full */
         for (int i = 0; i < 4; i++) {
@@ -199,8 +202,8 @@ public class ArrayDequeTest {
         assertEquals("should hold up to 8 items", 8, strings.size());
 
         strings.addLast("9");
-        assertEquals("should expand when array has more than 8 items", 9, strings.size());
-        assertTrue("should return the first element of the expanded array", strings.get(0).equals("1"));
+        assertEquals("should expand with more than 8 items", 9, strings.size());
+        assertTrue("should return the first element", strings.get(0).equals("1"));
     }
 
     @Test
@@ -215,12 +218,12 @@ public class ArrayDequeTest {
         for (int i = 0; i < 5; i++) {
             nums.removeFirst();
         }
-        assertEquals("should not shrink array when use ration is exactly 25%", 4, nums.size());
-        assertTrue("should return the first element of the current array", nums.get(0).equals(6));
+        assertEquals("should not shrink when use ratio is 25%", 4, nums.size());
+        assertTrue("should return the first element of array", nums.get(0).equals(6));
 
         nums.removeFirst();
-        assertEquals("should only shrink array when use ration is below 25%", 3, nums.size());
-        assertTrue("should return the first element of the downsized array", nums.get(0).equals(7));
+        assertEquals("should shrink when use ratio is < 25%", 3, nums.size());
+        assertTrue("should return first element", nums.get(0).equals(7));
     }
 
     @Test
@@ -234,11 +237,11 @@ public class ArrayDequeTest {
             nums.removeLast();
         }
 
-        assertEquals("should not shrink array when use ration is exactly 25%", 4, nums.size());
-        assertTrue("should return the first element of the current array", nums.get(0).equals(1));
+        assertEquals("should not shrink when use ratio is 25%", 4, nums.size());
+        assertTrue("should return the first element", nums.get(0).equals(1));
 
         nums.removeFirst();
-        assertEquals("should only shrink array when use ration is below 25%", 3, nums.size());
-        assertTrue("should return the first element of the downsized array", nums.get(0).equals(2));
+        assertEquals("should shrink when use ratio is < 25%", 3, nums.size());
+        assertTrue("should return the first element", nums.get(0).equals(2));
     }
 }

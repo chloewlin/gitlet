@@ -29,8 +29,8 @@ public class DequeTest {
         assertEquals("list should return the last item", 0, lld.get(r1 - 1));
 
         for (int i = 0; i < r1; i++) {
-            assertEquals("arr should preserve the order", r1 - i - 1, arr.removeFirst());
-            assertEquals("list should preserve the order", r1 - i - 1, lld.removeFirst());
+            assertEquals("should keep the order", r1 - i - 1, arr.removeFirst());
+            assertEquals("should keep the order", r1 - i - 1, lld.removeFirst());
         }
         assertTrue("arr should shrink when it has 0 items", arr.isEmpty());
         assertNull("arr should return null when it is empty", arr.get(0));
@@ -42,7 +42,7 @@ public class DequeTest {
             arr.addLast(i);
             lld.addLast(i);
         }
-        assertEquals("arr should resize with a large number of insertions", r2, arr.size());
+        assertEquals("arr should resize with a large num of insertions", r2, arr.size());
         assertEquals("arr should return the first item", 0, arr.get(0));
         assertEquals("list should hold a large number of insertions", r2, lld.size());
         assertEquals("list should return the first item", 0, lld.get(0));
