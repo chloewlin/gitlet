@@ -16,9 +16,9 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     /**
-     * Creates an empty array deque, again the starting size should be 8
+     * Creates an empty array deque. The starting size should be 8
      */
-    public ArrayDeque(){
+    public ArrayDeque() {
         this.array = (T[]) new Object[8];
         this.size = 0;
         this.nextFront = 0;
@@ -26,7 +26,7 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     /**
-     * Expands array
+     * Expands array when array is full
      */
     private void resize(int capacity) {
         T[] a = (T[]) new Object[capacity];
@@ -99,20 +99,12 @@ public class ArrayDeque<T> implements Deque<T> {
         System.out.println(" ");
     }
 
-    // delete after project is complete
-    public void printWholeDeque() {
-        for (int i = 0; i < this.array.length; i++) {
-            System.out.print(this.array[i] + " ");
-        }
-        System.out.println();
-    }
-
     /**
      * Shrinks array
      */
     private void shrink() {
         T[] a = (T[]) new Object[this.array.length / RFACTOR];
-        System.arraycopy(this.array, addOne(this.nextFront), a,0, this.size);
+        System.arraycopy(this.array, addOne(this.nextFront), a, 0, this.size);
         this.array = a;
         this.nextFront = this.array.length - 1;
         this.nextBack = this.size;
