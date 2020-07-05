@@ -5,6 +5,7 @@ public class ArrayDeque<T> implements Deque<T> {
     private int nextFront;
     private int nextBack;
     private T[] array;
+    private static int RFACTOR = 2;
 
     private int addOne(int i) {
         return (i + 1) % this.array.length;
@@ -48,7 +49,7 @@ public class ArrayDeque<T> implements Deque<T> {
      */
     public void addFirst(T item) {
         if (this.size == this.array.length) {
-            resize(this.array.length * 2);
+            resize(this.array.length * RFACTOR);
         }
         this.array[this.nextFront] = item;
         this.nextFront = minusOne(this.nextFront);
@@ -60,7 +61,7 @@ public class ArrayDeque<T> implements Deque<T> {
      */
     public void addLast(T item) {
         if (this.size == this.array.length) {
-            resize(this.array.length * 2);
+            resize(this.array.length * RFACTOR);
         }
         this.array[this.nextBack] = item;
         this.nextBack = addOne(this.nextBack);
@@ -110,8 +111,8 @@ public class ArrayDeque<T> implements Deque<T> {
      * Shrinks array
      */
     private void shrink() {
-        T[] a = (T[]) new Object[this.array.length/2];
-        System.arraycopy(this.array, this.nextFront + 1, a,0, this.size);
+        T[] a = (T[]) new Object[this.array.length / RFACTOR];
+        System.arraycopy(this.array, addOne(this.nextFront), a,0, this.size);
         this.array = a;
         this.nextFront = this.array.length - 1;
         this.nextBack = this.size;
