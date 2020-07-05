@@ -31,10 +31,10 @@ public class LinkedListDeque<T> implements Deque<T> {
         this.size++;
     }
 
-    @Override
     /**
      * Adds an item of type T to the front of the deque.
      */
+    @Override
     public void addFirst(T item) {
         Node first = new Node(item, this.sentinel, null);
         if (this.size == 0) {
@@ -48,10 +48,10 @@ public class LinkedListDeque<T> implements Deque<T> {
         this.size++;
     }
 
-    @Override
     /**
      * Adds an item of type T to the back of the deque.
      */
+    @Override
     public void addLast(T item) {
         Node last = new Node(item, null, null);
         if (this.size == 0) {
@@ -71,29 +71,33 @@ public class LinkedListDeque<T> implements Deque<T> {
     /**
      * Returns the number of items in the deque.
      */
+    @Override
     public int size() {
         return this.size;
     }
 
-    @Override
     /**
      * Prints the items in the deque from first to last, separated by a space.
      * Once all the items have been printed, print out a new line.
      */
+    @Override
     public void printDeque() {
         Node node = sentinel.next;
+        String result = new String();
         while (!node.equals(sentinel)) {
-            System.out.print(node.item + " ");
+            result += node.item + " ";
             node = node.next;
         }
-        System.out.println("");
+        result = result.trim();
+        System.out.print(result);
+        System.out.println(" ");
     }
 
-    @Override
     /**
      * Removes and returns the item at the front of the deque.
      * If no such item exists, returns null
      */
+    @Override
     public T removeFirst() {
         if (this.isEmpty()) {
             return null;
@@ -108,11 +112,11 @@ public class LinkedListDeque<T> implements Deque<T> {
         return (T)oldHead.item;
     }
 
-    @Override
     /**
      * Removes and returns the item at the back of the deque.
      * If no such item exists, returns null
      */
+    @Override
     public T removeLast() {
         if (this.isEmpty()) {
             return null;
@@ -127,12 +131,12 @@ public class LinkedListDeque<T> implements Deque<T> {
         return (T)oldTail.item;
     }
 
-    @Override
     /**
      * Gets the item at the given index, where 0 is the front,
      * 1 is the next item, and so forth. If no such item exists,
      * returns null. Must not alter the deque
      */
+    @Override
     public T get(int index) {
         if (this.isEmpty() || (index > this.size - 1) || (index < 0)) {
             return null;
@@ -145,7 +149,6 @@ public class LinkedListDeque<T> implements Deque<T> {
         }
         return (T)curr.item;
     }
-
 
     /**
      * Same as get, but this method should be implemented using recursion
