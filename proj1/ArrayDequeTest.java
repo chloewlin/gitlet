@@ -223,4 +223,23 @@ public class ArrayDequeTest {
         assertEquals("should only shrink array when use ration is below 25%", 3, strArray.size());
         assertTrue("should return the first element of the downsized array", strArray.get(0).equals(7));
     }
+
+    @Test
+    public void shrinkArrayTest4() {
+        ArrayDeque strArray = new ArrayDeque();
+        for (int i = 1; i < 16; i++) {
+            strArray.addLast(i);
+        }
+
+        for (int i = 0; i < 11; i++) {
+            strArray.removeLast();
+        }
+
+        assertEquals("should not shrink array when use ration is exactly 25%", 4, strArray.size());
+        assertTrue("should return the first element of the current array", strArray.get(0).equals(1));
+
+        strArray.removeFirst();
+        assertEquals("should only shrink array when use ration is below 25%", 3, strArray.size());
+        assertTrue("should return the first element of the downsized array", strArray.get(0).equals(2));
+    }
 }
