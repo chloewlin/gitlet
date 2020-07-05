@@ -7,10 +7,10 @@ import static org.junit.Assert.assertEquals;
 public class LinkedListDequeTest {
 
     private static class Obj<T> {
-        public int item;
-        public static String string = new String("object");
+        private int item;
+        private static String string = new String("object");
 
-        public Obj(int item) {
+        Obj(int item) {
             this.item = item;
         }
     }
