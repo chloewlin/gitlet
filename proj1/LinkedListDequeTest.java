@@ -118,7 +118,9 @@ public class LinkedListDequeTest {
         assertEquals(4, lld1.size());
     }
 
-    /** add item with addFirst() and addLast(), remove item with removeFirst() and removeLast(), ensure size() is correct */
+    /** add item with addFirst() and addLast(), remove item with removeFirst()
+     * and removeLast(), ensure size() is correct
+     * */
     @Test
     public void addAndRemoveIntegerTest() {
         System.out.println("Running add/remove test.");
@@ -153,7 +155,7 @@ public class LinkedListDequeTest {
 
         try {
             assertTrue(nums.isEmpty());
-            assertEquals("index should not be greater than the size of deque", null, nums.get(5));
+            assertEquals("index should be < deque size", null, nums.get(5));
             assertEquals("index cannot be a negative number", null, nums.get(-3));
 
             nums.addFirst(1);
@@ -162,7 +164,7 @@ public class LinkedListDequeTest {
             nums.addFirst(0);
             nums.addLast(4);
             int removedLast1 = nums.removeLast();
-            assertEquals("removedLast() should return the item removed",4, removedLast1);
+            assertEquals("should return the item removed",4, removedLast1);
             nums.addLast(4);
 
             assertEquals(0, (int) nums.get(0));
@@ -172,22 +174,22 @@ public class LinkedListDequeTest {
             assertEquals(4, (int) nums.get(4));
 
             int removedFirst1 = nums.removeFirst();
-            assertEquals("removedLast() should return the item removed", 0, removedFirst1);
-            assertEquals("removeFirst() should remove from the front",1, (int) nums.get(0));
+            assertEquals("should return the item removed", 0, removedFirst1);
+            assertEquals("should remove from the front",1, (int) nums.get(0));
 
             int removedLast2 = nums.removeLast();
-            assertEquals("removeLast() should remove from the back", 3, (int) nums.get(2));
-            assertEquals("removeLast() should reduce size by 1", 3, nums.size());
+            assertEquals("should remove from the back", 3, (int) nums.get(2));
+            assertEquals("should reduce size by 1", 3, nums.size());
 
             int removedLast3 = nums.removeLast();
-            assertEquals("removeLast() should return the item removed", 3, removedLast3);
+            assertEquals("should return the item removed", 3, removedLast3);
 
             int removedFirst2 = nums.removeFirst();
-            assertEquals("removedLast() should return the item removed", 1, removedFirst2);
+            assertEquals("should return the item removed", 1, removedFirst2);
             nums.removeLast();
 
             assertEquals(0, nums.size());
-            assertEquals("removeFirst() return null when the deque is empty", null, nums.removeFirst());
+            assertEquals("return null when empty", null, nums.removeFirst());
         } finally {
             System.out.println("Printing out deque: ");
             nums.printDeque();
@@ -201,8 +203,8 @@ public class LinkedListDequeTest {
 
         try {
             assertTrue(nums.isEmpty());
-            assertEquals("index should not be greater than the size of deque", null, nums.getRecursive(5));
-            assertEquals("index cannot be a negative number", null, nums.getRecursive(-3));
+            assertEquals(null, nums.getRecursive(5));
+            assertEquals(null, nums.getRecursive(-3));
 
             nums.addFirst(1);
             nums.addLast(2);
@@ -210,7 +212,7 @@ public class LinkedListDequeTest {
             nums.addFirst(0);
             nums.addLast(4);
             int removedLast1 = nums.removeLast();
-            assertEquals("removedLast() should return the item removed", 4, removedLast1);
+            assertEquals("should return the item removed", 4, removedLast1);
             nums.addLast(4);
 
             assertEquals(0, (int) nums.getRecursive(0));
@@ -220,22 +222,22 @@ public class LinkedListDequeTest {
             assertEquals(4, (int) nums.getRecursive(4));
 
             int removedFirst1 = nums.removeFirst();
-            assertEquals("removedLast() should return the item removed", 0, removedFirst1);
-            assertEquals("removeFirst() should remove from the front", 1, (int) nums.getRecursive(0));
+            assertEquals("should return the item removed", 0, removedFirst1);
+            assertEquals(1, (int) nums.getRecursive(0));
 
             int removedLast2 = nums.removeLast();
-            assertEquals("removeLast() should remove from the back", 3, (int) nums.getRecursive(2));
-            assertEquals("removeLast() should reduce size by 1", 3, nums.size());
+            assertEquals(3, (int) nums.getRecursive(2));
+            assertEquals("should reduce size by 1", 3, nums.size());
 
             int removedLast3 = nums.removeLast();
-            assertEquals("removeLast() should return the item removed", 3, removedLast3);
+            assertEquals("should return the item removed", 3, removedLast3);
 
             int removedFirst2 = nums.removeFirst();
-            assertEquals("removedLast() should return the item removed", 1, removedFirst2);
+            assertEquals("should return the item removed", 1, removedFirst2);
             nums.removeLast();
 
             assertEquals(0, nums.size());
-            assertEquals("removeFirst() return null when the deque is empty", null, nums.removeFirst());
+            assertEquals("return null when empty", null, nums.removeFirst());
         } finally {
             System.out.println("Printing out deque: ");
             nums.printDeque();
