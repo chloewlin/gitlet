@@ -15,7 +15,7 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     /**
-     *Creates an empty array deque, again the starting size should be 8
+     * Creates an empty array deque, again the starting size should be 8
      */
     public ArrayDeque(){
         this.array = (T[]) new Object[8];
@@ -29,9 +29,15 @@ public class ArrayDeque<T> implements Deque<T> {
      */
     private void resize(int capacity) {
         T[] a = (T[]) new Object[capacity];
+
+        /** copy elements from the front to end of array */
         int tailSize = this.array.length - this.nextFront - 1;
-        System.arraycopy(this.array, this.nextFront + 1, a, 0, tailSize);
-        System.arraycopy(this.array, 0, a, tailSize, this.nextBack);
+        System.arraycopy(this.array, addOne(this.nextFront), a, 0, tailSize);
+
+        /** copy elements from index 0 to the back */
+        int headSize = minusOne(this.nextBack) + 1;
+        System.arraycopy(this.array, 0, a, tailSize, headSize);
+
         this.array = a;
         this.nextFront = this.array.length - 1;
         this.nextBack = this.size;
@@ -82,10 +88,13 @@ public class ArrayDeque<T> implements Deque<T> {
      */
     public void printDeque() {
         int index = addOne(nextFront);
+        String result = new String();
         for (int i = 0; i < this.size; i++) {
-                System.out.print(this.array[index] + " ");
+                result += this.array[index] + " ";
                 index = addOne(index);
         }
+        result = result.trim();
+        System.out.print(result);
         System.out.println(" ");
     }
 
@@ -97,16 +106,16 @@ public class ArrayDeque<T> implements Deque<T> {
         System.out.println();
     }
 
-    /**
-     * Shrinks array
-     */
-    private void shrink() {
-        T[] a = (T[]) new Object[this.array.length/2];
-        System.arraycopy(this.array, this.nextFront + 1, a,0, this.size);
-        this.array = a;
-        this.nextFront = this.array.length - 1;
-        this.nextBack = this.size;
-    }
+//    /**
+//     * Shrinks array
+//     */
+//    private void shrink(int capacity) {
+//        T[] a = (T[]) new Object[capacity];
+//        System.arraycopy(this.array, addOne(this.nextFront), a,0, this.size);
+//        this.array = a;
+//        this.nextFront = this.array.length - 1;
+//        this.nextBack = this.size;
+//    }
     /**
      * Removes and returns the item at the nextFront of the deque.
      * If no such item exists, returns null
@@ -114,17 +123,17 @@ public class ArrayDeque<T> implements Deque<T> {
     public T removeFirst() {
         if (isEmpty()) {
             return null;
-       } else {
-            int newFront = addOne(this.nextFront);
-            T frontValue = this.array[newFront];
-            this.array[newFront] = null;
-            size--;
-            this.nextFront = newFront;
-            if (this.array.length > 8 && this.size <= this.array.length * 0.25) {
-                shrink();
-            }
-            return frontValue;
-       }
+        }
+        if (this.array.length > 8 && this.size < this.array.length * 0.25) {
+            resize(this.array.length/2);
+        }
+        int newFront = addOne(this.nextFront);
+        T frontValue = this.array[newFront];
+        this.array[newFront] = null;
+        size--;
+        this.nextFront = newFront;
+        return frontValue;
+
     }
 
     /**
@@ -134,17 +143,16 @@ public class ArrayDeque<T> implements Deque<T> {
     public T removeLast() {
         if (this.isEmpty()) {
             return null;
-        } else {
-            int newBack = minusOne(this.nextBack);
-            T backValue = this.array[newBack];
-            this.array[newBack] = null;
-            size--;
-            this.nextBack = newBack;
-            if (this.array.length > 8 && this.size <= this.array.length * 0.25) {
-                shrink();
-            }
-            return backValue;
         }
+        if (this.array.length > 8 && this.size < this.array.length * 0.25) {
+            resize(this.array.length/2);
+        }
+        int newBack = minusOne(this.nextBack);
+        T backValue = this.array[newBack];
+        this.array[newBack] = null;
+        size--;
+        this.nextBack = newBack;
+        return backValue;
     }
 
     /**
