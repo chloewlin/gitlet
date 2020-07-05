@@ -13,8 +13,8 @@ public class DequeTest {
 
     @Test
     public void DequeTest() {
-        Deque<Object> arr = new ArrayDeque<>();
-        Deque<Object> lld = new LinkedListDeque<>();
+        Deque<Object> arr = new ArrayDeque<Object>();
+        Deque<Object> lld = new LinkedListDeque<Object>();
 
         int r1 = generateRandom(600, 1000);
         for (int i = 0; i < r1; i++) {
@@ -29,7 +29,7 @@ public class DequeTest {
 
         for (int i = 0; i < r1; i++) {
             assertEquals("arr should preserve the order", r1 - i - 1, arr.removeFirst());
-            assertEquals("list should preserve the order",r1 - i - 1, lld.removeFirst());
+            assertEquals("list should preserve the order", r1 - i - 1, lld.removeFirst());
         }
         assertTrue("arr should shrink when it has 0 items", arr.isEmpty());
         assertNull("arr should return null when it is empty", arr.get(0));
