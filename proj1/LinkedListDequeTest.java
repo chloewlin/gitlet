@@ -164,7 +164,7 @@ public class LinkedListDequeTest {
             nums.addFirst(0);
             nums.addLast(4);
             int removedLast1 = nums.removeLast();
-            assertEquals("should return the item removed",4, removedLast1);
+            assertEquals("should return the item removed", 4, removedLast1);
             nums.addLast(4);
 
             assertEquals(0, (int) nums.get(0));
@@ -175,7 +175,7 @@ public class LinkedListDequeTest {
 
             int removedFirst1 = nums.removeFirst();
             assertEquals("should return the item removed", 0, removedFirst1);
-            assertEquals("should remove from the front",1, (int) nums.get(0));
+            assertEquals("should remove from the front", 1, (int) nums.get(0));
 
             int removedLast2 = nums.removeLast();
             assertEquals("should remove from the back", 3, (int) nums.get(2));
