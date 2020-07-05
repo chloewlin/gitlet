@@ -72,7 +72,6 @@ public class LinkedListDequeTest {
     @Test
     public void addIsEmptySizeTest() {
         System.out.println("Running add/isEmpty/Size test.");
-        System.out.println("Make sure to uncomment the lines below (and delete this line).");
 
         LinkedListDeque<String> lld1 = new LinkedListDeque<>();
 
@@ -124,7 +123,6 @@ public class LinkedListDequeTest {
     @Test
     public void addAndRemoveIntegerTest() {
         System.out.println("Running add/remove test.");
-        System.out.println("Make sure to uncomment the lines below (and delete this line).");
 
         LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
 
