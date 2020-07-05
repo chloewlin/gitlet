@@ -1,5 +1,3 @@
-import java.util.Objects;
-
 @SuppressWarnings("unchecked")
 
 public class ArrayDeque<T> implements Deque<T> {
@@ -89,8 +87,8 @@ public class ArrayDeque<T> implements Deque<T> {
         int index = addOne(nextFront);
         String result = new String();
         for (int i = 0; i < this.size; i++) {
-                result += this.array[index] + " ";
-                index = addOne(index);
+            result += this.array[index] + " ";
+            index = addOne(index);
         }
         result = result.trim();
         System.out.print(result);

@@ -3,11 +3,11 @@
 public class LinkedListDeque<T> implements Deque<T> {
 
     private static class Node<T> {
-        public T item;
-        public Node prev;
-        public Node next;
+        private T item;
+        private Node prev;
+        private Node next;
 
-        public Node(T item,  Node prev, Node next) {
+        Node(T item,  Node prev, Node next) {
             this.item = item;
             this.prev = prev;
             this.next = next;
@@ -103,7 +103,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         oldHead.next = null;
         oldHead.prev = null;
         this.size--;
-        return (T)oldHead.item;
+        return (T) oldHead.item;
     }
 
     /**
@@ -122,7 +122,7 @@ public class LinkedListDeque<T> implements Deque<T> {
         oldTail.next = null;
         oldTail.prev = null;
         this.size--;
-        return (T)oldTail.item;
+        return (T) oldTail.item;
     }
 
     /**
@@ -141,7 +141,7 @@ public class LinkedListDeque<T> implements Deque<T> {
             curr = curr.next;
             count++;
         }
-        return (T)curr.item;
+        return (T) curr.item;
     }
 
     /**
@@ -157,7 +157,7 @@ public class LinkedListDeque<T> implements Deque<T> {
 
     private T getRecursiveHelper(Node node, int count) {
         if (count == 0) {
-            return (T)node.item;
+            return (T) node.item;
         } else {
             return getRecursiveHelper(node.next, --count);
         }

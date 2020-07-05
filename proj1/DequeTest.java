@@ -12,9 +12,9 @@ public class DequeTest {
     };
 
     @Test
-    public void DequeTest() {
-        Deque<Object> arr = new ArrayDeque<Object>();
-        Deque<Object> lld = new LinkedListDeque<Object>();
+    public void dequeTest1() {
+        Deque<Object> arr = new ArrayDeque<>();
+        Deque<Object> lld = new LinkedListDeque<>();
 
         int r1 = generateRandom(600, 1000);
         for (int i = 0; i < r1; i++) {
