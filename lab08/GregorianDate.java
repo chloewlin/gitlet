@@ -11,28 +11,28 @@ public class GregorianDate extends Date {
 
     @Override
     public Date nextDate() {
-        int newDay = this.dayOfMonth;
-        int newMonth = this.month;
-        int newYear = this.year;
+        int newDay = dayOfMonth;
+        int newMonth = month;
+        int newYear = year;
 
-        if (month == 4 || month == 6 || month == 9 || month == 11){
+        if ((month == 4 || month == 6 || month == 9 || month == 11) && dayOfMonth == 30) {
             newDay = 1;
             newMonth = month + 1;
-        }
-        else if (getMonthLength(month) == 31 || getMonthLength(month) == 28) {
-            newDay = 1;
-            newMonth = month + 1;
-
+        } else if ((month == 2 && dayOfMonth == 28) || dayOfMonth == 31) {
+           newDay = 1;
+           newMonth = month + 1;
         } else {
             newDay = dayOfMonth + 1;
             newMonth = month;
         }
-        if (month == 12) {
+
+        if (month == 12 && dayOfMonth == 31) {
             newMonth = 1;
             newYear = year + 1;
         } else {
             newYear = year;
         }
+
         return new GregorianDate(newYear, newMonth, newDay);
     }
 
