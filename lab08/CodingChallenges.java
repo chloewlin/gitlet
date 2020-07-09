@@ -1,5 +1,4 @@
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class CodingChallenges {
 
@@ -27,8 +26,19 @@ public class CodingChallenges {
      * Assume all values in the array are unique.
      */
     public static boolean sumTo(int[] values, int n) {
-        // TODO
-        return false;
+        boolean found = false;
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < values.length; i++) {
+            map.put(i, n - values[i]);
+        }
+
+        for (int i = 0; i < values.length; i++) {
+            if (map.containsValue(values[i])) {
+                found = true;
+            }
+        }
+
+        return found;
     }
 
     /**
