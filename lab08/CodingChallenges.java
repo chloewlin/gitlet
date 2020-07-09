@@ -1,11 +1,24 @@
+import java.util.HashSet;
+import java.util.Set;
+
 public class CodingChallenges {
 
     /**
      * Return the missing number from an array of length N containing all the
      * values from 0 to N except for one missing number.
      */
+    // [1, 0, 2, 4]
+    // linear time
     public static int missingNumber(int[] values) {
-        // TODO
+        Set<Integer> seenSoFar = new HashSet<>();
+        for (int i: values) {
+            seenSoFar.add(i);
+        }
+        for(int x = 0; x <= values.length; x++) {
+            if (!seenSoFar.contains(x)) {
+                return x;
+            }
+        }
         return -1;
     }
 
