@@ -58,4 +58,24 @@ public class BooleanSetTest {
             assertEquals(expected[i], result[i]);
         }
     }
+
+    @Test
+    public void testBooleanSet2() {
+        BooleanSet aSet = new BooleanSet(10);
+        assertEquals(0, aSet.size());
+        for (int i = 0; i < 10; i += 2) {
+            aSet.add(i);
+            assertTrue(aSet.contains(i));
+        }
+        aSet.add(0);
+        aSet.add(4);
+        assertEquals("add the same element repeatedly should not affect the size", 5, aSet.size());
+
+        int[] expected = {0, 2, 4, 6, 8};
+        int[] result = aSet.toIntArray();
+
+        for (int i = 0; i < result.length; i++) {
+            assertEquals(expected[i], result[i]);
+        }
+    }
 }
