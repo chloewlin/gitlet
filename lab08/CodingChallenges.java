@@ -33,12 +33,13 @@ public class CodingChallenges {
     public static boolean sumTo(int[] values, int n) {
         boolean found = false;
         Map<Integer, Integer> map = new HashMap<>();
+
         for (int i = 0; i < values.length; i++) {
-            map.put(i, n - values[i]);
+            map.put(values[i], n - values[i]);
         }
 
         for (int i = 0; i < values.length; i++) {
-            if (map.containsValue(values[i])) {
+            if (map.get(values[i]) != values[i] && map.containsValue(values[i])) {
                 found = true;
             }
         }
