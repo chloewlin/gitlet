@@ -24,7 +24,8 @@ public class BooleanSet implements SimpleSet {
 
     /** Removes k from the set. */
     public void remove(int k) {
-        // TODO
+        contains[k] = false;
+        size--;
     }
 
     /** Return true if k is in this set, false otherwise. */
@@ -44,7 +45,13 @@ public class BooleanSet implements SimpleSet {
 
     /** Returns an array containing all of the elements in this collection. */
     public int[] toIntArray() {
-        // TODO
-        return new int[8];
+        int[] array = new int[size];
+        for (int i = 0, j = 0; i < contains.length; i++) {
+            if (contains[i]) {
+                array[j] = i;
+                j++;
+            }
+        }
+        return array;
     }
 }
