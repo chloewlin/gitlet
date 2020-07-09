@@ -42,13 +42,13 @@ public class BooleanSet implements SimpleSet {
 
     /** Returns an array containing all of the elements in this collection. */
     public int[] toIntArray() {
-        int[] result = new int[size];
-        for (int i = 0, j = 0; i < this.contains.length; i++) {
+        int[] array = new int[size];
+        for (int i = 0, j = 0; i < contains.length; i++) {
             if (contains[i]) {
-                result[j] = i;
+                array[j] = i;
                 j++;
             }
         }
-        return result;
+        return array;
     }
 }
