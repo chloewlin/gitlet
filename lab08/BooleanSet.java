@@ -1,3 +1,6 @@
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Represent a set of nonnegative ints from 0 to maxElement for some initially
  * specified maxElement.
@@ -15,7 +18,8 @@ public class BooleanSet implements SimpleSet {
 
     /** Adds k to the set. */
     public void add(int k) {
-        // TODO
+        contains[k] = true;
+        size++;
     }
 
     /** Removes k from the set. */
@@ -35,8 +39,7 @@ public class BooleanSet implements SimpleSet {
 
     /** Returns the number of items in the set. */
     public int size() {
-        //TODO
-        return 0;
+        return size;
     }
 
     /** Returns an array containing all of the elements in this collection. */
