@@ -5,6 +5,15 @@ import static org.junit.Assert.*;
 public class CodingChallengesTest {
 
     @Test
+    public void testMissingNumber() {
+        int[] arr = {0, 1, 2, 3, 4, 5, 7};
+        assertEquals(6, CodingChallenges.missingNumber(arr));
+
+        int[] arr2 = {9, 5, 3, 0, 1, 6, 7, 2, 8};
+        assertEquals(4, CodingChallenges.missingNumber(arr2));
+    }
+
+    @Test
     public void testIsPermute1() {
         String s1 = "cat";
         String s2 = "tac";
