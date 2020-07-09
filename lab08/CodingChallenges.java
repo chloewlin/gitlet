@@ -1,4 +1,7 @@
-import java.util.*;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 
 public class CodingChallenges {
 
@@ -13,7 +16,7 @@ public class CodingChallenges {
         for (int i: values) {
             seenSoFar.add(i);
         }
-        for(int x = 0; x <= values.length; x++) {
+        for (int x = 0; x <= values.length; x++) {
             if (!seenSoFar.contains(x)) {
                 return x;
             }
@@ -46,7 +49,30 @@ public class CodingChallenges {
      * permutation of s2 if it has the same number of each character as s2.
      */
     public static boolean isPermutation(String s1, String s2) {
-        // TODO
-        return false;
+        boolean isPermute = true;
+
+        if (s1.length() != s2.length()) {
+            return false;
+        }
+
+        Map<Character, Integer> map = new HashMap<>();
+
+        for (int i = 0; i < s2.length(); i++) {
+            map.put(s2.charAt(i), map.getOrDefault(map.get(s2.charAt(i)), 0) + 1);
+        }
+
+        for (int i = 0; i < s1.length(); i++) {
+            if (map.containsKey(s1.charAt(i))) {
+                map.put(s1.charAt(i), map.get(s1.charAt(i)) - 1);
+            }
+        }
+
+        for (int v : map.values()) {
+            if (v != 0) {
+                isPermute = false;
+            }
+        }
+
+        return isPermute;
     }
 }
