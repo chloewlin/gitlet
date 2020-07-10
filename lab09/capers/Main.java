@@ -49,7 +49,12 @@ public class Main {
         case "story":
             writeStory(args);
             break;
-        // FIXME
+        case "dog":
+            makeDog(args);
+            break;
+        case "birthday":
+            celebrateBirthday(args);
+            break;
         default:
             exitWithError(String.format("Unknown command: %s", args[0]));
         }
