@@ -10,7 +10,7 @@ public class Main {
     static final File CWD = new File(".");
 
     /** Main metadata folder. */
-    static final File CAPERS_FOLDER = new File(".");
+    static final File CAPERS_FOLDER = new File(".capers");
 
     /**
      * Runs one of three commands:
