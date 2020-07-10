@@ -72,7 +72,8 @@ public class Main {
      *
      */
     public static void setupPersistence() {
-        // FIXME
+        CAPERS_FOLDER.mkdir();
+        Dog.DOG_FOLDER.mkdir();
     }
 
     /**
