@@ -1,6 +1,7 @@
 package capers;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 
 /** Represents a dog that can be serialized.
@@ -30,8 +31,9 @@ public class Dog implements Serializable {
      * @return Dog read from file
      */
     public static Dog fromFile(String name) {
-        // FIXME
-        return null;
+        File dog = Utils.join(DOG_FOLDER, name);
+        Dog dogToBeReturned = Utils.readObject(dog, Dog.class);
+        return dogToBeReturned;
     }
 
     /**
@@ -48,9 +50,13 @@ public class Dog implements Serializable {
      */
     public void saveDog() {
         Dog dog = new Dog(_name, _breed, _age);
-        byte[] serializedObj = Utils.serialize(dog);
         File dogFile = Utils.join(".capers", "dogs", _name);
-        Utils.writeObject(dogFile, serializedObj);
+        try {
+            dogFile.createNewFile();
+        } catch (IOException excp) {
+            throw new IllegalArgumentException(excp.getMessage());
+        }
+        Utils.writeObject(dogFile, dog);
     }
 
     @Override
