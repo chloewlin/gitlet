@@ -1,7 +1,6 @@
 package capers;
 
 import java.io.File;
-import java.io.Serializable;
 import java.io.IOException;
 
 /** Canine Capers: A Gitlet Prelude.
@@ -48,17 +47,17 @@ public class Main {
         }
         setupPersistence();
         switch (args[0]) {
-        case "story":
-            writeStory(args);
-            break;
-        case "dog":
-            makeDog(args);
-            break;
-        case "birthday":
-            celebrateBirthday(args);
-            break;
-        default:
-            exitWithError(String.format("Unknown command: %s", args[0]));
+            case "story":
+                writeStory(args);
+                break;
+            case "dog":
+                makeDog(args);
+                break;
+            case "birthday":
+                celebrateBirthday(args);
+                break;
+            default:
+                exitWithError(String.format("Unknown command: %s", args[0]));
         }
         return;
     }
@@ -87,16 +86,16 @@ public class Main {
         validateNumArgs("story", args, 2);
         File story = Utils.join(CAPERS_FOLDER, "story.txt");
         if (!story.exists()) {
-             try {
-                  story.createNewFile();
-             } catch (IOException excp) {
-                  throw new IllegalArgumentException(excp.getMessage());
-             }
+            try {
+                story.createNewFile();
+            } catch (IOException excp) {
+                throw new IllegalArgumentException(excp.getMessage());
+            }
         }
-        byte[] currContent = Utils.readContents(story);
-        Utils.writeContents(story, currContent, args[1], "\n");
-        String s = Utils.readContentsAsString(story);
-        System.out.println(s);
+        byte[] currStory = Utils.readContents(story);
+        Utils.writeContents(story, currStory, args[1], "\n");
+        String fullStory = Utils.readContentsAsString(story);
+        System.out.println(fullStory);
     }
 
     /**
