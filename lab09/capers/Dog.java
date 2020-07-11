@@ -50,7 +50,7 @@ public class Dog implements Serializable {
      */
     public void saveDog() {
         Dog dog = new Dog(_name, _breed, _age);
-        File dogFile = Utils.join(".capers", "dogs", _name);
+        File dogFile = Utils.join(DOG_FOLDER, _name);
         try {
             dogFile.createNewFile();
         } catch (IOException excp) {
