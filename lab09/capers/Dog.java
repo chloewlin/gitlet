@@ -6,7 +6,7 @@ import java.io.Serializable;
 /** Represents a dog that can be serialized.
  * @author Sean Dooher
 */
-public class Dog { // FIXME
+public class Dog implements Serializable {
 
     /** Folder that dogs live in. */
     static final File DOG_FOLDER = Utils.join(".capers", "dogs");
@@ -47,7 +47,10 @@ public class Dog { // FIXME
      * Saves a dog to a file for future use.
      */
     public void saveDog() {
-        // FIXME
+        Dog dog = new Dog(_name, _breed, _age);
+        byte[] serializedObj = Utils.serialize(dog);
+        File dogFile = Utils.join(".capers", "dogs", _name);
+        Utils.writeObject(dogFile, serializedObj);
     }
 
     @Override

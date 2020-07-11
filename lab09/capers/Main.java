@@ -1,6 +1,7 @@
 package capers;
 
 import java.io.File;
+import java.io.Serializable;
 
 /** Canine Capers: A Gitlet Prelude.
  * @author Sean Dooher
@@ -95,7 +96,9 @@ public class Main {
      */
     public static void makeDog(String[] args) {
         validateNumArgs("dog", args, 4);
-        // FIXME
+        Dog dog = new Dog(args[1], args[2], Integer.parseInt(args[3]));
+        dog.saveDog();
+        System.out.println(dog.toString());
     }
 
     /**
