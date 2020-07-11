@@ -2,6 +2,7 @@ package capers;
 
 import java.io.File;
 import java.io.Serializable;
+import java.io.IOException;
 
 /** Canine Capers: A Gitlet Prelude.
  * @author Sean Dooher
@@ -84,7 +85,18 @@ public class Main {
      */
     public static void writeStory(String[] args) {
         validateNumArgs("story", args, 2);
-        // FIXME
+        File story = Utils.join(CAPERS_FOLDER, "story.txt");
+        if (!story.exists()) {
+             try {
+                  story.createNewFile();
+             } catch (IOException excp) {
+                  throw new IllegalArgumentException(excp.getMessage());
+             }
+        }
+        byte[] currContent = Utils.readContents(story);
+        Utils.writeContents(story, currContent, args[1], "\n");
+        String s = Utils.readContentsAsString(story);
+        System.out.println(s);
     }
 
     /**
