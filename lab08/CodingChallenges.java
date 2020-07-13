@@ -1,3 +1,8 @@
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
+
 public class CodingChallenges {
 
     /**
@@ -5,8 +10,20 @@ public class CodingChallenges {
      * values from 0 to N except for one missing number.
      */
     public static int missingNumber(int[] values) {
-        // TODO
-        return -1;
+        int missingNum = -1;
+        Set<Integer> seenSoFar = new HashSet<>();
+
+        for (int i: values) {
+            seenSoFar.add(i);
+        }
+
+        for (int x = 0; x <= values.length; x++) {
+            if (!seenSoFar.contains(x)) {
+                missingNum = x;
+            }
+        }
+
+        return missingNum;
     }
 
     /**
@@ -14,8 +31,20 @@ public class CodingChallenges {
      * Assume all values in the array are unique.
      */
     public static boolean sumTo(int[] values, int n) {
-        // TODO
-        return false;
+        boolean found = false;
+        Map<Integer, Integer> map = new HashMap<>();
+
+        for (int i = 0; i < values.length; i++) {
+            map.put(values[i], n - values[i]);
+        }
+
+        for (int i = 0; i < values.length; i++) {
+            if (map.get(values[i]) != values[i] && map.containsValue(values[i])) {
+                found = true;
+            }
+        }
+
+        return found;
     }
 
     /**
@@ -23,7 +52,30 @@ public class CodingChallenges {
      * permutation of s2 if it has the same number of each character as s2.
      */
     public static boolean isPermutation(String s1, String s2) {
-        // TODO
-        return false;
+        boolean isPermute = true;
+
+        if (s1.length() != s2.length()) {
+            return false;
+        }
+
+        Map<Character, Integer> map = new HashMap<>();
+
+        for (int i = 0; i < s2.length(); i++) {
+            map.put(s2.charAt(i), map.getOrDefault(map.get(s2.charAt(i)), 0) + 1);
+        }
+
+        for (int i = 0; i < s1.length(); i++) {
+            if (map.containsKey(s1.charAt(i))) {
+                map.put(s1.charAt(i), map.get(s1.charAt(i)) - 1);
+            }
+        }
+
+        for (int v : map.values()) {
+            if (v != 0) {
+                isPermute = false;
+            }
+        }
+
+        return isPermute;
     }
 }
