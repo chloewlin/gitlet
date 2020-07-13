@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.Objects;
+import java.util.Comparator;
 
 public class DBTable<T> {
     protected List<T> entries;
@@ -47,8 +48,11 @@ public class DBTable<T> {
      * getter, without modifying the entries.
      */
     public <R extends Comparable<R>> List<T> getOrderedBy(Function<T, R> getter) {
-        // TODO
-        return null;
+        List<T> entries = getEntries();
+        // another implementation:
+        // entries.sort((r1, r2) -> getter.apply(r1).compareTo(getter.apply(r2)));
+        entries.sort(Comparator.comparing(getter::apply));
+        return entries;
     }
 
     public static void main(String[] args) {
