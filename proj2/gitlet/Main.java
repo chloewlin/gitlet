@@ -38,7 +38,18 @@ public class Main {
      *  <COMMAND> <OPERAND> .... */
 
     public static void main(String... args) {
-        // FILL THIS IN
+           if (args.length == 0) {
+                exitWithError("Please enter a command.");
+           }
+           setupPersistence();
+           switch (args[0]) {
+               case "init":
+                    // call method
+                    break;
+               default:
+                   exitWithError("No command with that name exists.");
+           }
+           return;
     }
 
     /** set up all directories and files we need*/
@@ -46,4 +57,8 @@ public class Main {
 
     }
 
+    public static void exitWithError(String message) {
+        System.out.println(message);
+        System.exit(0);
+    }
 }
