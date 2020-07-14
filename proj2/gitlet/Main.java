@@ -54,7 +54,7 @@ public class Main {
 
     /** set up all directories and files we need*/
     private static void setupPersistence() {
-        // FILL THIS IN
+        GITLET_FOLDER.mkdir();
     }
 
     public static void exitWithError(String message) {
