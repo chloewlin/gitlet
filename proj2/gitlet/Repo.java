@@ -14,6 +14,13 @@ public class Repo {
         OBJECTS_FOLDER.mkdir();
         Commits.mkdir();
         Blobs.mkdir();
+        createInitialCommit();
+    }
+
+    public void createInitialCommit() {
+        String initPrevSha1 = "0000000000000000000000000000000000000000";
+        Commit initialCommit = new Commit("initial commit", initPrevSha1, true);
+        initialCommit.saveCommit();
     }
 
     // add one file to the hashmap in index(staging)
