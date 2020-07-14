@@ -15,23 +15,23 @@ public class Main {
     static final File GITLET_FOLDER = new File(".gitlet");
 
     /** commit hash current head*/
-    static final File HEAD = new File(".head");
+    static final File HEAD = new File("head");
 
     /** directory for storing commit objects as blobs*/
-    static final File Objects = new File(".object");
+    static final File Objects = new File("object");
 
     /** directory for storing branch and related commit has*/
-    static final File Branches = new File(".branch");
+    static final File Branches = new File("branch");
 
     /** directory for storing all commit logs for HEAD and branches*/
-    static final File Logs = new File(".log");
+    static final File Logs = new File("log");
 
     /** directory for storing the most recent commit hash*/
-    static final File Refs = new File(".ref");
+    static final File Refs = new File("ref");
 
     /** file that represents the staging area and stores file/blob
      Mapping*/
-    static final File index = new File(".index");
+    static final File index = new File("index");
 
 
      /** Usage: java gitlet.Main ARGS, where ARGS contains
@@ -54,7 +54,7 @@ public class Main {
 
     /** set up all directories and files we need*/
     private static void setupPersistence() {
-
+        // FILL THIS IN
     }
 
     public static void exitWithError(String message) {
