@@ -14,11 +14,12 @@ public class Main {
     /** directory for .gitlet */
     static final File GITLET_FOLDER = new File(".gitlet");
 
+    /** file that represents the staging area and stores file/blob
+        Mapping*/
+    static final File index = Utils.join(GITLET_FOLDER, "index");
+
     /** commit hash current head*/
     static final File HEAD = new File("head");
-
-    /** directory for storing commit objects as blobs*/
-    static final File Objects = new File("object");
 
     /** directory for storing branch and related commit has*/
     static final File Branches = new File("branch");
@@ -28,10 +29,6 @@ public class Main {
 
     /** directory for storing the most recent commit hash*/
     static final File Refs = new File("ref");
-
-    /** file that represents the staging area and stores file/blob
-     Mapping*/
-    static final File index = new File("index");
 
 
      /** Usage: java gitlet.Main ARGS, where ARGS contains
@@ -44,6 +41,9 @@ public class Main {
            setupPersistence();
            switch (args[0]) {
                case "init":
+                    initialize();
+                    break;
+               case "add":
                     // call method
                     break;
                default:
@@ -52,9 +52,18 @@ public class Main {
            return;
     }
 
+    private static void initialize() {
+        Repo repo = new Repo();
+    }
+
     /** set up all directories and files we need*/
     private static void setupPersistence() {
         GITLET_FOLDER.mkdir();
+        try {
+            index.createNewFile();
+        } catch(IOException excp) {
+            throw new IllegalArgumentException(excp.getMessage());
+        }
     }
 
     public static void exitWithError(String message) {

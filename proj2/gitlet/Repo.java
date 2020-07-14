@@ -1,12 +1,19 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 
 public class Repo {
+    /** directory for storing commit objects as blobs*/
+    static final File OBJECTS_FOLDER = Utils.join(".gitlet", "objects");
+    static final File Commits = Utils.join(OBJECTS_FOLDER,  "commits");
+    static final File Blobs = Utils.join(OBJECTS_FOLDER,  "blobs");
 
     // create initial commit and set up branch and HEAD pointer
-    public void init() {
-
+    public Repo() {
+        OBJECTS_FOLDER.mkdir();
+        Commits.mkdir();
+        Blobs.mkdir();
     }
 
     // add one file to the hashmap in index(staging)
