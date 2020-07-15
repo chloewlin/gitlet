@@ -29,7 +29,7 @@ public class Main {
     static final File Branches = new File("branch");
 
     /** directory for storing all commit logs for HEAD and branches*/
-    static final File Logs = new File("log");
+    static final File LOGS_FOLDER = Utils.join(GITLET_FOLDER, "logs");
 
     /** directory for storing the most recent commit hash*/
     static final File REFS_FOLDER = Utils.join(GITLET_FOLDER, "refs");
@@ -58,6 +58,9 @@ public class Main {
                case "commit":
                     commit(args);
                     break;
+               case "log":
+                   printAllLog(args);
+                   break;
                default:
                    exitWithError("No command with that name exists.");
                }
@@ -85,6 +88,34 @@ public class Main {
         Commit commit = new Commit(commitMessage, parentCommit.getHead(), false);
         commit.saveCommit();
         saveBranchHead("master", commit.SHA);
+        saveLog(commit);
+    }
+
+    private static void saveLog(Commit commit) throws IOException {
+        File currLogFile = Utils.join(LOGS_FOLDER, "master");
+        if (!currLogFile.exists()) {
+            currLogFile.createNewFile();
+        }
+        String currLog = new String(commit.SHA + " " + commit.timestamp + " " + commit.message);
+        byte[] Log = Utils.readContents(currLogFile);
+        Utils.writeContents(currLogFile, Log, currLog, "\n");
+        String fullLog = Utils.readContentsAsString(currLogFile);
+        System.out.println(fullLog);
+    }
+
+    private static void printAllLog(String[] args) throws IOException {
+        File currLogFile = Utils.join(LOGS_FOLDER, "master");
+        byte[] Log = Utils.readContents(currLogFile);
+        String fullLog = Utils.readContentsAsString(currLogFile);
+        int lines = 0;
+        while (fullLog.l)
+        for (int i = 0; i < currL.; i++) {
+
+        }
+        System.out.println("===");
+        System.out.println("commit " + sha);
+
+
     }
 
     public static void saveBranchHead(String branchName, String SHA1) {
@@ -99,6 +130,7 @@ public class Main {
         REFS_FOLDER.mkdir();
         HEADS_REFS_FOLDER.mkdir();
         STAGING_FOLDER.mkdir();
+        LOGS_FOLDER.mkdir();
         try {
             index.createNewFile();
         } catch(IOException excp) {
