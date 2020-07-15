@@ -11,7 +11,6 @@ import java.io.IOException;
 public class Main {
     /** repo*/
     static Repo repo;
-    static Staging stagingArea;
 
     /** Current Working Directory. */
     static final File CWD = new File(".");
@@ -37,13 +36,14 @@ public class Main {
 
     static final File HEADS_REFS_FOLDER = Utils.join(REFS_FOLDER, "heads");
 
+    /* directory for the staging area */
     static final File STAGING_FOLDER = Utils.join(GITLET_FOLDER, "staging");
-
+    private static Staging stagingArea = new Staging();
 
      /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND> .... */
 
-    public static void main(String... args) {
+    public static void main(String... args) throws IOException {
            if (args.length == 0) {
                 exitWithError("Please enter a command.");
            }
@@ -67,12 +67,11 @@ public class Main {
 
     // Adds a copy of the file as it currently exists to the staging area
     // remove it from the staging area if it is already there
-    private static void add(String[] args) {
+    private static void add(String[] args) throws IOException {
         String fileName = args[1];
         Blob blob = new Blob(fileName);
-        System.out.println("Blob " + blob.fileName);
-        System.out.println("BlobContent " + blob.fileContent);
-        System.out.println("Blob SHA" + blob.fileSHA1);
+        stagingArea.add(blob);
+        blob.saveBlob();
     }
 
     /** set up all directories and files we need*/
