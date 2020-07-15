@@ -28,8 +28,8 @@ public class Main {
     static final File Logs = new File("log");
 
     /** directory for storing the most recent commit hash*/
-    static final File Refs = new File("ref");
-
+    static final File REFS_FOLDER = Utils.join(GITLET_FOLDER, "refs");
+    static final File HEADS_REFS_FOLDER = Utils.join(REFS_FOLDER, "heads");
 
      /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND> .... */
@@ -59,6 +59,8 @@ public class Main {
     /** set up all directories and files we need*/
     private static void setupPersistence() {
         GITLET_FOLDER.mkdir();
+        REFS_FOLDER.mkdir();
+        HEADS_REFS_FOLDER.mkdir();
         try {
             index.createNewFile();
         } catch(IOException excp) {

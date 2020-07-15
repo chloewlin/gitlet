@@ -9,6 +9,10 @@ public class Repo {
     static final File Commits = Utils.join(OBJECTS_FOLDER,  "commits");
     static final File Blobs = Utils.join(OBJECTS_FOLDER,  "blobs");
 
+    static final File GITLET_FOLDER = new File(".gitlet");
+    static final File REFS_FOLDER = Utils.join(GITLET_FOLDER, "refs");
+    static final File HEADS_REFS_FOLDER = Utils.join(REFS_FOLDER, "heads");
+
     // create initial commit and set up branch and HEAD pointer
     public Repo() {
         OBJECTS_FOLDER.mkdir();
@@ -21,6 +25,18 @@ public class Repo {
         String initPrevSha1 = "0000000000000000000000000000000000000000";
         Commit initialCommit = new Commit("initial commit", initPrevSha1, true);
         initialCommit.saveCommit();
+        saveBranchHead("master", initialCommit);
+    }
+
+    public void saveBranchHead(String branchName, Commit commit) {
+        Branch branch = new Branch("master", commit);
+        File branchFile = Utils.join(HEADS_REFS_FOLDER, branchName);
+        try {
+            branchFile.createNewFile();
+        } catch (IOException excp) {
+            throw new IllegalArgumentException(excp.getMessage());
+        }
+        Utils.writeObject(branchFile, branch);
     }
 
     // add one file to the hashmap in index(staging)
