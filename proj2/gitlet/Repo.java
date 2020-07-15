@@ -13,6 +13,9 @@ public class Repo {
     static final File REFS_FOLDER = Utils.join(GITLET_FOLDER, "refs");
     static final File HEADS_REFS_FOLDER = Utils.join(REFS_FOLDER, "heads");
 
+    /** directory for storing all commit logs for HEAD and branches*/
+    static final File LOGS_FOLDER = Utils.join(GITLET_FOLDER, "logs");
+
     // create initial commit and set up branch and HEAD pointer
     public Repo() throws IOException {
         OBJECTS_FOLDER.mkdir();
@@ -26,23 +29,27 @@ public class Repo {
         Commit initialCommit = new Commit("initial commit", initPrevSha1, true);
         initialCommit.saveCommit();
         saveBranchHead("master", initialCommit.SHA);
+        saveLog(initialCommit);
     }
-
-//    public void saveBranchHead(String branchName, Commit commit) {
-//        Branch branch = new Branch("master", commit);
-//        File branchFile = Utils.join(HEADS_REFS_FOLDER, branchName);
-//        try {
-//            branchFile.createNewFile();
-//        } catch (IOException excp) {
-//            throw new IllegalArgumentException(excp.getMessage());
-//        }
-//        Utils.writeObject(branchFile, branch);
-//    }
 
     public void saveBranchHead(String branchName, String SHA1) {
         Branch branch = new Branch("master", SHA1);
         File branchFile = Utils.join(HEADS_REFS_FOLDER, branchName);
         Utils.writeObject(branchFile, branch);
+    }
+
+    private static void saveLog(Commit commit) throws IOException {
+        File currLogFile = Utils.join(LOGS_FOLDER, "master");
+        if (!currLogFile.exists()) {
+            currLogFile.createNewFile();
+        }
+        String divider = new String("===" + "\n");
+        String SHA = new String("commit " + commit.SHA + "\n");
+        String time = new String("Date: " + commit.timestamp + "\n");
+        String message = new String(commit.message + "\n");
+
+        byte[] Log = Utils.readContents(currLogFile);
+        Utils.writeContents(currLogFile, Log, divider, SHA, time, message);
     }
 
     // add one file to the hashmap in index(staging)

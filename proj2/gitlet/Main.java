@@ -96,26 +96,19 @@ public class Main {
         if (!currLogFile.exists()) {
             currLogFile.createNewFile();
         }
-        String currLog = new String(commit.SHA + " " + commit.timestamp + " " + commit.message);
+        String divider = new String("===" + "\n");
+        String SHA = new String("commit " + commit.SHA + "\n");
+        String time = new String("Date: " + commit.timestamp + "\n");
+        String message = new String(commit.message + "\n");
+
         byte[] Log = Utils.readContents(currLogFile);
-        Utils.writeContents(currLogFile, Log, currLog, "\n");
-        String fullLog = Utils.readContentsAsString(currLogFile);
-        System.out.println(fullLog);
+        Utils.writeContents(currLogFile, divider, SHA, time, message, "\n", Log);
     }
 
     private static void printAllLog(String[] args) throws IOException {
         File currLogFile = Utils.join(LOGS_FOLDER, "master");
-        byte[] Log = Utils.readContents(currLogFile);
         String fullLog = Utils.readContentsAsString(currLogFile);
-        int lines = 0;
-        while (fullLog.l)
-        for (int i = 0; i < currL.; i++) {
-
-        }
-        System.out.println("===");
-        System.out.println("commit " + sha);
-
-
+        System.out.println(fullLog);
     }
 
     public static void saveBranchHead(String branchName, String SHA1) {
