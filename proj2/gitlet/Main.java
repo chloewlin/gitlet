@@ -55,13 +55,16 @@ public class Main {
                case "add":
                    add(args);
                    break;
+               case "commit":
+                    commit(args);
+                    break;
                default:
                    exitWithError("No command with that name exists.");
                }
            return;
     }
 
-    private static void initialize() {
+    private static void initialize() throws IOException {
         Repo Repo = new Repo();
     }
 
@@ -72,6 +75,22 @@ public class Main {
         Blob blob = new Blob(fileName);
         stagingArea.add(blob);
         blob.saveBlob();
+    }
+
+    private static void commit(String[] args) throws IOException {
+        String commitMessage = args[1];
+        File branchFile = Utils.join(HEADS_REFS_FOLDER, "master");
+        Branch parentCommit = Utils.readObject(branchFile, Branch.class);
+        //  System.out.println("parentCommit: " + parentCommit.getHead());
+        Commit commit = new Commit(commitMessage, parentCommit.getHead(), false);
+        commit.saveCommit();
+        saveBranchHead("master", commit.SHA);
+    }
+
+    public static void saveBranchHead(String branchName, String SHA1) {
+        Branch branch = new Branch("master", SHA1);
+        File branchFile = Utils.join(HEADS_REFS_FOLDER, branchName);
+        Utils.writeObject(branchFile, branch);
     }
 
     /** set up all directories and files we need*/
