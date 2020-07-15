@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 
 public class Blob {
 
@@ -17,6 +18,9 @@ public class Blob {
     }
 
     /* Save blob as a file */
-    public static void saveBlob() {
+    public void saveBlob() throws IOException {
+        File blobFile =  Utils.join(BLOBS_FOLDER, fileSHA1);
+        blobFile.createNewFile();
+        Utils.writeContents(Utils.join(BLOBS_FOLDER, fileSHA1), fileContent);
     }
 }
