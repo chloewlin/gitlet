@@ -4,18 +4,18 @@ import java.io.Serializable;
 
 public class Branch implements Serializable {
     private String name;
-    private Commit head;
+    private String head;
 
-    public Branch(String name, Commit commit) {
+    public Branch(String name, String SHA1) {
         this.name = name;
-        this.head = commit;
+        this.head = SHA1;
     }
 
     public String getName() {
         return this.name;
     }
 
-    public Commit getHead() {
+    public String getHead() {
         return this.head;
     }
 }
