@@ -21,6 +21,6 @@ public class Blob {
     public void saveBlob() throws IOException {
         File blobFile =  Utils.join(BLOBS_FOLDER, fileSHA1);
         blobFile.createNewFile();
-        Utils.writeContents(Utils.join(BLOBS_FOLDER, fileSHA1), fileContent);
+        Utils.writeContents(blobFile, fileContent);
     }
 }

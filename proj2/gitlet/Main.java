@@ -56,8 +56,8 @@ public class Main {
                    add(args);
                    break;
                case "commit":
-                    commit(args);
-                    break;
+                   commit(args);
+                   break;
                case "log":
                    printAllLog(args);
                    break;
@@ -84,7 +84,6 @@ public class Main {
         String commitMessage = args[1];
         File branchFile = Utils.join(HEADS_REFS_FOLDER, "master");
         Branch parentCommit = Utils.readObject(branchFile, Branch.class);
-        //  System.out.println("parentCommit: " + parentCommit.getHead());
         Commit commit = new Commit(commitMessage, parentCommit.getHead(), false);
         commit.saveCommit();
         saveBranchHead("master", commit.SHA);
@@ -96,7 +95,7 @@ public class Main {
         if (!currLogFile.exists()) {
             currLogFile.createNewFile();
         }
-        String divider = new String("===" + "\n");
+        String divider = new String("===\n");
         String SHA = new String("commit " + commit.SHA + "\n");
         String time = new String("Date: " + commit.timestamp + "\n");
         String message = new String(commit.message + "\n");
