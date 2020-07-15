@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 
@@ -8,6 +9,9 @@ import java.io.IOException;
  *  @author Chloe Lin, Christal Huang
  */
 public class Main {
+    /** repo*/
+    static Repo repo = null;
+
     /** Current Working Directory. */
     static final File CWD = new File(".");
 
@@ -41,19 +45,34 @@ public class Main {
            setupPersistence();
            switch (args[0]) {
                case "init":
-                    initialize();
-                    break;
+                   initialize();
+                   break;
                case "add":
-                    // call method
-                    break;
+                   add(args);
+                   break;
                default:
                    exitWithError("No command with that name exists.");
-           }
-           return;
+               }
+               return;
     }
 
     private static void initialize() {
         Repo repo = new Repo();
+    }
+
+    //Adds a copy of the file as it currently exists to the staging area
+    //remove it from the staging area if it is already there
+    private static void add(String[] args) {
+        File newFile = new File(args[1]);
+        byte[] blob = Utils.serialize(args[1]);
+        Utils.writeContents(newFile, blob);
+        File blobFile = Utils.join(BLOBS_FOLDER, );
+        try {
+//            blobFile.createNewFile();
+        } catch (IOException excp) {
+            throw new IllegalArgumentException(excp.getMessage());
+        }
+        Utils.writeObject(blobFile, branch);
     }
 
     /** set up all directories and files we need*/

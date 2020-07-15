@@ -42,6 +42,7 @@ public class Repo {
     // add one file to the hashmap in index(staging)
     public void add(File file) {
 
+
     }
 
     // remove the added file from the hashmap in index(staging)
