@@ -14,48 +14,52 @@ public class Repo {
     static final File HEADS_REFS_FOLDER = Utils.join(REFS_FOLDER, "heads");
 
     // create initial commit and set up branch and HEAD pointer
-    public Repo() {
+    public Repo() throws IOException {
         OBJECTS_FOLDER.mkdir();
         Commits.mkdir();
         Blobs.mkdir();
         createInitialCommit();
     }
 
-    public void createInitialCommit() {
+    public void createInitialCommit() throws IOException {
         String initPrevSha1 = "0000000000000000000000000000000000000000";
         Commit initialCommit = new Commit("initial commit", initPrevSha1, true);
         initialCommit.saveCommit();
-        saveBranchHead("master", initialCommit);
+        saveBranchHead("master", initialCommit.SHA);
     }
 
-    public void saveBranchHead(String branchName, Commit commit) {
-        Branch branch = new Branch("master", commit);
+//    public void saveBranchHead(String branchName, Commit commit) {
+//        Branch branch = new Branch("master", commit);
+//        File branchFile = Utils.join(HEADS_REFS_FOLDER, branchName);
+//        try {
+//            branchFile.createNewFile();
+//        } catch (IOException excp) {
+//            throw new IllegalArgumentException(excp.getMessage());
+//        }
+//        Utils.writeObject(branchFile, branch);
+//    }
+
+    public void saveBranchHead(String branchName, String SHA1) {
+        Branch branch = new Branch("master", SHA1);
         File branchFile = Utils.join(HEADS_REFS_FOLDER, branchName);
-        try {
-            branchFile.createNewFile();
-        } catch (IOException excp) {
-            throw new IllegalArgumentException(excp.getMessage());
-        }
         Utils.writeObject(branchFile, branch);
     }
 
     // add one file to the hashmap in index(staging)
     public void add(String fileName) {
          Blob blob = new Blob(fileName);
-         System.out.println("Blob " + blob.fileName);
-         System.out.println("BlobContent " + blob.fileContent);
-         System.out.println("Blob SHA" + blob.fileSHA1);
+//         System.out.println("Blob " + blob.fileName);
+//         System.out.println("BlobContent " + blob.fileContent);
+//         System.out.println("Blob SHA" + blob.fileSHA1);
     }
 
     // remove the added file from the hashmap in index(staging)
     public void remove() {
-
     }
 
     // serialize added files into blobs, write blobs into files inside /object directory, add the
     // file-blob mapping to index(staging), update HEAD pointer
     public void commit() {
-
     }
 
     // print the commit metadata for current branch
