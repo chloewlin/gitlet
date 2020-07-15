@@ -54,7 +54,7 @@ public class Commit implements Serializable {
         if (init) {
             cal.setTimeInMillis(0);
         }
-        DateFormat sdf = new SimpleDateFormat("EEE d MMM HH:mm:ss yyyy Z");
+        DateFormat sdf = new SimpleDateFormat("EEE LLL d HH:mm:ss y Z");
         sdf.setTimeZone(tz);
         return sdf.format(cal.getTime());
     }
