@@ -40,9 +40,11 @@ public class Repo {
     }
 
     // add one file to the hashmap in index(staging)
-    public void add(File file) {
-
-
+    public void add(String fileName) {
+         Blob blob = new Blob(fileName);
+         System.out.println("Blob " + blob.fileName);
+         System.out.println("BlobContent " + blob.fileContent);
+         System.out.println("Blob SHA" + blob.fileSHA1);
     }
 
     // remove the added file from the hashmap in index(staging)

@@ -10,7 +10,8 @@ import java.io.IOException;
  */
 public class Main {
     /** repo*/
-    static Repo repo = null;
+    static Repo repo;
+    static Staging stagingArea;
 
     /** Current Working Directory. */
     static final File CWD = new File(".");
@@ -33,7 +34,11 @@ public class Main {
 
     /** directory for storing the most recent commit hash*/
     static final File REFS_FOLDER = Utils.join(GITLET_FOLDER, "refs");
+
     static final File HEADS_REFS_FOLDER = Utils.join(REFS_FOLDER, "heads");
+
+    static final File STAGING_FOLDER = Utils.join(GITLET_FOLDER, "staging");
+
 
      /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND> .... */
@@ -53,26 +58,21 @@ public class Main {
                default:
                    exitWithError("No command with that name exists.");
                }
-               return;
+           return;
     }
 
     private static void initialize() {
-        Repo repo = new Repo();
+        Repo Repo = new Repo();
     }
 
-    //Adds a copy of the file as it currently exists to the staging area
-    //remove it from the staging area if it is already there
+    // Adds a copy of the file as it currently exists to the staging area
+    // remove it from the staging area if it is already there
     private static void add(String[] args) {
-        File newFile = new File(args[1]);
-        byte[] blob = Utils.serialize(args[1]);
-        Utils.writeContents(newFile, blob);
-        File blobFile = Utils.join(BLOBS_FOLDER, );
-        try {
-//            blobFile.createNewFile();
-        } catch (IOException excp) {
-            throw new IllegalArgumentException(excp.getMessage());
-        }
-        Utils.writeObject(blobFile, branch);
+        String fileName = args[1];
+        Blob blob = new Blob(fileName);
+        System.out.println("Blob " + blob.fileName);
+        System.out.println("BlobContent " + blob.fileContent);
+        System.out.println("Blob SHA" + blob.fileSHA1);
     }
 
     /** set up all directories and files we need*/
@@ -80,6 +80,7 @@ public class Main {
         GITLET_FOLDER.mkdir();
         REFS_FOLDER.mkdir();
         HEADS_REFS_FOLDER.mkdir();
+        STAGING_FOLDER.mkdir();
         try {
             index.createNewFile();
         } catch(IOException excp) {
