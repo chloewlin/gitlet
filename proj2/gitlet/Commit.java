@@ -39,15 +39,11 @@ public class Commit implements Serializable {
         this.timestamp = generateDate(init);
     }
 
-    public void saveCommit() {
+    public void saveCommit() throws IOException {
         Commit commit = new Commit(this.message, this.parentsArray[0], this.init);
-        File commmitFile = Utils.join(COMMITS_FOLDER, this.SHA);
-        try {
-            commmitFile.createNewFile();
-        } catch (IOException excp) {
-            throw new IllegalArgumentException(excp.getMessage());
-        }
-        Utils.writeObject(commmitFile, commit);
+        File commitFile = Utils.join(COMMITS_FOLDER, this.SHA);
+        commitFile.createNewFile();
+        Utils.writeObject(commitFile, commit);
     }
 
     public String generateDate(boolean init) {
