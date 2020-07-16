@@ -26,12 +26,18 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
        the ROOT Amoeba printed first. Each Amoeba should be indented four spaces
        more than its parent. */
     public void print() {
-        System.out.println(this.root.name);
-        if (this.root == null) {
-            return;
+        if (this.root != null) {
+            printHelper(root, "");
         }
-        for (Amoeba amoebas : this.root.children) {
-            amoebas.print(1);
+    }
+
+    /** print helper function*/
+    public void printHelper(Amoeba amoebas, String indent) {
+        System.out.println(indent + amoebas.name);
+        if (amoebas.children != null) {
+            for (Amoeba amoeba : amoebas.children) {
+                printHelper(amoeba, indent + "\t");
+            }
         }
     }
 
@@ -121,9 +127,6 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
             return maxLengthSeen;
         }
 
-        /** print helper function*/
-        public void print(int i) {
-        }
 
         // TODO: ADD HELPER FUNCTIONS HERE
 
