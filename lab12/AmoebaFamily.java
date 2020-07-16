@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Stack;
 
 /* An AmoebaFamily is a tree, where nodes are Amoebas, each of which can have
    any number of children. */
@@ -76,7 +78,13 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
         family.addChild("Marge", "Bill");
         family.addChild("Marge", "Hilary");
         System.out.println("Here's the family:");
-        family.print();
+        //        family.print();
+
+        Iterator<Amoeba> iterator = family.iterator();
+
+        while (iterator.hasNext()) {
+            System.out.print(iterator.next() + " ");
+        }
     }
 
     /* An Amoeba is a node of an AmoebaFamily. */
@@ -126,10 +134,6 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
             }
             return maxLengthSeen;
         }
-
-
-        // TODO: ADD HELPER FUNCTIONS HERE
-
     }
 
     /* An Iterator class for the AmoebaFamily, running a DFS traversal on the
@@ -138,20 +142,36 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
     public class AmoebaDFSIterator implements Iterator<Amoeba> {
 
         // TODO: IMPLEMENT THE CLASS HERE
+        Stack<Amoeba> stack = new Stack<>();
 
         /* AmoebaDFSIterator constructor. Sets up all of the initial information
            for the AmoebaDFSIterator. */
         public AmoebaDFSIterator() {
+            if (root != null) {
+                stack.push(root);
+            }
         }
 
         /* Returns true if there is a next element to return. */
         public boolean hasNext() {
-            return false;
+            return !stack.isEmpty();
         }
 
         /* Returns the next element. */
         public Amoeba next() {
-            return null;
+            if (!hasNext()) {
+                throw new NoSuchElementException("tree ran out of elements");
+            }
+
+            Amoeba amoeba = stack.pop();
+
+            if (amoeba.children != null) {
+                for (int i = amoeba.getChildren().size() - 1; i >= 0; i--) {
+                    stack.push(amoeba.getChildren().get(i));
+                }
+            }
+
+            return amoeba;
         }
 
         public void remove() {
