@@ -14,7 +14,7 @@ public class Blob {
     public Blob(String fileName) {
         this.fileName = fileName;
         this.fileContent = Utils.readContents(Utils.join(".", fileName));
-        this.blobSHA1 = "$" + Utils.sha1(fileContent);
+        this.blobSHA1 = Utils.sha1("BLOB", fileContent);
     }
 
     /* Save blob as a file */
