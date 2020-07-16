@@ -54,7 +54,7 @@ public class Main {
                 printAllLog(args);
                 break;
             default:
-                printInvalidCommand();
+                validateCommand();
             }
         return;
 	}
@@ -72,8 +72,12 @@ public class Main {
         }
 	}
 
-	private static void printInvalidCommand() {
+	private static void validateCommand() {
 	    exitWithError("No command with that name exists.");
+	}
+
+	private static void validateCommitMessage() {
+	    exitWithError("Please enter a commit message.");
 	}
 
     public static void validateNumArgs(String[] args) {
@@ -85,6 +89,7 @@ public class Main {
             case "add":
                 if (n == 2) isValid = true;
             case "commit":
+                if (n == 1) validateCommitMessage();
                 if (n == 2) isValid = true;
             case "log":
                 if (n == 1) isValid = true;
