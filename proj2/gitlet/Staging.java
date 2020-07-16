@@ -19,6 +19,8 @@ public class Staging implements Serializable {
     /**
      * Store the mapping of file and blob like so:
      * Hello.txt:$1d229271928d3f9e2bb0375bd6ce5db6c6d348d9
+     * Staging an already-staged file overwrites the previous
+     * entry in the staging area with the new contents
      * */
     public void add(String fileName, String blobSHA1) {
         this.trackedFiles.put(fileName, blobSHA1);
