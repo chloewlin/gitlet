@@ -35,11 +35,11 @@ public class BinaryTree<T> {
     public static BinaryTree<Integer> fibTree(int N) {
         BinaryTree<Integer> result = new BinaryTree<Integer>();
         if (N <= 1) {
-            result.root = new TreeNode<>(N);
+            result.root = new TreeNode<Integer>(N);
         } else {
-            TreeNode left = fibTree(N-1).root;
-            TreeNode right = fibTree(N-2).root;
-            result.root = new TreeNode<>((int)left.item + (int)right.item);
+            TreeNode<Integer> left = fibTree(N-1).root;
+            TreeNode<Integer> right = fibTree(N-2).root;
+            result.root = new TreeNode<Integer>((left.item + right.item), left, right);
         }
         return result;
     }
@@ -117,6 +117,8 @@ public class BinaryTree<T> {
         print(t, "sample tree 2");
         System.out.println(t.height());
         System.out.println(t.isCompletelyBalanced());
+        t = fibTree(4);
+        print(t, "fib tree");
     }
 
     /* Note: this class is public in this lab for testing purposes. However,
