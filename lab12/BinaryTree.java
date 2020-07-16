@@ -16,15 +16,19 @@ public class BinaryTree<T> {
 
     /* Returns the height of the tree. */
     public int height() {
-        // TODO: YOUR CODE HERE
+        if (root != null) {
+            return root.height();
+        }
         return 0;
     }
 
     /* Returns true if the tree's left and right children are the same height
        and are themselves completely balanced. */
     public boolean isCompletelyBalanced() {
-        // TODO: YOUR CODE HERE
-        return false;
+        if (root != null) {
+            return root.isCompletelyBalanced();
+        }
+        return true;
     }
 
     /* Returns a BinaryTree representing the Fibonacci calculation for N. */
@@ -168,6 +172,26 @@ public class BinaryTree<T> {
             }
         }
 
-        // TODO: ADD HELPER METHODS HERE
+        /** height helper function */
+        private int height() {
+            if (this.left == null & this.right == null) {
+                return 1;
+            } else if (this.left == null) {
+                return 1 + right.height();
+            } else if (this.right == null) {
+                return 1 + left.height();
+            } else {
+                return 1 + Math.max(this.left.height(), this.right.height());
+            }
+        }
+
+        /** isCompletelyBalanced helper function */
+        private boolean isCompletelyBalanced() {
+            if (this.left.height() == 1 && right.height() == 1) {
+                return true;
+            } else {
+                return this.left.height() == this.right.height();
+            }
+        }
     }
 }

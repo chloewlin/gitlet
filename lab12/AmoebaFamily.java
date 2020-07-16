@@ -26,7 +26,13 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
        the ROOT Amoeba printed first. Each Amoeba should be indented four spaces
        more than its parent. */
     public void print() {
-        // TODO: YOUR CODE HERE
+        System.out.println(this.root.name);
+        if (this.root == null) {
+            return;
+        }
+        for (Amoeba amoebas : this.root.children) {
+            amoebas.print(1);
+        }
     }
 
     /* Returns the length of the longest name in this AmoebaFamily. */
@@ -113,6 +119,10 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
                                          a.longestNameLengthHelper());
             }
             return maxLengthSeen;
+        }
+
+        /** print helper function*/
+        public void print(int i) {
         }
 
         // TODO: ADD HELPER FUNCTIONS HERE
