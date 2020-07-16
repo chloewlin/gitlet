@@ -117,9 +117,21 @@ public class Main {
 		saveLog(initialCommit);
    }
 
-	// Adds a copy of the file as it currently exists to the staging area
-	// remove it from the staging area if it is already there
+	/**
+	* Lazy loading and caching: Let’s say you store the state of which
+	* files have been gitlet added to your repo in your filesytem.
+	* Lazy loading: The first time you want that list of files when
+	* you run your Java program, you need to load it from disk.
+	* Caching: The second time you need that list of files in the
+	* same run of the Java program, don’t load it from disk again,
+	* but use the same list as you loaded before. If you need to,
+	* you can then add multiple files to that list object in your
+	* Java program. Writing back: When you Java program is finished,
+	* at the very end, since you had loaded that list of files and
+	* may have modified it, write it back to your file system.
+	*/
 	private static void add(String[] args) throws IOException {
+	    // To-do: lazy loading and caching
 	    validateNumArgs(args);
 		String fileName = args[1];
 		Blob blob = new Blob(fileName);
