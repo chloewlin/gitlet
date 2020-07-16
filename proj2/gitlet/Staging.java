@@ -37,6 +37,7 @@ public class Staging implements Serializable {
      * already there (as can happen when a file is changed,
      * added, and then changed back).
      * */
+    // compare SHA1
     public void remove() {
         // To-do
     }

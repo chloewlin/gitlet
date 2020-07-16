@@ -35,6 +35,7 @@ public class Main {
 	static final File REFS_FOLDER = Utils.join(GITLET_FOLDER, "refs");
 	static final File HEADS_REFS_FOLDER = Utils.join(REFS_FOLDER, "heads");
 
+    static Repo repo = new Repo();
 	/** Usage: java gitlet.Main ARGS, where ARGS contains
 	*  <COMMAND> <OPERAND> .... */
 	public static void main(String... args) throws IOException {
@@ -46,6 +47,7 @@ public class Main {
                 break;
             case "add":
                 add(args);
+//                 repo.add(args);
                 break;
             case "commit":
                 commit(args);
