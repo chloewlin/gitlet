@@ -118,6 +118,14 @@ public class BinaryTree<T> {
         print(t, "sample tree 2");
         System.out.println(t.height());
         System.out.println(t.isCompletelyBalanced()); // false
+        t.sampleTree3();
+        print(t, "sample tree 3");
+        System.out.println(t.height());
+        System.out.println(t.isCompletelyBalanced()); // false
+        t.sampleTree4();
+        print(t, "sample tree 4");
+        System.out.println(t.height());
+        System.out.println(t.isCompletelyBalanced()); // true
         t = fibTree(3);
         print(t, "fib tree");
         t = fibTree(4);
