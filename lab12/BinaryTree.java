@@ -33,13 +33,13 @@ public class BinaryTree<T> {
 
     /* Returns a BinaryTree representing the Fibonacci calculation for N. */
     public static BinaryTree<Integer> fibTree(int N) {
-        BinaryTree<Integer> result = new BinaryTree<Integer>();
+        BinaryTree<Integer> result = new BinaryTree<>();
         if (N <= 1) {
-            result.root = new TreeNode<Integer>(N);
+            result.root = new TreeNode<>(N);
         } else {
-            TreeNode<Integer> left = fibTree(N-1).root;
-            TreeNode<Integer> right = fibTree(N-2).root;
-            result.root = new TreeNode<Integer>((left.item + right.item), left, right);
+            TreeNode<Integer> left = fibTree(N-1).getRoot();
+            TreeNode<Integer> right = fibTree(N-2).getRoot();
+            result.root = new TreeNode<>((left.getItem() + right.getItem()), left, right);
         }
         return result;
     }
@@ -117,6 +117,8 @@ public class BinaryTree<T> {
         print(t, "sample tree 2");
         System.out.println(t.height());
         System.out.println(t.isCompletelyBalanced());
+        t = fibTree(3);
+        print(t, "fib tree");
         t = fibTree(4);
         print(t, "fib tree");
     }
