@@ -34,7 +34,14 @@ public class BinaryTree<T> {
     /* Returns a BinaryTree representing the Fibonacci calculation for N. */
     public static BinaryTree<Integer> fibTree(int N) {
         BinaryTree<Integer> result = new BinaryTree<Integer>();
-        return null;
+        if (N <= 1) {
+            result.root = new TreeNode<>(N);
+        } else {
+            TreeNode left = fibTree(N-1).root;
+            TreeNode right = fibTree(N-2).root;
+            result.root = new TreeNode<>((int)left.item + (int)right.item);
+        }
+        return result;
     }
 
     /* Print the values in the tree in preorder: root value first, then values
