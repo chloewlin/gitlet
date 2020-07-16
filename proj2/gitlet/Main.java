@@ -123,9 +123,15 @@ public class Main {
 	    validateNumArgs(args);
 		String fileName = args[1];
 		Blob blob = new Blob(fileName);
-		Staging stagingArea = new Staging();
-//         stagingArea.add(blob);
+        stageFile(fileName, blob);
 		blob.saveBlob();
+	}
+
+	private static void stageFile(String fileName, Blob blob) {
+	    Staging staging = new Staging();
+        staging.add(fileName, blob.getBlobSHA1());
+        staging.save(staging);
+        staging.print();
 	}
 
 	private static void commit(String[] args) throws IOException {
