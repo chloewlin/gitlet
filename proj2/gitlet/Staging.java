@@ -31,6 +31,16 @@ public class Staging implements Serializable {
         Utils.writeObject(currentTrackedFiles, stagedFiles);
     }
 
+    /** If the current working version of the file is identical
+     * to the version in the current commit, do not stage it to
+     * be added, and remove it from the staging area if it is
+     * already there (as can happen when a file is changed,
+     * added, and then changed back).
+     * */
+    public void remove() {
+        // To-do
+    }
+
     public void print() {
         trackedFiles
                 .forEach((key, value) -> System.out.println(key + ":" + value));
