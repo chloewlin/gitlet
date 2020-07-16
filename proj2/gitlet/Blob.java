@@ -18,10 +18,10 @@ public class Blob {
     }
 
     /* Save blob as a file */
-    public void saveBlob() throws IOException {
+    public void save() throws IOException {
         File blobFile =  Utils.join(BLOBS_FOLDER, blobSHA1);
         blobFile.createNewFile();
-        Utils.writeContents(blobFile, fileContent);
+        Utils.writeObject(blobFile, fileContent);
     }
 
     public String getBlobSHA1() {

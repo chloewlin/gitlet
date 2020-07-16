@@ -124,7 +124,7 @@ public class Main {
 		String fileName = args[1];
 		Blob blob = new Blob(fileName);
         stageFile(fileName, blob);
-		blob.saveBlob();
+		blob.save();
 	}
 
 	private static void stageFile(String fileName, Blob blob) {
