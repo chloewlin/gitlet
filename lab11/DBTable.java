@@ -61,7 +61,7 @@ public class DBTable<T> {
                 );
      *      List<String> whiteListedNames = Arrays.asList("Connor", "Shreya");
      *      DBTable<User> t = new DBTable<>(users);
-     *      List<User> whiteListedUsers = t.getWhiteListed(User::getName, whiteListedNames); // should contain only Users Connor and Shreya
+     *      List<User> whiteListedUsers = t.getWhitelisted(User::getName, whiteListedNames); // should contain only Users Connor and Shreya
      * 
      */
     public <R> List<T> getWhitelisted(Function<T, R> getter, Collection<R> whitelist) {
