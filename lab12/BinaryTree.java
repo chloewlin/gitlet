@@ -101,10 +101,15 @@ public class BinaryTree<T> {
         BinaryTree t;
         t = new BinaryTree();
         print(t, "the empty tree");
+        System.out.println(t.height());
         t.sampleTree1();
+        System.out.println(t.height());
+        System.out.println(t.isCompletelyBalanced());
         print(t, "sample tree 1");
         t.sampleTree2();
         print(t, "sample tree 2");
+        System.out.println(t.height());
+        System.out.println(t.isCompletelyBalanced());
     }
 
     /* Note: this class is public in this lab for testing purposes. However,
@@ -174,24 +179,29 @@ public class BinaryTree<T> {
 
         /** height helper function */
         private int height() {
-            if (this.left == null & this.right == null) {
+            if (left == null & right == null) {
                 return 1;
-            } else if (this.left == null) {
+            } else if (left == null) {
                 return 1 + right.height();
-            } else if (this.right == null) {
+            } else if (right == null) {
                 return 1 + left.height();
-            } else {
-                return 1 + Math.max(this.left.height(), this.right.height());
             }
+            return 1 + Math.max(left.height(), right.height());
         }
+        //  Another implementation:
+        //  Use return root.height(root); on line 20
+        //
+        //  private int height(TreeNode root) {
+        //      if (root == null) return 0;
+        //      return Math.max(height(root.left) + 1, height(root.right) + 1);
+        //  }
 
         /** isCompletelyBalanced helper function */
         private boolean isCompletelyBalanced() {
-            if (this.left.height() == 1 && right.height() == 1) {
+            if (left.height() == 1 && right.height() == 1) {
                 return true;
-            } else {
-                return this.left.height() == this.right.height();
             }
+            return left.height() == right.height();
         }
     }
 }
