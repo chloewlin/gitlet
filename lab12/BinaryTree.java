@@ -17,7 +17,7 @@ public class BinaryTree<T> {
     /* Returns the height of the tree. */
     public int height() {
         if (root != null) {
-            return root.height();
+            return root.height(root);
         }
         return 0;
     }
@@ -178,30 +178,29 @@ public class BinaryTree<T> {
         }
 
         /** height helper function */
-        private int height() {
-            if (left == null & right == null) {
-                return 1;
-            } else if (left == null) {
-                return 1 + right.height();
-            } else if (right == null) {
-                return 1 + left.height();
-            }
-            return 1 + Math.max(left.height(), right.height());
+        private int height(TreeNode node) {
+            if (node == null) return 0;
+            return Math.max(height(node.left) + 1, height(node.right) + 1);
         }
-        //  Another implementation:
-        //  Use return root.height(root); on line 20
-        //
-        //  private int height(TreeNode root) {
-        //      if (root == null) return 0;
-        //      return Math.max(height(root.left) + 1, height(root.right) + 1);
+
+        //  Another implementation (Use return root.height(); on line 20)
+        //  private int height() {
+        //      if (left == null & right == null) {
+        //          return 1;
+        //      } else if (left == null) {
+        //          return 1 + right.height();
+        //      } else if (right == null) {
+        //           return 1 + left.height();
+        //      }
+        //      return 1 + Math.max(left.height(), right.height());
         //  }
 
         /** isCompletelyBalanced helper function */
         private boolean isCompletelyBalanced() {
-            if (left.height() == 1 && right.height() == 1) {
+            if (left.height(left) == 1 && right.height(left) == 1) {
                 return true;
             }
-            return left.height() == right.height();
+            return left.height(left) == right.height(left);
         }
     }
 }
