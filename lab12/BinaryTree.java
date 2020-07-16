@@ -26,7 +26,7 @@ public class BinaryTree<T> {
        and are themselves completely balanced. */
     public boolean isCompletelyBalanced() {
         if (root != null) {
-            return root.isCompletelyBalanced();
+            return root.height(root.left) == root.height(root.right);
         }
         return true;
     }
@@ -108,15 +108,16 @@ public class BinaryTree<T> {
         BinaryTree t;
         t = new BinaryTree();
         print(t, "the empty tree");
+        System.out.println(t.isCompletelyBalanced()); // true
         System.out.println(t.height());
         t.sampleTree1();
         System.out.println(t.height());
-        System.out.println(t.isCompletelyBalanced());
+        System.out.println(t.isCompletelyBalanced()); // true
         print(t, "sample tree 1");
         t.sampleTree2();
         print(t, "sample tree 2");
         System.out.println(t.height());
-        System.out.println(t.isCompletelyBalanced());
+        System.out.println(t.isCompletelyBalanced()); // false
         t = fibTree(3);
         print(t, "fib tree");
         t = fibTree(4);
@@ -205,13 +206,5 @@ public class BinaryTree<T> {
         //      }
         //      return 1 + Math.max(left.height(), right.height());
         //  }
-
-        /** isCompletelyBalanced helper function */
-        private boolean isCompletelyBalanced() {
-            if (left.height(left) == 1 && right.height(left) == 1) {
-                return true;
-            }
-            return left.height(left) == right.height(left);
-        }
     }
 }
