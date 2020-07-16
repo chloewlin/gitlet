@@ -3,54 +3,51 @@ package gitlet;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
+import java.util.HashMap;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
  *  @author Chloe Lin, Christal Huang
  */
 public class Main {
-    /** repo*/
-    static Repo repo;
 
     /** Current Working Directory. */
     static final File CWD = new File(".");
-
     /** directory for .gitlet */
     static final File GITLET_FOLDER = new File(".gitlet");
-
-    /** file that represents the staging area and stores file/blob
-        Mapping*/
-    static final File index = Utils.join(GITLET_FOLDER, "index");
-
+    /** directory for staging area and stores file/blob mapping */
+    static final File STAGING_FOLDER = Utils.join(GITLET_FOLDER, "staging");
+    /** file for staging area and stores file/blob mapping */
+    HashMap<String, String> trackedFilesMap = new HashMap<String, String>();
+    static final File trackedFiles = Utils.join(STAGING_FOLDER, "trackedFiles");
+    /** directory for storing commits and blobs */
+    static final File OBJECTS_FOLDER = Utils.join(".gitlet", "objects");
+    /** directory for storing commit objects */
+    static final File Commits = Utils.join(OBJECTS_FOLDER,  "commits");
+    /** directory for storing blobs */
+    static final File Blobs = Utils.join(OBJECTS_FOLDER,  "blobs");
     /** commit hash current head*/
     static final File HEAD = new File("head");
-
     /** directory for storing branch and related commit has*/
     static final File Branches = new File("branch");
-
     /** directory for storing all commit logs for HEAD and branches*/
     static final File LOGS_FOLDER = Utils.join(GITLET_FOLDER, "logs");
-
     /** directory for storing the most recent commit hash*/
     static final File REFS_FOLDER = Utils.join(GITLET_FOLDER, "refs");
-
     static final File HEADS_REFS_FOLDER = Utils.join(REFS_FOLDER, "heads");
 
-    /* directory for the staging area */
-    static final File STAGING_FOLDER = Utils.join(GITLET_FOLDER, "staging");
-    private static Staging stagingArea = new Staging();
-
-     /** Usage: java gitlet.Main ARGS, where ARGS contains
-     *  <COMMAND> <OPERAND> .... */
-
+    /** Usage: java gitlet.Main ARGS, where ARGS contains
+    *  <COMMAND> <OPERAND> .... */
     public static void main(String... args) throws IOException {
+           if (GITLET_FOLDER.exists()) {
+                exitWithError("A Gitlet version-control system"
+                    + "already exists in the current directory.");
+           }
            if (args.length == 0) {
                 exitWithError("Please enter a command.");
            }
-           setupPersistence();
            switch (args[0]) {
                case "init":
-                   initialize();
+                   setupPersistence();
                    break;
                case "add":
                    add(args);
@@ -67,16 +64,35 @@ public class Main {
            return;
     }
 
-    private static void initialize() throws IOException {
-        Repo Repo = new Repo();
+    /** set up all directories and files we need*/
+    private static void setupPersistence() throws IOException {
+        GITLET_FOLDER.mkdir();
+        REFS_FOLDER.mkdir();
+        HEADS_REFS_FOLDER.mkdir();
+        STAGING_FOLDER.mkdir();
+        trackedFiles.createNewFile();
+        LOGS_FOLDER.mkdir();
+        OBJECTS_FOLDER.mkdir();
+        Commits.mkdir();
+        Blobs.mkdir();
+        createInitialCommit();
     }
+
+   public static void createInitialCommit() throws IOException {
+        String initPrevSha1 = "0000000000000000000000000000000000000000";
+        Commit initialCommit = new Commit("initial commit", initPrevSha1, true);
+        initialCommit.saveCommit();
+        saveBranchHead("master", initialCommit.SHA);
+        saveLog(initialCommit);
+   }
 
     // Adds a copy of the file as it currently exists to the staging area
     // remove it from the staging area if it is already there
     private static void add(String[] args) throws IOException {
         String fileName = args[1];
         Blob blob = new Blob(fileName);
-        stagingArea.add(blob);
+        Staging stagingArea = new Staging();
+//         stagingArea.add(blob);
         blob.saveBlob();
     }
 
@@ -114,20 +130,6 @@ public class Main {
         Branch branch = new Branch("master", SHA1);
         File branchFile = Utils.join(HEADS_REFS_FOLDER, branchName);
         Utils.writeObject(branchFile, branch);
-    }
-
-    /** set up all directories and files we need*/
-    private static void setupPersistence() {
-        GITLET_FOLDER.mkdir();
-        REFS_FOLDER.mkdir();
-        HEADS_REFS_FOLDER.mkdir();
-        STAGING_FOLDER.mkdir();
-        LOGS_FOLDER.mkdir();
-        try {
-            index.createNewFile();
-        } catch(IOException excp) {
-            throw new IllegalArgumentException(excp.getMessage());
-        }
     }
 
     public static void exitWithError(String message) {
