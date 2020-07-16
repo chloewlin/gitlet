@@ -471,7 +471,7 @@ if __name__ == "__main__":
         JAVA_COMMAND = 'exec ' + JAVA_COMMAND
         JAVAC_COMMAND = 'exec ' + JAVAC_COMMAND
 
-    compile_target = join(gitlet_dir, "*.java")
+    compile_target = join('"' + gitlet_dir + '"', "*.java")
     msg, output = doCompile(compile_target)
     if output.find("error") >= 0:
         print(output)
