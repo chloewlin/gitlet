@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Stack;
+import java.util.*;
 
 /* An AmoebaFamily is a tree, where nodes are Amoebas, each of which can have
    any number of children. */
@@ -59,7 +56,8 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
 
     /* Returns an Iterator for this AmoebaFamily. */
     public Iterator<Amoeba> iterator() {
-        return new AmoebaDFSIterator();
+//        return new AmoebaDFSIterator();
+        return new AmoebaBFSIterator();
     }
 
     /* Creates a new AmoebaFamily and prints it out. */
@@ -83,7 +81,7 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
         Iterator<Amoeba> iterator = family.iterator();
 
         while (iterator.hasNext()) {
-            System.out.print(iterator.next() + " ");
+            System.out.println(iterator.next());
         }
     }
 
@@ -141,7 +139,6 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
        O(N) operations. */
     public class AmoebaDFSIterator implements Iterator<Amoeba> {
 
-        // TODO: IMPLEMENT THE CLASS HERE
         Stack<Amoeba> stack = new Stack<>();
 
         /* AmoebaDFSIterator constructor. Sets up all of the initial information
@@ -184,21 +181,36 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
        O(N) operations. */
     public class AmoebaBFSIterator implements Iterator<Amoeba> {
 
-        // TODO: IMPLEMENT THE CLASS HERE
+        Queue<Amoeba> queue= new LinkedList<Amoeba>();
 
         /* AmoebaBFSIterator constructor. Sets up all of the initial information
            for the AmoebaBFSIterator. */
         public AmoebaBFSIterator() {
+            if (root != null) {
+                queue.add(root);
+            }
         }
 
         /* Returns true if there is a next element to return. */
         public boolean hasNext() {
-            return false;
+            return !queue.isEmpty();
         }
 
         /* Returns the next element. */
         public Amoeba next() {
-            return null;
+            if (!hasNext()) {
+                throw new NoSuchElementException("tree ran out of elements");
+            }
+
+            Amoeba amoeba = queue.poll();
+
+            if (amoeba.children != null) {
+                for (int i = 0; i < amoeba.getChildren().size(); i++) {
+                    queue.add(amoeba.getChildren().get(i));
+                }
+            }
+
+            return amoeba;
         }
 
         public void remove() {
