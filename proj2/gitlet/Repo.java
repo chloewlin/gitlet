@@ -16,17 +16,12 @@ public class Repo {
     /** directory for storing all commit logs for HEAD and branches*/
     static final File LOGS_FOLDER = Utils.join(GITLET_FOLDER, "logs");
 
-//    // create initial commit and set up branch and HEAD pointer
-//    public Repo() {
-//        OBJECTS_FOLDER.mkdir();
-//        Commits.mkdir();
-//        Blobs.mkdir();
-//        try {
-//            createInitialCommit();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    // create initial commit and set up branch and HEAD pointer
+    public Repo() {
+        OBJECTS_FOLDER.mkdir();
+        Commits.mkdir();
+        Blobs.mkdir();
+    }
 
     public void createInitialCommit() throws IOException {
         String initPrevSha1 = "0000000000000000000000000000000000000000";

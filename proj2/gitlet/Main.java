@@ -44,10 +44,10 @@ public class Main {
             case "init":
                 validateGitlet();
                 setupPersistence();
+                repo.createInitialCommit();
                 break;
             case "add":
                 add(args);
-//                 repo.add(args);
                 break;
             case "commit":
                 commit(args);
@@ -113,16 +113,7 @@ public class Main {
 		OBJECTS_FOLDER.mkdir();
 		Commits.mkdir();
 		Blobs.mkdir();
-		createInitialCommit();
 	}
-
-   public static void createInitialCommit() throws IOException {
-		String initPrevSha1 = "0000000000000000000000000000000000000000";
-		Commit initialCommit = new Commit("initial commit", initPrevSha1, true);
-		initialCommit.saveCommit();
-		saveBranchHead("master", initialCommit.SHA);
-		saveLog(initialCommit);
-   }
 
 	/**
 	* Lazy loading and caching: Let’s say you store the state of which
