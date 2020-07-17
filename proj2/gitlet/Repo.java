@@ -32,20 +32,44 @@ public class Repo {
         saveLog(initialCommit);
     }
 
+    /**
+     * Lazy loading and caching: Let’s say you store the state of which
+     * files have been gitlet added to your repo in your filesytem.
+     * Lazy loading: The first time you want that list of files when
+     * you run your Java program, you need to load it from disk.
+     * Caching: The second time you need that list of files in the
+     * same run of the Java program, don’t load it from disk again,
+     * but use the same list as you loaded before. If you need to,
+     * you can then add multiple files to that list object in your
+     * Java program. Writing back: When you Java program is finished,
+     * at the very end, since you had loaded that list of files and
+     * may have modified it, write it back to your file system.
+     */
     public void add(String[] args) throws IOException {
         // To-do: lazy loading and caching
-        // Main.validateNumArgs(args);
+        Main.validateNumArgs(args);
         String fileName = args[1];
         Blob blob = new Blob(fileName);
         stageFile(fileName, blob);
         blob.save();
     }
 
-    private static void stageFile(String fileName, Blob blob) {
+    private void stageFile(String fileName, Blob blob) {
         Staging staging = new Staging();
         staging.add(fileName, blob.getBlobSHA1());
         staging.save(staging);
         staging.print();
+    }
+
+    public void commit(String[] args) throws IOException {
+        Main.validateNumArgs(args);
+        String commitMessage = args[1];
+        File branchFile = Utils.join(HEADS_REFS_FOLDER, "master");
+        Branch parentCommit = Utils.readObject(branchFile, Branch.class);
+        Commit commit = new Commit(commitMessage, parentCommit.getHead(), false);
+        commit.saveCommit();
+        saveBranchHead("master", commit.SHA);
+        saveLog(commit);
     }
 
     public void saveBranchHead(String branchName, String SHA1) {
@@ -54,7 +78,7 @@ public class Repo {
         Utils.writeObject(branchFile, branch);
     }
 
-    private static void saveLog(Commit commit) throws IOException {
+    private void saveLog(Commit commit) throws IOException {
         File currLogFile = Utils.join(LOGS_FOLDER, "master");
         if (!currLogFile.exists()) {
             currLogFile.createNewFile();
@@ -66,6 +90,13 @@ public class Repo {
 
         byte[] Log = Utils.readContents(currLogFile);
         Utils.writeContents(currLogFile, Log, divider, SHA, time, message);
+    }
+
+    public static void printAllLog(String[] args) throws IOException {
+        Main.validateNumArgs(args);
+        File currLogFile = Utils.join(LOGS_FOLDER, "master");
+        String fullLog = Utils.readContentsAsString(currLogFile);
+        System.out.println(fullLog);
     }
 
     // remove the added file from the hashmap in index(staging)

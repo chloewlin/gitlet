@@ -51,10 +51,10 @@ public class Main {
                 repo.add(args);
                 break;
             case "commit":
-                commit(args);
+                repo.commit(args);
                 break;
             case "log":
-                printAllLog(args);
+                repo.printAllLog(args);
                 break;
             default:
                 validateCommand();
@@ -116,72 +116,43 @@ public class Main {
 		Blobs.mkdir();
 	}
 
-	/**
-	* Lazy loading and caching: Let’s say you store the state of which
-	* files have been gitlet added to your repo in your filesytem.
-	* Lazy loading: The first time you want that list of files when
-	* you run your Java program, you need to load it from disk.
-	* Caching: The second time you need that list of files in the
-	* same run of the Java program, don’t load it from disk again,
-	* but use the same list as you loaded before. If you need to,
-	* you can then add multiple files to that list object in your
-	* Java program. Writing back: When you Java program is finished,
-	* at the very end, since you had loaded that list of files and
-	* may have modified it, write it back to your file system.
-	*/
-// 	private static void add(String[] args) throws IOException {
-// 	    // To-do: lazy loading and caching
-// 	    validateNumArgs(args);
-// 		String fileName = args[1];
-// 		Blob blob = new Blob(fileName);
-//         stageFile(fileName, blob);
-// 		blob.save();
-// 	}
+//	private static void commit(String[] args) throws IOException {
+//	    validateNumArgs(args);
+//		String commitMessage = args[1];
+//		File branchFile = Utils.join(HEADS_REFS_FOLDER, "master");
+//		Branch parentCommit = Utils.readObject(branchFile, Branch.class);
+//		Commit commit = new Commit(commitMessage, parentCommit.getHead(), false);
+//		commit.saveCommit();
+//		saveBranchHead("master", commit.SHA);
+//		saveLog(commit);
+//	}
+//
+//	private static void saveLog(Commit commit) throws IOException {
+//		File currLogFile = Utils.join(LOGS_FOLDER, "master");
+//		if (!currLogFile.exists()) {
+//			currLogFile.createNewFile();
+//		}
+//		String divider = new String("===\n");
+//		String SHA = new String("commit " + commit.SHA + "\n");
+//		String time = new String("Date: " + commit.timestamp + "\n");
+//		String message = new String(commit.message + "\n");
+//
+//		byte[] Log = Utils.readContents(currLogFile);
+//		Utils.writeContents(currLogFile, divider, SHA, time, message, "\n", Log);
+//	}
 
-// 	private static void stageFile(String fileName, Blob blob) {
-// 	    Staging staging = new Staging();
-//         staging.add(fileName, blob.getBlobSHA1());
-//         staging.save(staging);
-//         staging.print();
-// 	}
-
-	private static void commit(String[] args) throws IOException {
-	    validateNumArgs(args);
-		String commitMessage = args[1];
-		File branchFile = Utils.join(HEADS_REFS_FOLDER, "master");
-		Branch parentCommit = Utils.readObject(branchFile, Branch.class);
-		Commit commit = new Commit(commitMessage, parentCommit.getHead(), false);
-		commit.saveCommit();
-		saveBranchHead("master", commit.SHA);
-		saveLog(commit);
-	}
-
-	private static void saveLog(Commit commit) throws IOException {
-		File currLogFile = Utils.join(LOGS_FOLDER, "master");
-		if (!currLogFile.exists()) {
-			currLogFile.createNewFile();
-		}
-		String divider = new String("===\n");
-		String SHA = new String("commit " + commit.SHA + "\n");
-		String time = new String("Date: " + commit.timestamp + "\n");
-		String message = new String(commit.message + "\n");
-
-		byte[] Log = Utils.readContents(currLogFile);
-		Utils.writeContents(currLogFile, divider, SHA, time, message, "\n", Log);
-	}
-
-	private static void printAllLog(String[] args) throws IOException {
-	    validateNumArgs(args);
-		File currLogFile = Utils.join(LOGS_FOLDER, "master");
-		String fullLog = Utils.readContentsAsString(currLogFile);
-		System.out.println(fullLog);
-	}
-
-	public static void saveBranchHead(String branchName, String SHA1) {
-		Branch branch = new Branch("master", SHA1);
-		File branchFile = Utils.join(HEADS_REFS_FOLDER, branchName);
-		Utils.writeObject(branchFile, branch);
-	}
+//	private static void printAllLog(String[] args) throws IOException {
+//	    validateNumArgs(args);
+//		File currLogFile = Utils.join(LOGS_FOLDER, "master");
+//		String fullLog = Utils.readContentsAsString(currLogFile);
+//		System.out.println(fullLog);
+//	}
+//
+//	public static void saveBranchHead(String branchName, String SHA1) {
+//		Branch branch = new Branch("master", SHA1);
+//		File branchFile = Utils.join(HEADS_REFS_FOLDER, branchName);
+//		Utils.writeObject(branchFile, branch);
+//	}
 
 	public static void exitWithError(String message) {
 		System.out.println(message);
