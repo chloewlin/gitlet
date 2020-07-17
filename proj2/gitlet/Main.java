@@ -88,6 +88,7 @@ public class Main {
              break;
         case "checkout":
              validateCheckout(args);
+             break;
         default:
             validateCommand();
         }
