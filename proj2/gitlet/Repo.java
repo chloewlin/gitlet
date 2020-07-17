@@ -182,7 +182,12 @@ public class Repo {
      * our CWD/commit tree.
      */
     public void status() {
-
+        /** To-do: create helper functions for each state */
+        System.out.println("=== Branches ===");
+        System.out.println("=== Staged Files ===");
+        System.out.println("=== Removed Files ===");
+        System.out.println("=== Modifications Not Staged For Commit ===");
+        System.out.println("=== Untracked Files ===");
     }
 
     /**

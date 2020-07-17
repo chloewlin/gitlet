@@ -83,6 +83,9 @@ public class Main {
         case "log":
             repo.log();
             break;
+        case "status":
+             repo.status();
+             break;
         default:
             validateCommand();
         }
@@ -185,6 +188,10 @@ public class Main {
                 isValid = true;
             }
         case "log":
+            if (n == 1) {
+                isValid = true;
+            }
+        case "status":
             if (n == 1) {
                 isValid = true;
             }
