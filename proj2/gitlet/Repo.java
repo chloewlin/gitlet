@@ -194,20 +194,27 @@ public class Repo {
      * directory, overwriting the version of the file that’s already
      * there if there is one. The new version of the file is not staged.
      */
-
     public void checkoutFile(String filename) throws IOException {
         Map<String, String> snapshot = getHEAD().getSnapshot();
 
         if (snapshot.containsKey(filename)) {
             String blobSHA1 = snapshot.get(filename);
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
-            Blob b = Blob.load(blobFile);
-
-            String CWD = System.getProperty("user.dir");
-            File file = new File(CWD, b.getFileName());
-            file.createNewFile();
-            Utils.writeContents(file, b.getFileContent());
+            Blob blob = Blob.load(blobFile);
+            restoreFileInCWD(blob);
         }
+    }
+
+    /**
+     * Restore file from blob, put it in current working directory,
+     * and overwriting the version of the file that’s already
+     * there if there is one.
+     */
+    public void restoreFileInCWD(Blob blob) throws IOException {
+        String CWD = System.getProperty("user.dir");
+        File file = new File(CWD, blob.getFileName());
+        file.createNewFile();
+        Utils.writeContents(file, blob.getFileContent());
     }
 
     /**
