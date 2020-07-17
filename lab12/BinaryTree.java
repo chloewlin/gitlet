@@ -16,21 +16,32 @@ public class BinaryTree<T> {
 
     /* Returns the height of the tree. */
     public int height() {
-        // TODO: YOUR CODE HERE
+        if (root != null) {
+            return root.height(root);
+        }
         return 0;
     }
 
     /* Returns true if the tree's left and right children are the same height
        and are themselves completely balanced. */
     public boolean isCompletelyBalanced() {
-        // TODO: YOUR CODE HERE
-        return false;
+        if (root != null) {
+            return root.height(root.left) == root.height(root.right);
+        }
+        return true;
     }
 
     /* Returns a BinaryTree representing the Fibonacci calculation for N. */
     public static BinaryTree<Integer> fibTree(int N) {
-        BinaryTree<Integer> result = new BinaryTree<Integer>();
-        return null;
+        BinaryTree<Integer> result = new BinaryTree<>();
+        if (N <= 1) {
+            result.root = new TreeNode<>(N);
+        } else {
+            TreeNode<Integer> left = fibTree(N-1).getRoot();
+            TreeNode<Integer> right = fibTree(N-2).getRoot();
+            result.root = new TreeNode<>((left.getItem() + right.getItem()), left, right);
+        }
+        return result;
     }
 
     /* Print the values in the tree in preorder: root value first, then values
@@ -97,10 +108,28 @@ public class BinaryTree<T> {
         BinaryTree t;
         t = new BinaryTree();
         print(t, "the empty tree");
+        System.out.println(t.isCompletelyBalanced()); // true
+        System.out.println(t.height());
         t.sampleTree1();
+        System.out.println(t.height());
+        System.out.println(t.isCompletelyBalanced()); // true
         print(t, "sample tree 1");
         t.sampleTree2();
         print(t, "sample tree 2");
+        System.out.println(t.height());
+        System.out.println(t.isCompletelyBalanced()); // false
+        t.sampleTree3();
+        print(t, "sample tree 3");
+        System.out.println(t.height());
+        System.out.println(t.isCompletelyBalanced()); // false
+        t.sampleTree4();
+        print(t, "sample tree 4");
+        System.out.println(t.height());
+        System.out.println(t.isCompletelyBalanced()); // true
+        t = fibTree(3);
+        print(t, "fib tree");
+        t = fibTree(4);
+        print(t, "fib tree");
     }
 
     /* Note: this class is public in this lab for testing purposes. However,
@@ -168,6 +197,22 @@ public class BinaryTree<T> {
             }
         }
 
-        // TODO: ADD HELPER METHODS HERE
+        /** height helper function */
+        private int height(TreeNode node) {
+            if (node == null) return 0;
+            return Math.max(height(node.left) + 1, height(node.right) + 1);
+        }
+
+        //  Another implementation (Use return root.height(); on line 20)
+        //  private int height() {
+        //      if (left == null & right == null) {
+        //          return 1;
+        //      } else if (left == null) {
+        //          return 1 + right.height();
+        //      } else if (right == null) {
+        //           return 1 + left.height();
+        //      }
+        //      return 1 + Math.max(left.height(), right.height());
+        //  }
     }
 }
