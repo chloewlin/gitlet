@@ -94,7 +94,10 @@ public class Main {
         return;
     }
 
-    private static void validateCheckout(String[] args) {
+    /**
+     *  Validate the args when the operand is checkout.
+     */
+    private static void validateCheckout(String[] args) throws IOException {
         if (args[1].equals("--")) {
             repo.checkoutFile(args[2]);
         } else if (args[2].equals("--")) {
