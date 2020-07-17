@@ -167,7 +167,7 @@ public class Repo {
      * Print print all of the commit metadata.
      */
     public void globalLog() {
-
+        /** To-do: traverse the entire commit tree */
     }
 
     /**
