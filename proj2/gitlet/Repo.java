@@ -9,9 +9,8 @@ public class Repo {
     public void createInitialCommit() throws IOException {
         String initPrevSha1 = "0000000000000000000000000000000000000000";
         Commit initialCommit = new Commit("initial commit", initPrevSha1, true);
-        initialCommit.saveCommit();
-        saveBranchHead("master", initialCommit.SHA);
-        saveLog(initialCommit);
+        initialCommit.save();
+        updateHead("master", initialCommit.SHA);
     }
 
     /**
@@ -43,18 +42,21 @@ public class Repo {
         staging.print();
     }
 
+    /**
+     *  serialize added files into blobs, write blobs into files inside /object directory,
+     *  add the file-blob mapping to index(staging), update HEAD pointer
+     */
     public void commit(String[] args) throws IOException {
         Main.validateNumArgs(args);
         String commitMessage = args[1];
         File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, "master");
         Branch parentCommit = Utils.readObject(branchFile, Branch.class);
         Commit commit = new Commit(commitMessage, parentCommit.getHead(), false);
-        commit.saveCommit();
-        saveBranchHead("master", commit.SHA);
-        saveLog(commit);
+        commit.save();
+        updateHead("master", commit.SHA);
     }
 
-    public void saveBranchHead(String branchName, String SHA1) {
+    public void updateHead(String branchName, String SHA1) {
         Branch branch = new Branch("master", SHA1);
         File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, branchName);
         Utils.writeObject(branchFile, branch);
@@ -85,10 +87,6 @@ public class Repo {
     public void remove() {
     }
 
-    // serialize added files into blobs, write blobs into files inside /object directory, add the
-    // file-blob mapping to index(staging), update HEAD pointer
-    public void commit() {
-    }
 
     // print the commit metadata for current branch
     public void log() {

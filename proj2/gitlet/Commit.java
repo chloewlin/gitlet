@@ -34,7 +34,7 @@ public class Commit implements Serializable {
         this.map = new HashMap<>();
     }
 
-    public void saveCommit() throws IOException {
+    public void save() throws IOException {
         Commit commit = new Commit(this.message, this.parentsArray[0], this.init);
         File commitFile = Utils.join(COMMITS_FOLDER, this.SHA);
         commitFile.createNewFile();
