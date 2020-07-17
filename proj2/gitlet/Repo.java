@@ -45,32 +45,29 @@ public class Repo {
      * already there (as can happen when a file is changed,
      * added, and then changed back).
      * */
-    // compare the hashmap inside each commit node and see if the new blob matches it
     public boolean hasBlob(Blob blob) {
-        // load from last commit
         File master = Utils.join(Main.HEADS_REFS_FOLDER, "master");
-        Commit head =  Branch.load(master).getHead();
+        Commit head = Branch.load(master).getHead();
+        System.out.println("hasBlob - current blob SHA1: " + blob.getBlobSHA1());
         System.out.println("head commit message: " + head.message);
         System.out.println("head commit SHA: " + head.SHA);
         System.out.println("head commit MAP: " + head.getMap());
-        return true;
-//        Map<String, String> mapFromLastCommit = Branch.load(master).getHead().getMap();
-//
-//        mapFromLastCommit.forEach((k, v) -> System.out.println("mapFromLastCommit" + k + " : " + v));
-//        System.out.println("blob SHA: " + blob.getBlobSHA1());
-//        return mapFromLastCommit.containsValue(blob.getBlobSHA1());
+        Map<String, String> lastSnapshot = head.getMap();
+        System.out.println("hasBlobInLastCommit? " + lastSnapshot.containsValue(blob.getBlobSHA1()));
+        return lastSnapshot.containsValue(blob.getBlobSHA1());
     }
 
     private void stageFile(String fileName, Blob blob) {
         Staging staging = new Staging();
-        System.out.println("staging file....");
-        hasBlob(blob);
-//        if (hasBlob(blob)) {
-//            System.out.println("has same blob!.....");
-//        }
-        staging.add(fileName, blob.getBlobSHA1());
-        staging.save(staging);
-        staging.print();
+        if (!hasBlob(blob)) {
+            System.out.println("staging file....");
+            staging.add(fileName, blob.getBlobSHA1());
+            staging.save(staging);
+            staging.print();
+        } else {
+            System.out.println("unstaging file....");
+            // unstage file
+        }
     }
 
     /**
@@ -94,8 +91,8 @@ public class Repo {
         System.out.println("commit map: " + commit.map);
 
         commit.save();
-
         updateHead("master", commit);
+        stage.clear();
     }
 
     public void updateHead(String branchName, Commit commit) {
