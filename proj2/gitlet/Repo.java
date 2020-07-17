@@ -198,7 +198,7 @@ public class Repo {
     /**
      * TBD.
      */
-    public void checkout(String commitId, File file) {
+    public void checkout(String commitId, String fileName) {
 
     }
 
