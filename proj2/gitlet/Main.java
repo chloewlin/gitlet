@@ -16,8 +16,6 @@ public class Main {
 	static final File GITLET_FOLDER = new File(".gitlet");
 	/** directory for staging area and stores file/blob mapping */
 	static final File STAGING_FOLDER = Utils.join(GITLET_FOLDER, "staging");
-	/** file for staging area and stores file/blob mapping */
-	HashMap<String, String> trackedFilesMap = new HashMap<String, String>();
 	static final File trackedFiles = Utils.join(STAGING_FOLDER, "trackedFiles");
 	/** directory for storing commits and blobs */
 	static final File OBJECTS_FOLDER = Utils.join(".gitlet", "objects");
@@ -62,6 +60,18 @@ public class Main {
         return;
 	}
 
+	private static void setupPersistence() throws IOException {
+		GITLET_FOLDER.mkdir();
+		REFS_FOLDER.mkdir();
+		HEADS_REFS_FOLDER.mkdir();
+		STAGING_FOLDER.mkdir();
+		trackedFiles.createNewFile();
+		LOGS_FOLDER.mkdir();
+		OBJECTS_FOLDER.mkdir();
+		Commits.mkdir();
+		Blobs.mkdir();
+	}
+
 	private static void validateNumCommand(String[] args) {
         if (args.length == 0) {
             exitWithError("Please enter a command.");
@@ -102,57 +112,6 @@ public class Main {
         }
         return;
     }
-
-	/** set up all directories and files we need*/
-	private static void setupPersistence() throws IOException {
-	    GITLET_FOLDER.mkdir();
-		REFS_FOLDER.mkdir();
-		HEADS_REFS_FOLDER.mkdir();
-		STAGING_FOLDER.mkdir();
-		trackedFiles.createNewFile();
-		LOGS_FOLDER.mkdir();
-		OBJECTS_FOLDER.mkdir();
-		Commits.mkdir();
-		Blobs.mkdir();
-	}
-
-//	private static void commit(String[] args) throws IOException {
-//	    validateNumArgs(args);
-//		String commitMessage = args[1];
-//		File branchFile = Utils.join(HEADS_REFS_FOLDER, "master");
-//		Branch parentCommit = Utils.readObject(branchFile, Branch.class);
-//		Commit commit = new Commit(commitMessage, parentCommit.getHead(), false);
-//		commit.saveCommit();
-//		saveBranchHead("master", commit.SHA);
-//		saveLog(commit);
-//	}
-//
-//	private static void saveLog(Commit commit) throws IOException {
-//		File currLogFile = Utils.join(LOGS_FOLDER, "master");
-//		if (!currLogFile.exists()) {
-//			currLogFile.createNewFile();
-//		}
-//		String divider = new String("===\n");
-//		String SHA = new String("commit " + commit.SHA + "\n");
-//		String time = new String("Date: " + commit.timestamp + "\n");
-//		String message = new String(commit.message + "\n");
-//
-//		byte[] Log = Utils.readContents(currLogFile);
-//		Utils.writeContents(currLogFile, divider, SHA, time, message, "\n", Log);
-//	}
-
-//	private static void printAllLog(String[] args) throws IOException {
-//	    validateNumArgs(args);
-//		File currLogFile = Utils.join(LOGS_FOLDER, "master");
-//		String fullLog = Utils.readContentsAsString(currLogFile);
-//		System.out.println(fullLog);
-//	}
-//
-//	public static void saveBranchHead(String branchName, String SHA1) {
-//		Branch branch = new Branch("master", SHA1);
-//		File branchFile = Utils.join(HEADS_REFS_FOLDER, branchName);
-//		Utils.writeObject(branchFile, branch);
-//	}
 
 	public static void exitWithError(String message) {
 		System.out.println(message);

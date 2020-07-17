@@ -4,26 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class Repo {
-    /** directory for storing commit objects as blobs*/
-    static final File OBJECTS_FOLDER = Utils.join(".gitlet", "objects");
-    static final File Commits = Utils.join(OBJECTS_FOLDER,  "commits");
-    static final File Blobs = Utils.join(OBJECTS_FOLDER,  "blobs");
 
-    static final File GITLET_FOLDER = new File(".gitlet");
-    static final File REFS_FOLDER = Utils.join(GITLET_FOLDER, "refs");
-    static final File HEADS_REFS_FOLDER = Utils.join(REFS_FOLDER, "heads");
-
-    /** directory for storing all commit logs for HEAD and branches*/
-    static final File LOGS_FOLDER = Utils.join(GITLET_FOLDER, "logs");
-
-    static final File CWD = new File(".");
     // create initial commit and set up branch and HEAD pointer
-    public Repo() {
-        OBJECTS_FOLDER.mkdir();
-        Commits.mkdir();
-        Blobs.mkdir();
-    }
-
     public void createInitialCommit() throws IOException {
         String initPrevSha1 = "0000000000000000000000000000000000000000";
         Commit initialCommit = new Commit("initial commit", initPrevSha1, true);
@@ -64,7 +46,7 @@ public class Repo {
     public void commit(String[] args) throws IOException {
         Main.validateNumArgs(args);
         String commitMessage = args[1];
-        File branchFile = Utils.join(HEADS_REFS_FOLDER, "master");
+        File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, "master");
         Branch parentCommit = Utils.readObject(branchFile, Branch.class);
         Commit commit = new Commit(commitMessage, parentCommit.getHead(), false);
         commit.saveCommit();
@@ -74,12 +56,12 @@ public class Repo {
 
     public void saveBranchHead(String branchName, String SHA1) {
         Branch branch = new Branch("master", SHA1);
-        File branchFile = Utils.join(HEADS_REFS_FOLDER, branchName);
+        File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, branchName);
         Utils.writeObject(branchFile, branch);
     }
 
     private void saveLog(Commit commit) throws IOException {
-        File currLogFile = Utils.join(LOGS_FOLDER, "master");
+        File currLogFile = Utils.join(Main.LOGS_FOLDER, "master");
         if (!currLogFile.exists()) {
             currLogFile.createNewFile();
         }
@@ -94,7 +76,7 @@ public class Repo {
 
     public static void printAllLog(String[] args) throws IOException {
         Main.validateNumArgs(args);
-        File currLogFile = Utils.join(LOGS_FOLDER, "master");
+        File currLogFile = Utils.join(Main.LOGS_FOLDER, "master");
         String fullLog = Utils.readContentsAsString(currLogFile);
         System.out.println(fullLog);
     }
