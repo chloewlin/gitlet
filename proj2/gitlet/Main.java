@@ -105,6 +105,21 @@ public class Main {
     }
 
     /**
+     *  print the message if a user inputs a command that requires
+     *  being in an initialized Gitlet working directory (i.e., one
+     *  containing a .gitlet subdirectory), but is not in such a
+     *  directory.
+     *  @param args user's input of commands and operands
+     */
+    private static void validateInitialization(String[] args) {
+        String[] directories = CWD.list();
+        for (String d : directories) {
+            System.out.println(d);
+        }
+        exitWithError("Not in an initialized Gitlet directory.");
+    }
+
+    /**
      *  print the message if a user doesn’t input any arguments.
      *  @param args user's input of commands and operands
      */
