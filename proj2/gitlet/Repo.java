@@ -21,7 +21,7 @@ public class Repo {
         Commit initialCommit = new Commit("initial commit",
                 INIT_PARENT_SHA1, true, new HashMap<>());
         initialCommit.saveInit();
-        updateHead("master", initialCommit);
+        setHEAD("master", initialCommit);
     }
 
     /**
@@ -42,14 +42,14 @@ public class Repo {
         Main.validateNumArgs(args);
         String fileName = args[1];
         Blob blob = new Blob(fileName);
-        stageFile(fileName, blob);
+        stage(fileName, blob);
         blob.save();
     }
 
     /**
      * Add a file to the staging area.
      */
-    private void stageFile(String fileName, Blob blob) {
+    private void stage(String fileName, Blob blob) {
         Staging staging = new Staging();
         if (!isSameVersion(blob)) {
             System.out.println("staging file....");
@@ -118,9 +118,8 @@ public class Repo {
         System.out.println("commit message: " + commit.getMessage());
         System.out.println("commit SHA: " + commit.getSHA());
         System.out.println("commit map: " + commit.getSnapshot());
-
         commit.save();
-        updateHead("master", commit);
+        setHEAD("master", commit);
         stage.clear();
     }
 
@@ -128,11 +127,10 @@ public class Repo {
      * Update the HEAD pointer of a branch by writing the last
      * commit node into a byte array.
      */
-    public void updateHead(String branchName, Commit commit) {
+    public void setHEAD(String branchName, Commit commit) {
         Branch branch = new Branch("master", commit);
         System.out.println("CURRENT HEAD ====> " + commit.getSHA());
         System.out.println("CURRENT HEAD PARENT ====> " + commit.getFirstParentSHA1());
-
         File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, branchName);
         Utils.writeObject(branchFile, branch);
     }
