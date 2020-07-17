@@ -191,21 +191,21 @@ public class Repo {
     /**
      * TBD.
      */
-    public void checkout(File file) {
+    public void checkoutFile(String filename) {
 
     }
 
     /**
      * TBD.
      */
-    public void checkout(String commitId, String fileName) {
+    public void checkoutCommit(String commitId, String fileName) {
 
     }
 
     /**
      * TBD.
      */
-    public void checkout(String branchName) {
+    public void checkoutBranch(String branchName) {
 
     }
 

@@ -96,11 +96,11 @@ public class Main {
 
     private static void validateCheckout(String[] args) {
         if (args[1].equals("--")) {
-            repo.checkout(args[2]);
+            repo.checkoutFile(args[2]);
         } else if (args[2].equals("--")) {
-            repo.checkout(args[1], args[3]);
+            repo.checkoutCommit(args[1], args[3]);
         } else {
-            repo.checkout(args[1]);
+            repo.checkoutBranch(args[1]);
         }
     }
 
