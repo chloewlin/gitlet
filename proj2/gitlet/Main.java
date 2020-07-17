@@ -93,6 +93,8 @@ public class Main {
 	    exitWithError("Please enter a commit message.");
 	}
 
+	public static void validateFileToBeStaged() { exitWithError("No changes added to the commit."); }
+
     public static void validateNumArgs(String[] args) {
         int n = args.length;
         boolean isValid = false;

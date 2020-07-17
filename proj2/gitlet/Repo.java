@@ -48,6 +48,7 @@ public class Repo {
         } else {
             System.out.println("unstaging file....");
             // unstage file
+            Main.validateFileToBeStaged();
         }
     }
 
