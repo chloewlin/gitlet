@@ -189,9 +189,38 @@ public class Repo {
     }
 
     /**
-     * TBD.
+     * Takes the version of the file as it exists in the head commit,
+     * the front of the current branch, and puts it in the working
+     * directory, overwriting the version of the file that’s already
+     * there if there is one. The new version of the file is not staged.
      */
-    public void checkoutFile(String filename) {
+
+    public void checkoutFile(String filename) throws IOException {
+//        - get current branch head commit (use getHead)
+//        - get the snapshot hashmap in that head commit (use getSnapshot)
+//        - find the SHA1 of the file stored in hashmap
+//        - find the blob
+//        - restore the blob
+//        - put it in current working directory
+        Map<String, String> snapshot = getHEAD().getSnapshot();
+
+        if (snapshot.containsKey(filename)) {
+            String blobSHA1 = snapshot.get(filename);
+
+            File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+            Blob b = Blob.load(blobFile);
+
+            String CWD = System.getProperty("user.dir");
+            // create file in CWD
+            File file = new File(CWD, b.getFileName());
+            file.createNewFile();
+            Utils.writeContents(file, b.getFileContent());
+            // get the byte array content from blob
+            // write the byte array content into the newly created file
+            // write blob into that new file
+//            Utils.writeContents(file, blob.);
+            // deserialize blob content?
+        }
 
     }
 
