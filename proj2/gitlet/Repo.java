@@ -16,6 +16,7 @@ public class Repo {
     /** directory for storing all commit logs for HEAD and branches*/
     static final File LOGS_FOLDER = Utils.join(GITLET_FOLDER, "logs");
 
+    static final File CWD = new File(".");
     // create initial commit and set up branch and HEAD pointer
     public Repo() {
         OBJECTS_FOLDER.mkdir();
@@ -29,6 +30,22 @@ public class Repo {
         initialCommit.saveCommit();
         saveBranchHead("master", initialCommit.SHA);
         saveLog(initialCommit);
+    }
+
+    public void add(String[] args) throws IOException {
+        // To-do: lazy loading and caching
+        // Main.validateNumArgs(args);
+        String fileName = args[1];
+        Blob blob = new Blob(fileName);
+        stageFile(fileName, blob);
+        blob.save();
+    }
+
+    private static void stageFile(String fileName, Blob blob) {
+        Staging staging = new Staging();
+        staging.add(fileName, blob.getBlobSHA1());
+        staging.save(staging);
+        staging.print();
     }
 
     public void saveBranchHead(String branchName, String SHA1) {
@@ -49,15 +66,6 @@ public class Repo {
 
         byte[] Log = Utils.readContents(currLogFile);
         Utils.writeContents(currLogFile, Log, divider, SHA, time, message);
-    }
-
-    // add one file to the hashmap in index(staging)
-    public void add(String[] args) {
-        System.out.println("test");
-//         Blob blob = new Blob(fileName);
-//         System.out.println("Blob " + blob.fileName);
-//         System.out.println("BlobContent " + blob.fileContent);
-//         System.out.println("Blob SHA" + blob.fileSHA1);
     }
 
     // remove the added file from the hashmap in index(staging)

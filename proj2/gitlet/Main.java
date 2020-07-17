@@ -36,6 +36,7 @@ public class Main {
 	static final File HEADS_REFS_FOLDER = Utils.join(REFS_FOLDER, "heads");
 
     static Repo repo = new Repo();
+
 	/** Usage: java gitlet.Main ARGS, where ARGS contains
 	*  <COMMAND> <OPERAND> .... */
 	public static void main(String... args) throws IOException {
@@ -47,7 +48,7 @@ public class Main {
                 repo.createInitialCommit();
                 break;
             case "add":
-                add(args);
+                repo.add(args);
                 break;
             case "commit":
                 commit(args);
@@ -128,21 +129,21 @@ public class Main {
 	* at the very end, since you had loaded that list of files and
 	* may have modified it, write it back to your file system.
 	*/
-	private static void add(String[] args) throws IOException {
-	    // To-do: lazy loading and caching
-	    validateNumArgs(args);
-		String fileName = args[1];
-		Blob blob = new Blob(fileName);
-        stageFile(fileName, blob);
-		blob.save();
-	}
+// 	private static void add(String[] args) throws IOException {
+// 	    // To-do: lazy loading and caching
+// 	    validateNumArgs(args);
+// 		String fileName = args[1];
+// 		Blob blob = new Blob(fileName);
+//         stageFile(fileName, blob);
+// 		blob.save();
+// 	}
 
-	private static void stageFile(String fileName, Blob blob) {
-	    Staging staging = new Staging();
-        staging.add(fileName, blob.getBlobSHA1());
-        staging.save(staging);
-        staging.print();
-	}
+// 	private static void stageFile(String fileName, Blob blob) {
+// 	    Staging staging = new Staging();
+//         staging.add(fileName, blob.getBlobSHA1());
+//         staging.save(staging);
+//         staging.print();
+// 	}
 
 	private static void commit(String[] args) throws IOException {
 	    validateNumArgs(args);
