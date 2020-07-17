@@ -7,36 +7,39 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.TimeZone;
+import java.util.*;
 
 public class Commit implements Serializable {
 
-    private String[] parentsArray = new String[2];
+    private String[] parents = new String[2];
     public String SHA;
     public String timestamp;
     public String message;
     /* mapping between file SHA1 and blob SHA1 */
-    private HashMap<String, String> map;
+    Map<String, String> map = new HashMap<>();
 
     private boolean init = false;
 
-    static final File COMMITS_FOLDER = Utils.join(".gitlet", "objects/commits");
-
-    /* constructor */
-    public Commit(String message, String parent, boolean init) {
+    public Commit(String message, String parent, boolean init, Map<String, String> map) {
         this.message = message;
-        this.parentsArray[0] = parent;
+        this.parents[0] = parent;
         this.SHA = Utils.sha1(message);
         this.timestamp = generateDate(init);
-        this.map = new HashMap<>();
+        this.map = map;
+    }
+
+    public void saveInit() throws IOException {
+        Commit commit = new Commit(this.message, this.parents[0], this.init, null);
+        File commitFile = Utils.join(Main.Commits, this.SHA);
+        commitFile.createNewFile();
+        Utils.writeObject(commitFile, commit);
     }
 
     public void save() throws IOException {
-        Commit commit = new Commit(this.message, this.parentsArray[0], this.init);
-        File commitFile = Utils.join(COMMITS_FOLDER, this.SHA);
+        Staging stage = Staging.load();
+        Commit commit =
+                new Commit(this.message, this.parents[0], this.init, stage.getTrackedFiles());
+        File commitFile = Utils.join(Main.Commits, this.SHA);
         commitFile.createNewFile();
         Utils.writeObject(commitFile, commit);
     }
@@ -50,5 +53,9 @@ public class Commit implements Serializable {
         DateFormat sdf = new SimpleDateFormat("EEE LLL d HH:mm:ss y Z");
         sdf.setTimeZone(tz);
         return sdf.format(cal.getTime());
+    }
+
+    public String getSHA() {
+        return this.SHA;
     }
 }
