@@ -2,123 +2,244 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * A Repo class represents a gitlet repository.
+ *
+ * @author Chloe Lin, Christal Huang
+ */
 public class Repo {
-    /** directory for storing commit objects as blobs*/
-    static final File OBJECTS_FOLDER = Utils.join(".gitlet", "objects");
-    static final File Commits = Utils.join(OBJECTS_FOLDER,  "commits");
-    static final File Blobs = Utils.join(OBJECTS_FOLDER,  "blobs");
 
-    static final File GITLET_FOLDER = new File(".gitlet");
-    static final File REFS_FOLDER = Utils.join(GITLET_FOLDER, "refs");
-    static final File HEADS_REFS_FOLDER = Utils.join(REFS_FOLDER, "heads");
+    static final String INIT_PARENT_SHA1 = "0000000000000000000000000000000000000000";
 
-    /** directory for storing all commit logs for HEAD and branches*/
-    static final File LOGS_FOLDER = Utils.join(GITLET_FOLDER, "logs");
-
-    // create initial commit and set up branch and HEAD pointer
-    public Repo() throws IOException {
-        OBJECTS_FOLDER.mkdir();
-        Commits.mkdir();
-        Blobs.mkdir();
-        createInitialCommit();
-    }
-
+    /**
+     * Create initial commit and set up branch and HEAD pointer.
+     */
     public void createInitialCommit() throws IOException {
-        String initPrevSha1 = "0000000000000000000000000000000000000000";
-        Commit initialCommit = new Commit("initial commit", initPrevSha1, true);
-        initialCommit.saveCommit();
-        saveBranchHead("master", initialCommit.SHA);
-        saveLog(initialCommit);
+        Commit initialCommit = new Commit("initial commit",
+                INIT_PARENT_SHA1, true, new HashMap<>());
+        initialCommit.saveInit();
+        setHEAD("master", initialCommit);
     }
 
-    public void saveBranchHead(String branchName, String SHA1) {
-        Branch branch = new Branch("master", SHA1);
-        File branchFile = Utils.join(HEADS_REFS_FOLDER, branchName);
+    /**
+     * Lazy loading and caching: Let’s say you store the state of which
+     * files have been gitlet added to your repo in your filesytem.
+     * Lazy loading: The first time you want that list of files when
+     * you run your Java program, you need to load it from disk.
+     * Caching: The second time you need that list of files in the
+     * same run of the Java program, don’t load it from disk again,
+     * but use the same list as you loaded before. If you need to,
+     * you can then add multiple files to that list object in your
+     * Java program. Writing back: When you Java program is finished,
+     * at the very end, since you had loaded that list of files and
+     * may have modified it, write it back to your file system.
+     */
+    public void add(String[] args) throws IOException {
+        /** To-do: lazy loading and caching */
+        Main.validateNumArgs(args);
+        String fileName = args[1];
+        Blob blob = new Blob(fileName);
+        stage(fileName, blob);
+        blob.save();
+    }
+
+    /**
+     * Add a file to the staging area.
+     */
+    private void stage(String fileName, Blob blob) {
+        Staging staging = new Staging();
+        if (!isSameVersion(blob)) {
+            System.out.println("staging file....");
+            staging.add(fileName, blob.getBlobSHA1());
+            staging.save(staging);
+            staging.print();
+        } else {
+            System.out.println("unstaging file....");
+            /** TO-DO: Unstage file... */
+
+            Main.validateFileToBeStaged();
+        }
+    }
+
+    /**
+     * Remove a file from the staging area (hashmap). Unstage the file
+     * if it is currently staged for addition. If the file is tracked in
+     * the current commit, stage it for removal and remove the file
+     * from the working directory if the user has not already done so
+     * (do not remove it unless it is tracked in the current commit).
+     */
+    public void unstage() {
+
+    }
+
+    /**
+     * If the current working version of the file is identical
+     * to the version in the current commit, do not stage it to
+     * be added, and remove it from the staging area if it is
+     * already there (as can happen when a file is changed,
+     * added, and then changed back).
+     * */
+    public boolean isSameVersion(Blob blob) {
+        Commit head = getHEAD();
+        System.out.println("hasBlob - current blob SHA1: " + blob.getBlobSHA1());
+        System.out.println("head commit message: " + head.getMessage());
+        System.out.println("head commit SHA: " + head.getSHA());
+        System.out.println("head commit MAP: " + head.getSnapshot());
+        Map<String, String> lastSnapshot = head.getSnapshot();
+        System.out.println("hasBlobInLastCommit? "
+                + lastSnapshot.containsValue(blob.getBlobSHA1()));
+        return lastSnapshot.containsValue(blob.getBlobSHA1());
+    }
+
+    /**
+     *  serialize added files into blobs, write blobs
+     *  into files inside /object directory, add the
+     *  file-blob mapping to index(staging), update
+     *  HEAD pointer
+     */
+    public void commit(String[] args) throws IOException {
+        Main.validateNumArgs(args);
+        String commitMessage = args[1];
+
+        Commit HEAD = getHEAD();
+        String parent = HEAD.getSHA();
+        Staging stage = Staging.load();
+        Commit commit = new Commit(commitMessage, parent, false, stage.getTrackedFiles());
+        System.out.println("saving staged map into commit....");
+        System.out.println("print parent commit: " + parent);
+        System.out.println("print self commit: " + commit.getSHA());
+        stage.getTrackedFiles().forEach((k, v) ->
+                System.out.println("copy map from staging to "
+                + "commit...." + k + " : " + v));
+        System.out.println("confirming if commit object is complete....");
+        System.out.println("commit message: " + commit.getMessage());
+        System.out.println("commit SHA: " + commit.getSHA());
+        System.out.println("commit map: " + commit.getSnapshot());
+        commit.save();
+        setHEAD("master", commit);
+        stage.clear();
+    }
+
+    /**
+     * Update the HEAD pointer of a branch by writing the last
+     * commit node into a byte array.
+     */
+    public void setHEAD(String branchName, Commit commit) {
+        Branch branch = new Branch("master", commit);
+        System.out.println("CURRENT HEAD ====> " + commit.getSHA());
+        System.out.println("CURRENT HEAD PARENT ====> " + commit.getFirstParentSHA1());
+        File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, branchName);
         Utils.writeObject(branchFile, branch);
     }
 
-    private static void saveLog(Commit commit) throws IOException {
-        File currLogFile = Utils.join(LOGS_FOLDER, "master");
-        if (!currLogFile.exists()) {
-            currLogFile.createNewFile();
+    /**
+     * Print the history of a commit tree.
+     * Starting at the current head commit, display information about
+     * each commit backwards along the commit tree until the initial commit.
+     */
+    public static void log() {
+        Commit commit = getHEAD();
+
+        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+            System.out.print("===" + "\n");
+            System.out.print("commit " + commit.getSHA() + "\n");
+            System.out.print("Date: " + commit.getTimestamp() + "\n");
+            System.out.print(commit.getMessage() + "\n");
+            System.out.println("");
+            commit = commit.getParent();
         }
-        String divider = new String("===" + "\n");
-        String SHA = new String("commit " + commit.SHA + "\n");
-        String time = new String("Date: " + commit.timestamp + "\n");
-        String message = new String(commit.message + "\n");
-
-        byte[] Log = Utils.readContents(currLogFile);
-        Utils.writeContents(currLogFile, Log, divider, SHA, time, message);
     }
 
-    // add one file to the hashmap in index(staging)
-    public void add(String fileName) {
-         Blob blob = new Blob(fileName);
-//         System.out.println("Blob " + blob.fileName);
-//         System.out.println("BlobContent " + blob.fileContent);
-//         System.out.println("Blob SHA" + blob.fileSHA1);
+    /**
+     * Return the commit node that the HEAD reference points to.
+     */
+    public static Commit getHEAD() {
+        File master = Utils.join(Main.HEADS_REFS_FOLDER, "master");
+        return Branch.load(master).getHead();
     }
 
-    // remove the added file from the hashmap in index(staging)
-    public void remove() {
-    }
-
-    // serialize added files into blobs, write blobs into files inside /object directory, add the
-    // file-blob mapping to index(staging), update HEAD pointer
-    public void commit() {
-    }
-
-    // print the commit metadata for current branch
-    public void log() {
-
-    }
-
-    // print all of the commit metadata
+    /**
+     * Print print all of the commit metadata.
+     */
     public void globalLog() {
-
+        /** To-do: traverse the entire commit tree */
     }
 
-    // search for commits that have the given commit message
+    /**
+     * Search for commits that have the given commit message.
+     */
     public void find(String commitId) {
-
+        /** To-do: search and traverse the entire commit tree */
     }
 
-    // prints the status (branch, staged/removed files) of our CWD/commit tree
+    /**
+     * prints the status (branch, staged/removed files) of
+     * our CWD/commit tree.
+     */
     public void status() {
-
+        /** To-do: create helper functions for each state */
+        System.out.println("=== Branches ===");
+        System.out.println("=== Staged Files ===");
+        System.out.println("=== Removed Files ===");
+        System.out.println("=== Modifications Not Staged For Commit ===");
+        System.out.println("=== Untracked Files ===");
     }
 
+    /**
+     * TBD.
+     */
     public void checkout(File file) {
 
     }
 
+    /**
+     * TBD.
+     */
     public void checkout(String commitId, File file) {
 
     }
 
+    /**
+     * TBD.
+     */
     public void checkout(String branchName) {
 
     }
 
-    // create a new reference for current commit node
+    /**
+     * Create a new reference for current commit node.
+     */
     public void branch(String branchName) {
 
     }
 
-    // remove the branch reference
+    /**
+     * Remove the branch reference.
+     */
     public void rmBranch(String branchName) {
 
     }
 
+    /**
+     * TBD.
+     */
     public void reset(String commitId) {
 
     }
 
+    /**
+     * TBD.
+     */
     public void merge(String branchName) {
 
     }
 
+    /**
+     * TBD.
+     */
     public void rebase(String branchName) {
 
     }
