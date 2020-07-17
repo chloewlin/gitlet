@@ -81,7 +81,7 @@ public class Main {
             repo.commit(args);
             break;
         case "log":
-            repo.printAllLog(args);
+            repo.log();
             break;
         default:
             validateCommand();

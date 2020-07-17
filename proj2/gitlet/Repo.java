@@ -12,13 +12,14 @@ import java.util.Map;
  */
 public class Repo {
 
+    static final String INIT_PARENT_SHA1 = "0000000000000000000000000000000000000000";
+
     /**
      * Create initial commit and set up branch and HEAD pointer.
      */
     public void createInitialCommit() throws IOException {
-        String initPrevSha1 = "0000000000000000000000000000000000000000";
         Commit initialCommit = new Commit("initial commit",
-                initPrevSha1, true, new HashMap<>());
+                INIT_PARENT_SHA1, true, new HashMap<>());
         initialCommit.saveInit();
         updateHead("master", initialCommit);
     }
@@ -103,13 +104,16 @@ public class Repo {
     public void commit(String[] args) throws IOException {
         Main.validateNumArgs(args);
         String commitMessage = args[1];
+
         File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, "master");
-        Branch parentCommit = Utils.readObject(branchFile, Branch.class);
+        Branch branch = Utils.readObject(branchFile, Branch.class);
+        String parent = branch.getHead().getSHA();
 
         Staging stage = Staging.load();
-        Commit commit = new Commit(commitMessage, parentCommit.
-                getHeadSHA(), false, stage.getTrackedFiles());
+        Commit commit = new Commit(commitMessage, parent, false, stage.getTrackedFiles());
         System.out.println("saving staged map into commit....");
+        System.out.println("print parent commit: " + parent);
+        System.out.println("print self commit: " + commit.getSHA());
         stage.getTrackedFiles().forEach((k, v) ->
                 System.out.println("copy map from staging to "
                 + "commit...." + k + " : " + v));
@@ -129,42 +133,37 @@ public class Repo {
      */
     public void updateHead(String branchName, Commit commit) {
         Branch branch = new Branch("master", commit);
+        System.out.println("CURRENT HEAD ====> " + commit.getSHA());
+        System.out.println("CURRENT HEAD PARENT ====> " + commit.getFirstParentSHA1());
+
         File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, branchName);
         Utils.writeObject(branchFile, branch);
     }
 
     /**
-     * TO BE FIXED.
+     * Print the history of a commit tree.
+     * Starting at the current head commit, display information about
+     * each commit backwards along the commit tree until the initial commit.
      */
-    private void saveLog(Commit commit) throws IOException {
-        File currLogFile = Utils.join(Main.LOGS_FOLDER, "master");
-        if (!currLogFile.exists()) {
-            currLogFile.createNewFile();
+    public static void log() {
+        Commit commit = getHEAD();
+
+        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+            System.out.print("===" + "\n");
+            System.out.print("commit " + commit.getSHA() + "\n");
+            System.out.print("Date: " + commit.getTimestamp() + "\n");
+            System.out.print(commit.getMessage() + "\n");
+            System.out.println("");
+            commit = commit.getParent();
         }
-        String divider = new String("===" + "\n");
-        String sha1 = new String("commit " + commit.getSHA() + "\n");
-        String time = new String("Date: " + commit.getTimestamp() + "\n");
-        String message = new String(commit.getMessage() + "\n");
-
-        byte[] log = Utils.readContents(currLogFile);
-        Utils.writeContents(currLogFile, log, divider, sha1, time, message);
     }
 
     /**
-     * TO BE FIXED.
+     * Return the commit node that the HEAD reference points to.
      */
-    public static void printAllLog(String[] args) throws IOException {
-        Main.validateNumArgs(args);
-        File currLogFile = Utils.join(Main.LOGS_FOLDER, "master");
-        String fullLog = Utils.readContentsAsString(currLogFile);
-        System.out.println(fullLog);
-    }
-
-    /**
-     * Print the commit metadata for current branch.
-     */
-    public void log() {
-
+    public static Commit getHEAD() {
+        File master = Utils.join(Main.HEADS_REFS_FOLDER, "master");
+        return Branch.load(master).getHead();
     }
 
     /**

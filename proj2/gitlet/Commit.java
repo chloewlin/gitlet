@@ -57,7 +57,7 @@ public class Commit implements Serializable {
                   Map<String, String> map) {
         this.message = msg;
         this.parents[0] = parent;
-        this.sha1 = Utils.sha1(message);
+        this.sha1 = Utils.sha1("COMMIT" + message);
         this.timestamp = generateDate(init);
         this.snapshot = map;
     }
@@ -67,7 +67,7 @@ public class Commit implements Serializable {
      */
     public void saveInit() throws IOException {
         Commit commit = new Commit(this.message, this.parents[0],
-                this.init, new HashMap<>());
+                true, new HashMap<>());
         File commitFile = Utils.join(Main.COMMITS_FOLDER, this.sha1);
         commitFile.createNewFile();
         Utils.writeObject(commitFile, commit);
@@ -85,19 +85,27 @@ public class Commit implements Serializable {
     }
 
     /**
-     * Generate a timestamp for a commit node.
-     * @return a timestamp
-     * @param initial returns true if it is the first commit
+     * Return the parent commit node of a given node.
      */
-    public String generateDate(boolean initial) {
-        TimeZone tz = TimeZone.getTimeZone("PST");
-        Calendar cal = Calendar.getInstance(tz);
-        if (initial) {
-            cal.setTimeInMillis(0);
-        }
-        DateFormat sdf = new SimpleDateFormat("EEE LLL d HH:mm:ss y Z");
-        sdf.setTimeZone(tz);
-        return sdf.format(cal.getTime());
+    public Commit getParent() {
+        String parentSha1 = this.parents[0];
+        Commit parent = load(parentSha1);
+        return parent;
+    }
+
+    /**
+     * Return a commit node from a byte array.
+     */
+    public Commit load(String sha1) {
+        File commitFile = Utils.join(Main.COMMITS_FOLDER, sha1);
+        return Utils.readObject(commitFile, Commit.class);
+    }
+
+    /**
+     * Return the SHA1 of the first parent commit node.
+     */
+    public String getFirstParentSHA1() {
+        return this.parents[0];
     }
 
     /**
@@ -126,6 +134,22 @@ public class Commit implements Serializable {
      */
     public Map<String, String> getSnapshot() {
         return this.snapshot;
+    }
+
+    /**
+     * Generate a timestamp for a commit node.
+     * @return a timestamp
+     * @param initial returns true if it is the first commit
+     */
+    public String generateDate(boolean initial) {
+        TimeZone tz = TimeZone.getTimeZone("PST");
+        Calendar cal = Calendar.getInstance(tz);
+        if (initial) {
+            cal.setTimeInMillis(0);
+        }
+        DateFormat sdf = new SimpleDateFormat("EEE LLL d HH:mm:ss y Z");
+        sdf.setTimeZone(tz);
+        return sdf.format(cal.getTime());
     }
 
     /**
