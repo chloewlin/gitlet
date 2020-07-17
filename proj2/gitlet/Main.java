@@ -9,6 +9,24 @@ import java.io.IOException;
  * @author Chloe Lin, Christal Huang
  */
 public class Main {
+    /** repo*/
+    static Repo repo;
+
+    /** Current Working Directory. */
+    static final File CWD = new File(".");
+
+    /** directory for .gitlet */
+    static final File GITLET_FOLDER = new File(".gitlet");
+
+    /** file that represents the staging area and stores file/blob
+        Mapping*/
+    static final File index = Utils.join(GITLET_FOLDER, "index");
+
+    /** commit hash current head*/
+    static final File HEAD = new File("head");
+
+    /** directory for storing branch and related commit has*/
+    static final File Branches = new File("branch");
 
     /**
      * Current Working Directory.

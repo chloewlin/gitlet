@@ -1,5 +1,6 @@
 package gitlet;
 
+
 import java.io.File;
 import java.io.Serializable;
 
@@ -39,7 +40,7 @@ public class Branch implements Serializable {
     public String getName() {
         return this.name;
     }
-
+  
     /**
      * Return the last commit node of the current branch.
      */
