@@ -38,6 +38,24 @@ public class Repo {
         blob.save();
     }
 
+    private void stageFile(String fileName, Blob blob) {
+        Staging staging = new Staging();
+        if (!isSameVersion(blob)) {
+            System.out.println("staging file....");
+            staging.add(fileName, blob.getBlobSHA1());
+            staging.save(staging);
+            staging.print();
+        } else {
+            System.out.println("unstaging file....");
+            // unstage file
+        }
+    }
+
+    // remove the added file from the hashmap in index(staging)
+    public void unstage() {
+
+    }
+
     /**
      * If the current working version of the file is identical
      * to the version in the current commit, do not stage it to
@@ -45,7 +63,7 @@ public class Repo {
      * already there (as can happen when a file is changed,
      * added, and then changed back).
      * */
-    public boolean hasBlob(Blob blob) {
+    public boolean isSameVersion(Blob blob) {
         File master = Utils.join(Main.HEADS_REFS_FOLDER, "master");
         Commit head = Branch.load(master).getHead();
         System.out.println("hasBlob - current blob SHA1: " + blob.getBlobSHA1());
@@ -55,19 +73,6 @@ public class Repo {
         Map<String, String> lastSnapshot = head.getMap();
         System.out.println("hasBlobInLastCommit? " + lastSnapshot.containsValue(blob.getBlobSHA1()));
         return lastSnapshot.containsValue(blob.getBlobSHA1());
-    }
-
-    private void stageFile(String fileName, Blob blob) {
-        Staging staging = new Staging();
-        if (!hasBlob(blob)) {
-            System.out.println("staging file....");
-            staging.add(fileName, blob.getBlobSHA1());
-            staging.save(staging);
-            staging.print();
-        } else {
-            System.out.println("unstaging file....");
-            // unstage file
-        }
     }
 
     /**
@@ -121,10 +126,6 @@ public class Repo {
         File currLogFile = Utils.join(Main.LOGS_FOLDER, "master");
         String fullLog = Utils.readContentsAsString(currLogFile);
         System.out.println(fullLog);
-    }
-
-    // remove the added file from the hashmap in index(staging)
-    public void remove() {
     }
 
 
