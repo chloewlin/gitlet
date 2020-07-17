@@ -7,7 +7,6 @@ import java.util.Map;
 
 public class Staging implements Serializable {
 
-    static final File STAGING_FOLDER = Utils.join(".gitlet", "staging");
     Map<String, String> trackedFiles;
     Map<String, String> untrackedFiles;
 
@@ -27,23 +26,21 @@ public class Staging implements Serializable {
     }
 
     public void save(Staging stagedFiles) {
-        File currentTrackedFiles = Utils.join(STAGING_FOLDER, "trackedFiles");
+        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "trackedFiles");
         Utils.writeObject(currentTrackedFiles, stagedFiles);
     }
 
-    /** If the current working version of the file is identical
-     * to the version in the current commit, do not stage it to
-     * be added, and remove it from the staging area if it is
-     * already there (as can happen when a file is changed,
-     * added, and then changed back).
-     * */
-    // compare SHA1
-    public void remove() {
-        // To-do
+    public static Staging load() {
+        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "trackedFiles");
+        return Utils.readObject(currentTrackedFiles, Staging.class);
+    }
+
+    public Map<String, String> getTrackedFiles() {
+        return this.trackedFiles;
     }
 
     public void print() {
-        trackedFiles
-                .forEach((key, value) -> System.out.println(key + ":" + value));
+        System.out.println("Currently tracked files on Staging....");
+        trackedFiles.forEach((key, value) -> System.out.println(key + " : " + value));
     }
 }

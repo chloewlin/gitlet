@@ -16,7 +16,7 @@ public class Commit implements Serializable {
     public String timestamp;
     public String message;
     /* mapping between file SHA1 and blob SHA1 */
-    Map<String, String> map = new HashMap<>();
+    Map<String, String> map;
 
     private boolean init = false;
 
@@ -29,16 +29,14 @@ public class Commit implements Serializable {
     }
 
     public void saveInit() throws IOException {
-        Commit commit = new Commit(this.message, this.parents[0], this.init, null);
+        Commit commit = new Commit(this.message, this.parents[0], this.init, new HashMap<>());
         File commitFile = Utils.join(Main.Commits, this.SHA);
         commitFile.createNewFile();
         Utils.writeObject(commitFile, commit);
     }
 
     public void save() throws IOException {
-        Staging stage = Staging.load();
-        Commit commit =
-                new Commit(this.message, this.parents[0], this.init, stage.getTrackedFiles());
+        Commit commit = new Commit(this.message, this.parents[0], this.init, this.map);
         File commitFile = Utils.join(Main.Commits, this.SHA);
         commitFile.createNewFile();
         Utils.writeObject(commitFile, commit);
@@ -57,5 +55,11 @@ public class Commit implements Serializable {
 
     public String getSHA() {
         return this.SHA;
+    }
+
+    public Map<String, String> getMap() { return this.map; }
+
+    public void printMap() {
+        this.map.forEach((key, value) -> System.out.println(key + " : " + value));
     }
 }

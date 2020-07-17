@@ -24,7 +24,7 @@ public class Branch implements Serializable {
         return this.head.getSHA();
     }
 
-    public static Branch load(File branchFile) {
-        return Utils.readObject(branchFile, Branch.class);
+    public static Branch load(File branch) {
+        return Utils.readObject(branch, Branch.class);
     }
 }

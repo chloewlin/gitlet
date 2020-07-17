@@ -2,15 +2,18 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Repo {
 
     // create initial commit and set up branch and HEAD pointer
     public void createInitialCommit() throws IOException {
         String initPrevSha1 = "0000000000000000000000000000000000000000";
-        Commit initialCommit = new Commit("initial commit", initPrevSha1, true);
-        initialCommit.save();
-        updateHead("master", initialCommit.SHA);
+        Commit initialCommit = new Commit("initial commit", initPrevSha1, true,
+                new HashMap<>());
+        initialCommit.saveInit();
+        updateHead("master", initialCommit);
     }
 
     /**
@@ -35,8 +38,36 @@ public class Repo {
         blob.save();
     }
 
+    /**
+     * If the current working version of the file is identical
+     * to the version in the current commit, do not stage it to
+     * be added, and remove it from the staging area if it is
+     * already there (as can happen when a file is changed,
+     * added, and then changed back).
+     * */
+    // compare the hashmap inside each commit node and see if the new blob matches it
+    public boolean hasBlob(Blob blob) {
+        // load from last commit
+        File master = Utils.join(Main.HEADS_REFS_FOLDER, "master");
+        Commit head =  Branch.load(master).getHead();
+        System.out.println("head commit message: " + head.message);
+        System.out.println("head commit SHA: " + head.SHA);
+        System.out.println("head commit MAP: " + head.getMap());
+        return true;
+//        Map<String, String> mapFromLastCommit = Branch.load(master).getHead().getMap();
+//
+//        mapFromLastCommit.forEach((k, v) -> System.out.println("mapFromLastCommit" + k + " : " + v));
+//        System.out.println("blob SHA: " + blob.getBlobSHA1());
+//        return mapFromLastCommit.containsValue(blob.getBlobSHA1());
+    }
+
     private void stageFile(String fileName, Blob blob) {
         Staging staging = new Staging();
+        System.out.println("staging file....");
+        hasBlob(blob);
+//        if (hasBlob(blob)) {
+//            System.out.println("has same blob!.....");
+//        }
         staging.add(fileName, blob.getBlobSHA1());
         staging.save(staging);
         staging.print();
@@ -51,13 +82,25 @@ public class Repo {
         String commitMessage = args[1];
         File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, "master");
         Branch parentCommit = Utils.readObject(branchFile, Branch.class);
-        Commit commit = new Commit(commitMessage, parentCommit.getHead(), false);
+
+        Staging stage = Staging.load();
+        Commit commit = new Commit(commitMessage, parentCommit.getHeadSHA(), false, stage.getTrackedFiles());
+        System.out.println("saving staged map into commit....");
+        stage.getTrackedFiles().forEach((k, v) -> System.out.println("copy map from staging to " +
+                "commit...." + k + " : " + v));
+        System.out.println("confirming if commit object is complete....");
+        System.out.println("commit message: " + commit.message);
+        System.out.println("commit SHA: " + commit.SHA);
+        System.out.println("commit map: " + commit.map);
+
         commit.save();
-        updateHead("master", commit.SHA);
+
+        updateHead("master", commit);
     }
 
-    public void updateHead(String branchName, String SHA1) {
-        Branch branch = new Branch("master", SHA1);
+    public void updateHead(String branchName, Commit commit) {
+        // writing the last commit into a file
+        Branch branch = new Branch("master", commit);
         File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, branchName);
         Utils.writeObject(branchFile, branch);
     }
