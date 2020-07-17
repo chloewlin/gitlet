@@ -68,10 +68,10 @@ public class Repo {
         File master = Utils.join(Main.HEADS_REFS_FOLDER, "master");
         Commit head = Branch.load(master).getHead();
         System.out.println("hasBlob - current blob SHA1: " + blob.getBlobSHA1());
-        System.out.println("head commit message: " + head.message);
-        System.out.println("head commit SHA: " + head.SHA);
-        System.out.println("head commit MAP: " + head.getMap());
-        Map<String, String> lastSnapshot = head.getMap();
+        System.out.println("head commit message: " + head.getMessage());
+        System.out.println("head commit SHA: " + head.getSHA());
+        System.out.println("head commit MAP: " + head.getSnapshot());
+        Map<String, String> lastSnapshot = head.getSnapshot();
         System.out.println("hasBlobInLastCommit? " + lastSnapshot.containsValue(blob.getBlobSHA1()));
         return lastSnapshot.containsValue(blob.getBlobSHA1());
     }
@@ -92,9 +92,9 @@ public class Repo {
         stage.getTrackedFiles().forEach((k, v) -> System.out.println("copy map from staging to " +
                 "commit...." + k + " : " + v));
         System.out.println("confirming if commit object is complete....");
-        System.out.println("commit message: " + commit.message);
-        System.out.println("commit SHA: " + commit.SHA);
-        System.out.println("commit map: " + commit.map);
+        System.out.println("commit message: " + commit.getMessage());
+        System.out.println("commit SHA: " + commit.getSHA());
+        System.out.println("commit map: " + commit.getSnapshot());
 
         commit.save();
         updateHead("master", commit);
@@ -114,9 +114,9 @@ public class Repo {
             currLogFile.createNewFile();
         }
         String divider = new String("===" + "\n");
-        String SHA = new String("commit " + commit.SHA + "\n");
-        String time = new String("Date: " + commit.timestamp + "\n");
-        String message = new String(commit.message + "\n");
+        String SHA = new String("commit " + commit.getSHA() + "\n");
+        String time = new String("Date: " + commit.getTimestamp() + "\n");
+        String message = new String(commit.getMessage() + "\n");
 
         byte[] Log = Utils.readContents(currLogFile);
         Utils.writeContents(currLogFile, Log, divider, SHA, time, message);
