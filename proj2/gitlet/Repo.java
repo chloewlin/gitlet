@@ -174,7 +174,7 @@ public class Repo {
      * Search for commits that have the given commit message.
      */
     public void find(String commitId) {
-
+        /** To-do: search and traverse the entire commit tree */
     }
 
     /**
