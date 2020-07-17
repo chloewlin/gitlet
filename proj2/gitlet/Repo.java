@@ -83,8 +83,7 @@ public class Repo {
      * added, and then changed back).
      * */
     public boolean isSameVersion(Blob blob) {
-        File master = Utils.join(Main.HEADS_REFS_FOLDER, "master");
-        Commit head = Branch.load(master).getHead();
+        Commit head = getHEAD();
         System.out.println("hasBlob - current blob SHA1: " + blob.getBlobSHA1());
         System.out.println("head commit message: " + head.getMessage());
         System.out.println("head commit SHA: " + head.getSHA());
@@ -105,10 +104,8 @@ public class Repo {
         Main.validateNumArgs(args);
         String commitMessage = args[1];
 
-        File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, "master");
-        Branch branch = Utils.readObject(branchFile, Branch.class);
-        String parent = branch.getHead().getSHA();
-
+        Commit HEAD = getHEAD();
+        String parent = HEAD.getSHA();
         Staging stage = Staging.load();
         Commit commit = new Commit(commitMessage, parent, false, stage.getTrackedFiles());
         System.out.println("saving staged map into commit....");
