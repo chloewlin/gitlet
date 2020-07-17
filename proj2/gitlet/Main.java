@@ -66,7 +66,7 @@ public class Main {
     /**
      * Usage: java gitlet.Main ARGS, where ARGS contains <COMMAND> <OPERAND>.
      */
-    public static void main(String... args) throws IOException {
+    public static void main(String... args) throws IOException { // {"checkout, --, filename "}
         validateNumCommand(args);
         switch (args[0]) {
         case "init":
@@ -86,10 +86,26 @@ public class Main {
         case "status":
              repo.status();
              break;
+        case "checkout":
+             validateCheckout(args);
+             break;
         default:
             validateCommand();
         }
         return;
+    }
+
+    /**
+     *  Validate the args when the operand is checkout.
+     */
+    private static void validateCheckout(String[] args) throws IOException {
+        if (args[1].equals("--")) {
+            repo.checkoutFile(args[2]);
+        } else if (args[2].equals("--")) {
+            repo.checkoutCommit(args[1], args[3]);
+        } else {
+            repo.checkoutBranch(args[1]);
+        }
     }
 
     /**

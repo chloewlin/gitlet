@@ -189,23 +189,45 @@ public class Repo {
     }
 
     /**
+     * Takes the version of the file as it exists in the head commit,
+     * the front of the current branch, and puts it in the working
+     * directory, overwriting the version of the file that’s already
+     * there if there is one. The new version of the file is not staged.
+     */
+    public void checkoutFile(String filename) throws IOException {
+        Map<String, String> snapshot = getHEAD().getSnapshot();
+
+        if (snapshot.containsKey(filename)) {
+            String blobSHA1 = snapshot.get(filename);
+            File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+            Blob blob = Blob.load(blobFile);
+            restoreFileInCWD(blob);
+        }
+    }
+
+    /**
+     * Restore file from blob, put it in current working directory,
+     * and overwriting the version of the file that’s already
+     * there if there is one.
+     */
+    public void restoreFileInCWD(Blob blob) throws IOException {
+        String CWD = System.getProperty("user.dir");
+        File file = new File(CWD, blob.getFileName());
+        file.createNewFile();
+        Utils.writeContents(file, blob.getFileContent());
+    }
+
+    /**
      * TBD.
      */
-    public void checkout(File file) {
+    public void checkoutCommit(String commitId, String fileName) {
 
     }
 
     /**
      * TBD.
      */
-    public void checkout(String commitId, File file) {
-
-    }
-
-    /**
-     * TBD.
-     */
-    public void checkout(String branchName) {
+    public void checkoutBranch(String branchName) {
 
     }
 
