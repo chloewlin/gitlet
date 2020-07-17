@@ -43,4 +43,10 @@ public class Staging implements Serializable {
         System.out.println("Currently tracked files on Staging....");
         trackedFiles.forEach((key, value) -> System.out.println(key + " : " + value));
     }
+
+    public void clear() {
+        // To-do: check if we should delete the file when clearing staging
+        File currentTrackedFiles = Utils.join(Main.GITLET_FOLDER, "staging" , "trackedFiles");
+        currentTrackedFiles.delete();
+    }
 }
