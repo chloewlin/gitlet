@@ -66,7 +66,7 @@ public class Main {
     /**
      * Usage: java gitlet.Main ARGS, where ARGS contains <COMMAND> <OPERAND>.
      */
-    public static void main(String... args) throws IOException { // {"checkout, --, filename "}
+    public static void main(String... args) throws IOException {
         validateNumCommand(args);
         switch (args[0]) {
         case "init":
@@ -84,11 +84,11 @@ public class Main {
             repo.log();
             break;
         case "status":
-             repo.status();
-             break;
+            repo.status();
+            break;
         case "checkout":
-             validateCheckout(args);
-             break;
+            validateCheckout(args);
+            break;
         default:
             validateCommand();
         }
@@ -96,7 +96,9 @@ public class Main {
     }
 
     /**
-     *  Validate the args when the operand is checkout.
+     * Validate the args when the operand is checkout.
+     * @param args **this is the call args**
+     * @throws IOException
      */
     private static void validateCheckout(String[] args) throws IOException {
         if (args[1].equals("--")) {
@@ -190,31 +192,26 @@ public class Main {
         boolean isValid = false;
         switch (args[0]) {
         case "init":
+        case "log":
+        case "status":
             if (n == 1) {
                 isValid = true;
             }
+            break;
         case "add":
             if (n == 2) {
                 isValid = true;
             }
+            break;
         case "commit":
             if (n == 1) {
                 validateCommitMessage();
             } else if (n == 2) {
                 isValid = true;
             }
-        case "log":
-            if (n == 1) {
-                isValid = true;
-            }
-        case "status":
-            if (n == 1) {
-                isValid = true;
-            }
+            break;
         default:
-            if (n == 2) {
-                isValid = true;
-            }
+            isValid = false;
         }
         if (!isValid) {
             exitWithError("Incorrect operands.");
