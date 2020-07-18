@@ -206,6 +206,30 @@ public class Repo {
     }
 
     /**
+     * Takes the version of the file as it exists in the commit with the given id,
+     * and puts it in the working directory, overwriting the version of the file
+     * that’s already there if there is one.
+     * The new version of the file is not staged.
+     */
+    public void checkoutCommit(String commitId, String fileName) throws IOException {
+        Commit commit = getHEAD();
+        String blobSHA1 = "";
+
+        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+            if (commit.getSHA().equals(commitId)) {
+                blobSHA1 = commit.getSnapshot().get(fileName);
+                break;
+            }
+            commit = commit.getParent();
+        }
+
+        File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+        Blob blob = Blob.load(blobFile);
+        restoreFileInCWD(blob);
+    }
+
+
+    /**
      * Restore file from blob, put it in current working directory,
      * and overwriting the version of the file that’s already
      * there if there is one.
@@ -215,13 +239,6 @@ public class Repo {
         File file = new File(CWD, blob.getFileName());
         file.createNewFile();
         Utils.writeContents(file, blob.getFileContent());
-    }
-
-    /**
-     * TBD.
-     */
-    public void checkoutCommit(String commitId, String fileName) {
-
     }
 
     /**
