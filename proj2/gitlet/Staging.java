@@ -8,17 +8,17 @@ import java.util.TreeMap;
 
 public class Staging implements Serializable {
 
-    private Map<String, String> trackedFiles;
-    private HashSet<String> untrackedFiles;
+    private Map<String, String> stagedForAddition;
+    private HashSet<String> stagedForRemoval;
 
     public Staging() {
-        this.trackedFiles = new TreeMap<String, String>();
-        this.untrackedFiles = new HashSet<String>();
+        this.stagedForAddition = new TreeMap<String, String>();
+        this.stagedForRemoval = new HashSet<String>();
     }
 
     public Staging(Map<String, String> trackedFiles, HashSet<String> untrackedFiles) {
-        this.trackedFiles = trackedFiles;
-        this.untrackedFiles = untrackedFiles;
+        this.stagedForAddition = trackedFiles;
+        this.stagedForRemoval = untrackedFiles;
     }
 
     /**
@@ -28,30 +28,30 @@ public class Staging implements Serializable {
      * entry in the staging area with the new contents
      * */
     public void add(String fileName, String blobSHA1) {
-        this.trackedFiles.put(fileName, blobSHA1);
+        this.stagedForAddition.put(fileName, blobSHA1);
     }
 
     public void remove(String fileName) {
-        this.trackedFiles.remove(fileName);
+        this.stagedForAddition.remove(fileName);
     }
 
     public boolean containsFile(String fileName) {
-        return this.trackedFiles.containsKey(fileName);
+        return this.stagedForAddition.containsKey(fileName);
     }
 
     public void unstage(String fileName) {
-        this.untrackedFiles.add(fileName);
+        this.stagedForRemoval.add(fileName);
     }
 
     public Blob getBlobOfFile(String fileName) {
-        String blobSHA1 = this.trackedFiles.get(fileName);
+        String blobSHA1 = this.stagedForAddition.get(fileName);
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
         Blob blob = Blob.load(blobFile);
         return blob;
     }
 
     public void save() {
-        Staging stage = new Staging(this.trackedFiles, this.untrackedFiles);
+        Staging stage = new Staging(this.stagedForAddition, this.stagedForRemoval);
         File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "index");
         Utils.writeObject(currentTrackedFiles, stage);
     }
@@ -61,22 +61,22 @@ public class Staging implements Serializable {
         return Utils.readObject(currentTrackedFiles, Staging.class);
     }
 
-    public Map<String, String> getTrackedFiles() {
-        return this.trackedFiles;
+    public Map<String, String> getFilesStagedForAddition() {
+        return this.stagedForAddition;
     }
 
-    public HashSet<String> getUntrackedFiles() {
-        return this.untrackedFiles;
+    public HashSet<String> getFilesStagedForRemoval() {
+        return this.stagedForRemoval;
     }
 
     public void printTrackedFiles() {
         System.out.println("Currently tracked files on Staging....");
-        trackedFiles.forEach((key, value) -> System.out.println(key + " : " + value));
+        stagedForAddition.forEach((key, value) -> System.out.println(key + " : " + value));
     }
 
     public void printUntrackedFiles() {
         System.out.println("Currently untracked files on Staging....");
-        untrackedFiles.forEach(s -> System.out.println(s));
+        stagedForRemoval.forEach(s -> System.out.println(s));
     }
 
     /**

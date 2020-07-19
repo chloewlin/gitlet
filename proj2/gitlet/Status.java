@@ -42,7 +42,7 @@ public class Status {
     public static void getStagedFilesStatus() {
         Repo.stagingArea
                 .load()
-                .getTrackedFiles()
+                .getFilesStagedForAddition()
                 .forEach((name, SHA1) -> {
                     System.out.println(name);
                 });
@@ -55,7 +55,7 @@ public class Status {
     public static void getRemovedFilesStatus() {
         Repo.stagingArea
                 .load()
-                .getUntrackedFiles()
+                .getFilesStagedForRemoval()
                 .forEach(System.out::println);
         System.out.println();
     }

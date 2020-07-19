@@ -142,8 +142,8 @@ public class Repo {
         Commit HEAD = getHEAD();
         Staging stage = this.stagingArea.load();
         Map<String, String> parentSnapshot = HEAD.getSnapshot();
-        Map<String, String> trackedFiles = stage.getTrackedFiles();
-        trackedFiles.forEach((file, SHA1) -> parentSnapshot.put(file,SHA1));
+        Map<String, String> stagedForAdditionFiles = stage.getFilesStagedForAddition();
+        stagedForAdditionFiles.forEach((file, SHA1) -> parentSnapshot.put(file,SHA1));
         return parentSnapshot;
     }
 
