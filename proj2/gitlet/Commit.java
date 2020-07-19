@@ -53,13 +53,20 @@ public class Commit implements Serializable {
      * @param initial a boolean value to separate initial commit
      * @param map the file-blob hashmap
      */
-    public Commit(String msg, String parent, boolean initial,
-                  Map<String, String> map) {
+    public Commit(String msg, String parent, boolean initial, Map<String, String> map) {
         this.message = msg;
         this.parents[0] = parent;
         this.sha1 = Utils.sha1("COMMIT" + message);
         this.timestamp = generateDate(init);
         this.snapshot = map;
+        this.init = initial;
+    }
+
+    public Commit(String msg) {
+        this.message = msg;
+        this.parents[0] = Repo.INIT_PARENT_SHA1;
+        this.sha1 = Utils.sha1("COMMIT" + message);
+        this.timestamp = generateDate(init);
     }
 
     /**
@@ -67,7 +74,7 @@ public class Commit implements Serializable {
      */
     public void saveInit() throws IOException {
         Commit commit = new Commit(this.message, this.parents[0],
-                true, new HashMap<>());
+                true, this.snapshot);
         File commitFile = Utils.join(Main.COMMITS_FOLDER, this.sha1);
         commitFile.createNewFile();
         Utils.writeObject(commitFile, commit);
