@@ -88,6 +88,9 @@ public class Main {
         case "checkout":
              validateCheckout(args);
              break;
+        case "branch":
+             repo.branch(args);
+             break;
         default:
             validateCommand();
         }

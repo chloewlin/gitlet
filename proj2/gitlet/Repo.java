@@ -220,14 +220,6 @@ public class Repo {
     }
 
     /**
-     * Return the commit node that the HEAD reference points to.
-     */
-    public static Commit getHEAD() {
-        File master = Utils.join(Main.HEADS_REFS_FOLDER, "master");
-        return Branch.load(master).getHead();
-    }
-
-    /**
      * Print print all of the commit metadata.
      */
     public void globalLog() {
@@ -319,8 +311,22 @@ public class Repo {
     /**
      * Create a new reference for current commit node.
      */
-    public void branch(String branchName) {
+    public void branch(String[] args) throws IOException {
+        String name = args[1];
+        if (!Branch.hasBranch(name)) {
+            Branch branch = new Branch(name, getHEAD());
+            branch.create();
+        } else {
+            Main.exitWithError("A branch with that name already exists.");
+        }
+    }
 
+    /**
+     * Return the commit node that the HEAD pointer of a given branch points to.
+     */
+    public static Commit getHEAD() {
+        File master = Utils.join(Main.HEADS_REFS_FOLDER, "master");
+        return Branch.load(master).getHead();
     }
 
     /**
