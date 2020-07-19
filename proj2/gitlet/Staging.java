@@ -7,12 +7,17 @@ import java.util.Map;
 
 public class Staging implements Serializable {
 
-    Map<String, String> trackedFiles;
-    Map<String, String> untrackedFiles;
+    private Map<String, String> trackedFiles;
+    private Map<String, String> untrackedFiles;
 
     public Staging() {
         this.trackedFiles = new HashMap<String, String>();
         this.untrackedFiles = new HashMap<String, String>();
+    }
+
+    public Staging(Map<String, String> trackedFiles, Map<String, String> untrackedFiles) {
+        this.trackedFiles = trackedFiles;
+        this.untrackedFiles = untrackedFiles;
     }
 
     /**
@@ -22,12 +27,19 @@ public class Staging implements Serializable {
      * entry in the staging area with the new contents
      * */
     public void add(String fileName, String blobSHA1) {
+        System.out.print("inside Staging.add method...");
         this.trackedFiles.put(fileName, blobSHA1);
     }
 
     public void save(Staging stagedFiles) {
         File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "trackedFiles");
         Utils.writeObject(currentTrackedFiles, stagedFiles);
+    }
+
+    public void save() {
+        Staging stage = new Staging(this.trackedFiles, this.untrackedFiles);
+        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "trackedFiles");
+        Utils.writeObject(currentTrackedFiles, stage);
     }
 
     public static Staging load() {
@@ -45,8 +57,8 @@ public class Staging implements Serializable {
     }
 
     public void clear() {
-        // To-do: check if we should delete the file when clearing staging
-        File currentTrackedFiles = Utils.join(Main.GITLET_FOLDER, "staging" , "trackedFiles");
-        currentTrackedFiles.delete();
+//        File trackedFiles = Utils.join(Main.GITLET_FOLDER, "staging" , "trackedFiles");
+        Staging newStagingArea = new Staging();
+        newStagingArea.save();
     }
 }

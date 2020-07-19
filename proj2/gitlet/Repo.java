@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import java.util.Map;
 public class Repo {
 
     static final String INIT_PARENT_SHA1 = "0000000000000000000000000000000000000000";
+    private Staging stagingArea = new Staging();
 
     /**
      * Create initial commit and set up branch and HEAD pointer.
@@ -23,6 +25,9 @@ public class Repo {
         sentinel.save();
         initialCommit.saveInit();
         setHEAD("master", initialCommit);
+
+        // initialize + save initial stage
+        this.stagingArea.save();
     }
 
     /**
@@ -43,6 +48,7 @@ public class Repo {
         Main.validateNumArgs(args);
         String fileName = args[1];
         Blob blob = new Blob(fileName);
+
         stage(fileName, blob);
         blob.save();
     }
@@ -50,14 +56,22 @@ public class Repo {
     /**
      * Add a file to the staging area.
      */
-    private void stage(String fileName, Blob blob) {
-        Staging staging = new Staging();
+    private void stage(String fileName, Blob blob) throws IOException {
 
-        if (!isSameVersion(blob)) {
-            System.out.println("staging file....");
-            staging.add(fileName, blob.getBlobSHA1());
-            staging.save(staging);
-            staging.print();
+        this.stagingArea = this.stagingArea.load();
+
+        System.out.println("OLD STAGE HASHMP LENGTH: ");
+        System.out.println(this.stagingArea.getTrackedFiles().size());
+
+        if (!isSameVersionAsCWD(fileName)) {
+            System.out.println("================== NOT THE SAME VERSION! ================");
+            this.stagingArea.add(fileName, blob.getBlobSHA1());
+            this.stagingArea.save();
+
+            System.out.println("Saving the new file into staging....");
+            System.out.println("Curr HASHMP LENGTH: ");
+            System.out.println(this.stagingArea.getTrackedFiles().size());
+            this.stagingArea.print();
         } else {
             System.out.println("unstaging file....");
             /** TO-DO: Unstage file... */
@@ -84,17 +98,34 @@ public class Repo {
      * already there (as can happen when a file is changed,
      * added, and then changed back).
      * */
-    public boolean isSameVersion(Blob blob) {
-        Commit head = getHEAD();
-        System.out.println("hasBlob - current blob SHA1: " + blob.getBlobSHA1());
-        System.out.println("head commit message: " + head.getMessage());
-        System.out.println("head commit SHA: " + head.getSHA());
-        System.out.println("head commit MAP: " + head.getSnapshot());
-        Map<String, String> lastSnapshot = head.getSnapshot();
-        System.out.println("hasBlobInLastCommit? "
-                + lastSnapshot.containsValue(blob.getBlobSHA1()));
-        return lastSnapshot.containsValue(blob.getBlobSHA1());
+    public boolean isSameVersionAsCWD(String currentVersionFileName) throws IOException {
+        String CWD = System.getProperty("user.dir");
+        File file = new File(CWD, currentVersionFileName);
+
+        Commit currentCommit = getHEAD();
+        String blobSHA1OfFileInCurrentCommit =
+                currentCommit.getSnapshot().get(currentVersionFileName);
+        if (blobSHA1OfFileInCurrentCommit == null) return false;
+        File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1OfFileInCurrentCommit);
+        Blob blob = Blob.load(blobFile);
+
+        byte[] versionInCurrCommit = blob.getFileContent();
+        byte[] versionInCWD = Utils.readContents(file);
+
+        return Arrays.equals(versionInCurrCommit, versionInCWD);
     }
+
+//    public boolean isSameVersion(Blob blob) {
+//        Commit head = getHEAD();
+////        System.out.println("hasBlob - current blob SHA1: " + blob.getBlobSHA1());
+////        System.out.println("head commit message: " + head.getMessage());
+////        System.out.println("head commit SHA: " + head.getSHA());
+////        System.out.println("head commit MAP: " + head.getSnapshot());
+//        Map<String, String> lastSnapshot = head.getSnapshot();
+////        System.out.println("hasBlobInLastCommit? "
+////                + lastSnapshot.containsValue(blob.getBlobSHA1()));
+//        return lastSnapshot.containsValue(blob.getBlobSHA1());
+//    }
 
     /**
      *  serialize added files into blobs, write blobs
