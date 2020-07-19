@@ -253,6 +253,7 @@ public class Repo {
         System.out.println("=== Branches ===");
         getBranchStatus();
         System.out.println("=== Staged Files ===");
+        getStagedFilesStatus();
         System.out.println("=== Removed Files ===");
         System.out.println("=== Modifications Not Staged For Commit ===");
         System.out.println("=== Untracked Files ===");
@@ -277,6 +278,17 @@ public class Repo {
                 System.out.println(name);
             }
         });
+        System.out.println();
+    }
+
+    public void getStagedFilesStatus() {
+        this.stagingArea
+                .load()
+                .getTrackedFiles()
+                .forEach((name, SHA1) -> {
+                    System.out.println(name);
+                });
+        System.out.println();
     }
 
     /**

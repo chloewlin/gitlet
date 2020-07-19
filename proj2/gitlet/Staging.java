@@ -2,9 +2,9 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class Staging implements Serializable {
 
@@ -12,7 +12,7 @@ public class Staging implements Serializable {
     private HashSet<String> untrackedFiles;
 
     public Staging() {
-        this.trackedFiles = new HashMap<String, String>();
+        this.trackedFiles = new TreeMap<String, String>();
         this.untrackedFiles = new HashSet<String>();
     }
 
