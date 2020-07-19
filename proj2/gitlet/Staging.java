@@ -79,33 +79,20 @@ public class Staging implements Serializable {
         untrackedFiles.forEach(s -> System.out.println(s));
     }
 
-    public void getStagedFilesStatus() {
-        Repo.stagingArea
-                .load()
-                .getTrackedFiles()
-                .forEach((name, SHA1) -> {
-                    System.out.println(name);
-                });
-        System.out.println();
-    }
-
-    /**
-     * To-do: Can we also stop tracking the "removed files"?
-     */
-    public void getRemovedFilesStatus() {
-        Repo.stagingArea
-                .load()
-                .getUntrackedFiles()
-                .forEach(System.out::println);
-        System.out.println();
-    }
-
     /**
      * To-do: Can we also stop tracking the "removed files"?
      * If not, we might not be able to instantiate a new staging obj
      */
     public void clear() {
-        Staging newStagingArea = new Staging();
-        newStagingArea.save();
+//        Staging newStagingArea = new Staging();
+//        newStagingArea.save();
+//        Repo.stagingArea.resetStagingArea(new TreeMap<>());
+        this.trackedFiles = new TreeMap<>();
+        Repo.stagingArea.save();
+    }
+
+    public void resetStagingArea(TreeMap<String, String> newTrackedFiles) {
+        this.trackedFiles = newTrackedFiles;
+        Repo.stagingArea.save();
     }
 }
