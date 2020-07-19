@@ -18,8 +18,9 @@ public class Repo {
      * Create initial commit and set up branch and HEAD pointer.
      */
     public void createInitialCommit() throws IOException {
-        Commit initialCommit = new Commit("initial commit",
-                INIT_PARENT_SHA1, true, new HashMap<>());
+        Commit sentinel = new Commit("sentinel");
+        Commit initialCommit = new Commit("initial commit", sentinel.getSHA(), true, new HashMap<>());
+        sentinel.save();
         initialCommit.saveInit();
         setHEAD("master", initialCommit);
     }
@@ -51,6 +52,7 @@ public class Repo {
      */
     private void stage(String fileName, Blob blob) {
         Staging staging = new Staging();
+
         if (!isSameVersion(blob)) {
             System.out.println("staging file....");
             staging.add(fileName, blob.getBlobSHA1());
@@ -162,6 +164,7 @@ public class Repo {
             System.out.print("Date: " + commit.getTimestamp() + "\n");
             System.out.print(commit.getMessage() + "\n");
             System.out.println("");
+
             commit = commit.getParent();
         }
     }
@@ -210,8 +213,12 @@ public class Repo {
     public void checkoutFile(String filename) throws IOException {
         Map<String, String> snapshot = getHEAD().getSnapshot();
 
+        System.out.print(snapshot);
+
         if (snapshot.containsKey(filename)) {
             String blobSHA1 = snapshot.get(filename);
+
+            System.out.println("found older blob! " + blobSHA1);
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
             Blob blob = Blob.load(blobFile);
             restoreFileInCWD(blob);
