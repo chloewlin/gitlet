@@ -26,7 +26,7 @@ public class Repo {
         initialCommit.saveInit();
         setHEAD("master", initialCommit);
 
-        // initialize + save initial stage
+        /** initialize + save initial stage */
         this.stagingArea.save();
     }
 
@@ -54,16 +54,23 @@ public class Repo {
 
     /**
      * Add a file to the staging area.
-     */
+     * If the current working version of the file is identical
+     * to the version in the current commit, do not stage it to
+     * be added, and remove it from the staging area if it is
+     * already there (as can happen when a file is changed,
+     * added, and then changed back).
+     * */
     private void stage(String fileName, Blob blob) throws IOException {
-
         this.stagingArea = this.stagingArea.load();
+
         if (!isSameVersion(fileName)) {
             this.stagingArea.add(fileName, blob.getBlobSHA1());
             this.stagingArea.save();
             this.stagingArea.print();
         } else {
-            System.out.println("Same version! Don't stage....");
+            if (this.stagingArea.containsFile(fileName)) {
+                this.stagingArea.remove(fileName);
+            }
             Main.validateFileToBeStaged();
         }
     }
@@ -80,12 +87,9 @@ public class Repo {
     }
 
     /**
-     * If the current working version of the file is identical
-     * to the version in the current commit, do not stage it to
-     * be added, and remove it from the staging area if it is
-     * already there (as can happen when a file is changed,
-     * added, and then changed back).
-     * */
+     * Checks if the current working version of the file is identical
+     * to the version in the current commit.
+     */
     public boolean isSameVersion(String currFileName) {
         String CWD = System.getProperty("user.dir");
         File currentFile = new File(CWD, currFileName);

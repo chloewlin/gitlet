@@ -30,6 +30,14 @@ public class Staging implements Serializable {
         this.trackedFiles.put(fileName, blobSHA1);
     }
 
+    public void remove(String fileName) {
+        this.trackedFiles.remove(fileName);
+    }
+
+    public boolean containsFile(String fileName) {
+        return this.trackedFiles.containsKey(fileName);
+    }
+
     public void save() {
         Staging stage = new Staging(this.trackedFiles, this.untrackedFiles);
         File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "trackedFiles");
