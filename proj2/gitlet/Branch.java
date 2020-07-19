@@ -63,26 +63,4 @@ public class Branch implements Serializable {
     public static Branch load(File branch) {
         return Utils.readObject(branch, Branch.class);
     }
-
-    /**
-     * prints the status of branches
-     */
-    public static void getBranchStatus() {
-        /**
-         * To-do: handle the situation when having multiple branches.
-         * Do this after finishing the method to create branch.
-         */
-        List<String> branchNames = Utils.plainFilenamesIn(Main.HEADS_REFS_FOLDER);
-        Branch currBranch = Utils.readObject((Utils.join(Main.GITLET_FOLDER, "HEAD")),
-                Branch.class);
-
-        branchNames.forEach((name) -> {
-            if (currBranch.getName().equals(name)) {
-                System.out.println("*" + name);
-            } else {
-                System.out.println(name);
-            }
-        });
-        System.out.println();
-    }
 }
