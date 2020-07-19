@@ -290,6 +290,9 @@ public class Repo {
 
         System.out.print(snapshot);
 
+        /**
+         * To-do: checkout should use abbreviated filename.
+         */
         if (snapshot.containsKey(filename)) {
             String blobSHA1 = snapshot.get(filename);
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
@@ -356,6 +359,9 @@ public class Repo {
 
     /**
      * TBD.
+     *
+     * checkout should use abbreviated filename.
+     *
      */
     public void reset(String commitId) {
 
