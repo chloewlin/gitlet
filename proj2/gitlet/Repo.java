@@ -66,7 +66,7 @@ public class Repo {
         if (!isSameVersion(fileName)) {
             this.stagingArea.add(fileName, blob.getBlobSHA1());
             this.stagingArea.save();
-            this.stagingArea.print();
+            this.stagingArea.printTrackedFiles();
         } else {
             if (this.stagingArea.containsFile(fileName)) {
                 this.stagingArea.remove(fileName);
@@ -76,19 +76,10 @@ public class Repo {
     }
 
     /**
-     * Remove a file from the staging area (hashmap). Unstage the file
-     * if it is currently staged for addition. If the file is tracked in
-     * the current commit, stage it for removal and remove the file
-     * from the working directory if the user has not already done so
-     * (do not remove it unless it is tracked in the current commit).
-     */
-    public void unstage() {
-
-    }
-
-    /**
      * Checks if the current working version of the file is identical
      * to the version in the current commit.
+     *
+     * TBD: double check if current commit means the last SAVED commit
      */
     public boolean isSameVersion(String currFileName) {
         String CWD = System.getProperty("user.dir");
@@ -167,6 +158,48 @@ public class Repo {
         System.out.println("CURRENT HEAD PARENT ====> " + commit.getFirstParentSHA1());
         File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, branchName);
         Utils.writeObject(branchFile, branch);
+    }
+
+    /**
+     * Remove a file from the staging area (hashmap). Unstage the file
+     * if it is currently staged for addition. If the file is tracked in
+     * the current commit, stage it for removal and remove the file
+     * from the working directory if the user has not already done so
+     * (do not remove it unless it is tracked in the current commit).
+     */
+    public void remove(String[] args) {
+        String fileName = args[1];
+        unstage(fileName);
+    }
+
+    public void unstage(String fileName) {
+        this.stagingArea = this.stagingArea.load();
+
+        if (this.stagingArea.containsFile(fileName)) {
+            this.stagingArea.remove(fileName);
+        }
+
+        if (trackedByCurrCommit(fileName)) {
+            this.stagingArea.unstage(fileName);
+            String CWD = System.getProperty("user.dir");
+            File file = new File(CWD, fileName);
+            Utils.restrictedDelete(file);
+        }
+
+        this.stagingArea.printTrackedFiles();
+        this.stagingArea.printUntrackedFiles();
+    }
+
+    /**
+     * Questions:
+     * 1. Does current commit means the last/most recent commit
+     * (AKA Head)?
+     * 2. Do we need to save a blob copy? Probably Not.
+     * Can we only save the file name of removed files?
+     * */
+    public boolean trackedByCurrCommit(String fileName) {
+        Commit head = getHEAD();
+        return head.getSnapshot().containsKey(fileName);
     }
 
     /**
