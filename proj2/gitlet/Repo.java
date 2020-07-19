@@ -77,8 +77,6 @@ public class Repo {
     /**
      * Checks if the current working version of the file is identical
      * to the version in the current commit.
-     *
-     * TBD: double check if current commit means the last SAVED commit
      */
     public boolean isSameVersion(String currFileName) {
         String CWD = System.getProperty("user.dir");
