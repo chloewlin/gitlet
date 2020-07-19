@@ -12,7 +12,7 @@ import java.util.*;
 public class Repo {
 
     static final String INIT_PARENT_SHA1 = "0000000000000000000000000000000000000000";
-    private Staging stagingArea = new Staging();
+    static Staging stagingArea = new Staging();
 
     /**
      * Create initial commit and set up branch and HEAD pointer.
@@ -177,12 +177,13 @@ public class Repo {
      */
     public void remove(String[] args) {
         String fileName = args[1];
-        this.stagingArea = this.stagingArea.load();
+        stagingArea = stagingArea.load();
 
-        if (this.stagingArea.containsFile(fileName)) {
-            this.stagingArea.remove(fileName);
+        if (stagingArea.containsFile(fileName)) {
+            stagingArea.remove(fileName);
+            stagingArea.unstage(fileName);
         } else if (trackedByCurrCommit(fileName)) {
-            this.stagingArea.unstage(fileName);
+            stagingArea.unstage(fileName);
             String CWD = System.getProperty("user.dir");
             File file = new File(CWD, fileName);
             Utils.restrictedDelete(file);
@@ -190,7 +191,7 @@ public class Repo {
             Main.exitWithError("No reason to remove the file.");
         }
 
-        this.stagingArea.save();
+        stagingArea.save();
     }
 
     /**
@@ -253,57 +254,13 @@ public class Repo {
     public void status() {
         /** To-do: create helper functions for each state */
         System.out.println("=== Branches ===");
-        getBranchStatus();
+        Branch.getBranchStatus();
         System.out.println("=== Staged Files ===");
-        getStagedFilesStatus();
+        this.stagingArea.getStagedFilesStatus();
         System.out.println("=== Removed Files ===");
-        getRemovedFilesStatus();
+        this.stagingArea.getRemovedFilesStatus();
         System.out.println("=== Modifications Not Staged For Commit ===");
         System.out.println("=== Untracked Files ===");
-    }
-
-    /**
-     * prints the status of branches
-     */
-    public void getBranchStatus() {
-        /**
-         * To-do: handle the situation when having multiple branches.
-         * Do this after finishing the method to create branch.
-         */
-        List<String> branchNames = Utils.plainFilenamesIn(Main.HEADS_REFS_FOLDER);
-        Branch currBranch = Utils.readObject((Utils.join(Main.GITLET_FOLDER, "HEAD")),
-                Branch.class);
-
-        branchNames.forEach((name) -> {
-            if (currBranch.getName().equals(name)) {
-                System.out.println("*" + name);
-            } else {
-                System.out.println(name);
-            }
-        });
-        System.out.println();
-    }
-
-    public void getStagedFilesStatus() {
-        this.stagingArea
-                .load()
-                .getTrackedFiles()
-                .forEach((name, SHA1) -> {
-                    System.out.println(name);
-                });
-        System.out.println();
-    }
-
-
-    /**
-     * To-do: Can we also stop tracking the "removed files"?
-     */
-    public void getRemovedFilesStatus() {
-        this.stagingArea
-                .load()
-                .getUntrackedFiles()
-                .forEach(System.out::println);
-        System.out.println();
     }
 
     /**
