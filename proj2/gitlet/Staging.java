@@ -3,19 +3,20 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class Staging implements Serializable {
 
     private Map<String, String> trackedFiles;
-    private Map<String, String> untrackedFiles;
+    private HashSet<String> untrackedFiles;
 
     public Staging() {
         this.trackedFiles = new HashMap<String, String>();
-        this.untrackedFiles = new HashMap<String, String>();
+        this.untrackedFiles = new HashSet<String>();
     }
 
-    public Staging(Map<String, String> trackedFiles, Map<String, String> untrackedFiles) {
+    public Staging(Map<String, String> trackedFiles, HashSet<String> untrackedFiles) {
         this.trackedFiles = trackedFiles;
         this.untrackedFiles = untrackedFiles;
     }
@@ -38,14 +39,25 @@ public class Staging implements Serializable {
         return this.trackedFiles.containsKey(fileName);
     }
 
+    public void unstage(String fileName) {
+        this.untrackedFiles.add(fileName);
+    }
+
+    public Blob getBlobOfFile(String fileName) {
+        String blobSHA1 = this.trackedFiles.get(fileName);
+        File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+        Blob blob = Blob.load(blobFile);
+        return blob;
+    }
+
     public void save() {
         Staging stage = new Staging(this.trackedFiles, this.untrackedFiles);
-        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "trackedFiles");
+        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "index");
         Utils.writeObject(currentTrackedFiles, stage);
     }
 
     public static Staging load() {
-        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "trackedFiles");
+        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "index");
         return Utils.readObject(currentTrackedFiles, Staging.class);
     }
 
@@ -53,9 +65,14 @@ public class Staging implements Serializable {
         return this.trackedFiles;
     }
 
-    public void print() {
+    public void printTrackedFiles() {
         System.out.println("Currently tracked files on Staging....");
         trackedFiles.forEach((key, value) -> System.out.println(key + " : " + value));
+    }
+
+    public void printUntrackedFiles() {
+        System.out.println("Currently untracked files on Staging....");
+        untrackedFiles.forEach(s -> System.out.println(s));
     }
 
     public void clear() {

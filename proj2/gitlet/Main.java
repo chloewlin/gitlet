@@ -80,6 +80,9 @@ public class Main {
         case "commit":
             repo.commit(args);
             break;
+        case "rm":
+            repo.remove(args);
+            break;
         case "log":
             repo.log();
             break;
