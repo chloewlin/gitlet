@@ -25,9 +25,14 @@ public class Staging implements Serializable {
      * Store the mapping of file and blob like so:
      * Hello.txt:$1d229271928d3f9e2bb0375bd6ce5db6c6d348d9
      * Staging an already-staged file overwrites the previous
-     * entry in the staging area with the new contents
+     * entry in the staging area with the new contents.
+     * If a file was removed and added back, remove it from
+     * stagedForRemoval.
      * */
     public void add(String fileName, String blobSHA1) {
+        if (this.stagedForRemoval.contains(fileName)) {
+            this.stagedForRemoval.remove(fileName);
+        }
         this.stagedForAddition.put(fileName, blobSHA1);
     }
 
