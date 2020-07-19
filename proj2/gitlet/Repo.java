@@ -2,10 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A Repo class represents a gitlet repository.
@@ -16,7 +13,6 @@ public class Repo {
 
     static final String INIT_PARENT_SHA1 = "0000000000000000000000000000000000000000";
     private Staging stagingArea = new Staging();
-    private Map<String, Boolean> branchNames = new HashMap<String, Boolean>();
 
     /**
      * Create initial commit and set up branch and HEAD pointer.
@@ -27,11 +23,10 @@ public class Repo {
         sentinel.save();
         initialCommit.saveInit();
         setHEAD("master", initialCommit);
+        setupGlobalHead("master", initialCommit);
 
         /** initialize + save initial stage */
         this.stagingArea.save();
-        /** add master as default branch name */
-        this.branchNames.put("master", true);
     }
 
     /**
@@ -157,10 +152,19 @@ public class Repo {
      * commit node into a byte array.
      */
     public void setHEAD(String branchName, Commit commit) {
-        Branch branch = new Branch("master", commit);
+        Branch branch = new Branch(branchName, commit);
         System.out.println("CURRENT HEAD ====> " + commit.getSHA());
         System.out.println("CURRENT HEAD PARENT ====> " + commit.getFirstParentSHA1());
         File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, branchName);
+        Utils.writeObject(branchFile, branch);
+    }
+
+    /**
+     * Set up the global HEAD, default to master
+     */
+    public void setupGlobalHead(String branchName, Commit commit) {
+        Branch branch = new Branch("master", commit);
+        File branchFile = Utils.join(Main.GITLET_FOLDER, "HEAD");
         Utils.writeObject(branchFile, branch);
     }
 
@@ -254,12 +258,24 @@ public class Repo {
         System.out.println("=== Untracked Files ===");
     }
 
+    /**
+     * prints the status of branches
+     */
     public void getBranchStatus() {
-        this.branchNames.forEach((name, isDefault) -> {
-            if (isDefault) {
+        /**
+         * To-do: handle the situation when having multiple branches.
+         * Do this after finishing the method to create branch.
+         */
+        List<String> branchNames = Utils.plainFilenamesIn(Main.HEADS_REFS_FOLDER);
+        Branch currBranch = Utils.readObject((Utils.join(Main.GITLET_FOLDER, "HEAD")),
+                Branch.class);
+
+        branchNames.forEach((name) -> {
+            if (currBranch.getName().equals(name)) {
                 System.out.println("*" + name);
+            } else {
+                System.out.println(name);
             }
-            System.out.println(name);
         });
     }
 

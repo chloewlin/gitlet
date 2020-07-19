@@ -39,9 +39,9 @@ public class Main {
      */
     static final File BLOBS_FOLDER = Utils.join(OBJECTS_FOLDER, "blobs");
     /**
-     * commit hash current head.
+     * commit hash of HEAD of the current branch.
      */
-    static final File HEAD = new File("head");
+    static final File HEAD = Utils.join(GITLET_FOLDER, "HEAD");
     /**
      * directory for storing all commit logs for HEAD and branches.
      */
@@ -120,6 +120,7 @@ public class Main {
         OBJECTS_FOLDER.mkdir();
         COMMITS_FOLDER.mkdir();
         BLOBS_FOLDER.mkdir();
+        HEAD.createNewFile();
     }
 
     /**
