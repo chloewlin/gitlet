@@ -25,7 +25,7 @@ public class Main {
     /**
      * file for storing trackedFiles and file/blob mapping.
      */
-    static final File TRACKEDFILES = Utils.join(STAGING_FOLDER, "trackedFiles");
+    static final File INDEX = Utils.join(STAGING_FOLDER, "index");
     /**
      * directory for storing commits and blobs.
      */
@@ -119,7 +119,7 @@ public class Main {
         REFS_FOLDER.mkdir();
         HEADS_REFS_FOLDER.mkdir();
         STAGING_FOLDER.mkdir();
-        TRACKEDFILES.createNewFile();
+        INDEX.createNewFile();
         LOGS_FOLDER.mkdir();
         OBJECTS_FOLDER.mkdir();
         COMMITS_FOLDER.mkdir();
