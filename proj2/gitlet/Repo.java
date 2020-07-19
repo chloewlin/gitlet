@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -15,11 +16,12 @@ public class Repo {
 
     static final String INIT_PARENT_SHA1 = "0000000000000000000000000000000000000000";
     private Staging stagingArea = new Staging();
+    private Map<String, Boolean> branchNames = new HashMap<String, Boolean>();
 
     /**
      * Create initial commit and set up branch and HEAD pointer.
      */
-    public void createInitialCommit() throws IOException {
+    public void initialize() throws IOException {
         Commit sentinel = new Commit("sentinel");
         Commit initialCommit = new Commit("initial commit", sentinel.getSHA(), true, new HashMap<>());
         sentinel.save();
@@ -28,6 +30,8 @@ public class Repo {
 
         /** initialize + save initial stage */
         this.stagingArea.save();
+        /** add master as default branch name */
+        this.branchNames.put("master", true);
     }
 
     /**
@@ -243,10 +247,20 @@ public class Repo {
     public void status() {
         /** To-do: create helper functions for each state */
         System.out.println("=== Branches ===");
+        getBranchStatus();
         System.out.println("=== Staged Files ===");
         System.out.println("=== Removed Files ===");
         System.out.println("=== Modifications Not Staged For Commit ===");
         System.out.println("=== Untracked Files ===");
+    }
+
+    public void getBranchStatus() {
+        this.branchNames.forEach((name, isDefault) -> {
+            if (isDefault) {
+                System.out.println("*" + name);
+            }
+            System.out.println(name);
+        });
     }
 
     /**

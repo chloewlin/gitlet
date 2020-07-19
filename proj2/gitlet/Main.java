@@ -43,10 +43,6 @@ public class Main {
      */
     static final File HEAD = new File("head");
     /**
-     * directory for storing branch and related commit has.
-     */
-    static final File BRANCHES = new File("branch");
-    /**
      * directory for storing all commit logs for HEAD and branches.
      */
     static final File LOGS_FOLDER = Utils.join(GITLET_FOLDER, "logs");
@@ -72,7 +68,7 @@ public class Main {
         case "init":
             validateGitlet();
             setupPersistence();
-            repo.createInitialCommit();
+            repo.initialize();
             break;
         case "add":
             repo.add(args);
