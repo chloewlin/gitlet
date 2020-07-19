@@ -283,6 +283,9 @@ public class Repo {
         Commit commit = getHEAD();
         String blobSHA1 = "";
 
+        /**
+         * To-do: FIX BUG
+         */
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             if (commit.getSHA().equals(commitId)) {
                 blobSHA1 = commit.getSnapshot().get(fileName);
