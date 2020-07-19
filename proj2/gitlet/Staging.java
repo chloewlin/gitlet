@@ -84,15 +84,7 @@ public class Staging implements Serializable {
      * If not, we might not be able to instantiate a new staging obj
      */
     public void clear() {
-//        Staging newStagingArea = new Staging();
-//        newStagingArea.save();
-//        Repo.stagingArea.resetStagingArea(new TreeMap<>());
-        this.trackedFiles = new TreeMap<>();
-        Repo.stagingArea.save();
-    }
-
-    public void resetStagingArea(TreeMap<String, String> newTrackedFiles) {
-        this.trackedFiles = newTrackedFiles;
-        Repo.stagingArea.save();
+        Staging newStagingArea = new Staging();
+        newStagingArea.save();
     }
 }
