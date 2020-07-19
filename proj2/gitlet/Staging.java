@@ -2,51 +2,94 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class Staging implements Serializable {
 
-    Map<String, String> trackedFiles;
-    Map<String, String> untrackedFiles;
+    private Map<String, String> stagedForAddition;
+    private HashSet<String> stagedForRemoval;
 
     public Staging() {
-        this.trackedFiles = new HashMap<String, String>();
-        this.untrackedFiles = new HashMap<String, String>();
+        this.stagedForAddition = new TreeMap<String, String>();
+        this.stagedForRemoval = new HashSet<String>();
+    }
+
+    public Staging(Map<String, String> trackedFiles, HashSet<String> untrackedFiles) {
+        this.stagedForAddition = trackedFiles;
+        this.stagedForRemoval = untrackedFiles;
     }
 
     /**
      * Store the mapping of file and blob like so:
      * Hello.txt:$1d229271928d3f9e2bb0375bd6ce5db6c6d348d9
      * Staging an already-staged file overwrites the previous
-     * entry in the staging area with the new contents
+     * entry in the staging area with the new contents.
+     * If a file was removed and added back, remove it from
+     * stagedForRemoval.
      * */
     public void add(String fileName, String blobSHA1) {
-        this.trackedFiles.put(fileName, blobSHA1);
+        if (this.stagedForRemoval.contains(fileName)) {
+            this.stagedForRemoval.remove(fileName);
+        }
+        this.stagedForAddition.put(fileName, blobSHA1);
     }
 
-    public void save(Staging stagedFiles) {
-        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "trackedFiles");
-        Utils.writeObject(currentTrackedFiles, stagedFiles);
+    public void remove(String fileName) {
+        this.stagedForAddition.remove(fileName);
     }
 
-    public static Staging load() {
-        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "trackedFiles");
+    public boolean containsFile(String fileName) {
+        return this.stagedForAddition.containsKey(fileName);
+    }
+
+    public void unstage(String fileName) {
+        this.stagedForRemoval.add(fileName);
+    }
+
+    public Blob getBlobOfFile(String fileName) {
+        String blobSHA1 = this.stagedForAddition.get(fileName);
+        File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+        Blob blob = Blob.load(blobFile);
+        return blob;
+    }
+
+    public void save() {
+        Staging stage = new Staging(this.stagedForAddition, this.stagedForRemoval);
+        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "index");
+        Utils.writeObject(currentTrackedFiles, stage);
+    }
+
+    public Staging load() {
+        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "index");
         return Utils.readObject(currentTrackedFiles, Staging.class);
     }
 
-    public Map<String, String> getTrackedFiles() {
-        return this.trackedFiles;
+    public Map<String, String> getFilesStagedForAddition() {
+        return this.stagedForAddition;
     }
 
-    public void print() {
+    public HashSet<String> getFilesStagedForRemoval() {
+        return this.stagedForRemoval;
+    }
+
+    public void printTrackedFiles() {
         System.out.println("Currently tracked files on Staging....");
-        trackedFiles.forEach((key, value) -> System.out.println(key + " : " + value));
+        stagedForAddition.forEach((key, value) -> System.out.println(key + " : " + value));
     }
 
+    public void printUntrackedFiles() {
+        System.out.println("Currently untracked files on Staging....");
+        stagedForRemoval.forEach(s -> System.out.println(s));
+    }
+
+    /**
+     * To-do: Can we also stop tracking the "removed files"?
+     * If not, we might not be able to instantiate a new staging obj
+     */
     public void clear() {
-        // To-do: check if we should delete the file when clearing staging
-        File currentTrackedFiles = Utils.join(Main.GITLET_FOLDER, "staging" , "trackedFiles");
-        currentTrackedFiles.delete();
+        Staging newStagingArea = new Staging();
+        newStagingArea.save();
     }
 }

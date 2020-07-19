@@ -2,8 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A Repo class represents a gitlet repository.
@@ -13,15 +12,21 @@ import java.util.Map;
 public class Repo {
 
     static final String INIT_PARENT_SHA1 = "0000000000000000000000000000000000000000";
+    static Staging stagingArea = new Staging();
 
     /**
      * Create initial commit and set up branch and HEAD pointer.
      */
-    public void createInitialCommit() throws IOException {
-        Commit initialCommit = new Commit("initial commit",
-                INIT_PARENT_SHA1, true, new HashMap<>());
+    public void initialize() throws IOException {
+        Commit sentinel = new Commit("sentinel");
+        Commit initialCommit = new Commit("initial commit", sentinel.getSHA(), true, new HashMap<>());
+        sentinel.save();
         initialCommit.saveInit();
         setHEAD("master", initialCommit);
+        setupGlobalHead("master", initialCommit);
+
+        /** initialize + save initial stage */
+        this.stagingArea.save();
     }
 
     /**
@@ -42,56 +47,60 @@ public class Repo {
         Main.validateNumArgs(args);
         String fileName = args[1];
         Blob blob = new Blob(fileName);
-        stage(fileName, blob);
         blob.save();
+        stage(fileName, blob);
     }
 
     /**
      * Add a file to the staging area.
-     */
-    private void stage(String fileName, Blob blob) {
-        Staging staging = new Staging();
-        if (!isSameVersion(blob)) {
-            System.out.println("staging file....");
-            staging.add(fileName, blob.getBlobSHA1());
-            staging.save(staging);
-            staging.print();
-        } else {
-            System.out.println("unstaging file....");
-            /** TO-DO: Unstage file... */
-
-            Main.validateFileToBeStaged();
-        }
-    }
-
-    /**
-     * Remove a file from the staging area (hashmap). Unstage the file
-     * if it is currently staged for addition. If the file is tracked in
-     * the current commit, stage it for removal and remove the file
-     * from the working directory if the user has not already done so
-     * (do not remove it unless it is tracked in the current commit).
-     */
-    public void unstage() {
-
-    }
-
-    /**
      * If the current working version of the file is identical
      * to the version in the current commit, do not stage it to
      * be added, and remove it from the staging area if it is
      * already there (as can happen when a file is changed,
      * added, and then changed back).
      * */
-    public boolean isSameVersion(Blob blob) {
-        Commit head = getHEAD();
-        System.out.println("hasBlob - current blob SHA1: " + blob.getBlobSHA1());
-        System.out.println("head commit message: " + head.getMessage());
-        System.out.println("head commit SHA: " + head.getSHA());
-        System.out.println("head commit MAP: " + head.getSnapshot());
-        Map<String, String> lastSnapshot = head.getSnapshot();
-        System.out.println("hasBlobInLastCommit? "
-                + lastSnapshot.containsValue(blob.getBlobSHA1()));
-        return lastSnapshot.containsValue(blob.getBlobSHA1());
+    private void stage(String fileName, Blob blob) throws IOException {
+        this.stagingArea = this.stagingArea.load();
+
+        if (!isSameVersion(fileName)) {
+            this.stagingArea.add(fileName, blob.getBlobSHA1());
+            this.stagingArea.save();
+            this.stagingArea.printTrackedFiles();
+        } else {
+            if (this.stagingArea.containsFile(fileName)) {
+                this.stagingArea.remove(fileName);
+            }
+            Main.validateFileToBeStaged();
+        }
+    }
+
+    /**
+     * Checks if the current working version of the file is identical
+     * to the version in the current commit.
+     */
+    public boolean isSameVersion(String currFileName) {
+        String CWD = System.getProperty("user.dir");
+        File currentFile = new File(CWD, currFileName);
+        Commit currCommit = getHEAD();
+        String blobSHA1 = currCommit.getSnapshot().get(currFileName);
+        if (blobSHA1 == null) {
+            return false;
+        }
+        File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+        Blob blob = Blob.load(blobFile);
+        return hasSameContent(currentFile, blob);
+    }
+
+    /**
+     * Compares the byte array of the file in CWD and the byte array
+     * saved in the last commit/blob.
+     * @param currVersion file in CWD
+     * @blob blob the blob of the same file saved in current commit
+     * */
+    public boolean hasSameContent(File currVersion, Blob blob) {
+        byte[] versionInCurrCommit = blob.getFileContent();
+        byte[] versionInCWD = Utils.readContents(currVersion);
+        return Arrays.equals(versionInCurrCommit, versionInCWD);
     }
 
     /**
@@ -102,18 +111,18 @@ public class Repo {
      */
     public void commit(String[] args) throws IOException {
         Main.validateNumArgs(args);
-        String commitMessage = args[1];
+        String message = args[1];
+        String parentSHA1 = getHEAD().getSHA();
+        Staging stage = this.stagingArea.load();
+        Map<String, String> snapshot = updateSnapshot();
 
-        Commit HEAD = getHEAD();
-        String parent = HEAD.getSHA();
-        Staging stage = Staging.load();
-        Commit commit = new Commit(commitMessage, parent, false, stage.getTrackedFiles());
+        Commit commit = new Commit(message, parentSHA1, false, snapshot);
         System.out.println("saving staged map into commit....");
-        System.out.println("print parent commit: " + parent);
+        System.out.println("print parent commit: " + parentSHA1);
         System.out.println("print self commit: " + commit.getSHA());
-        stage.getTrackedFiles().forEach((k, v) ->
-                System.out.println("copy map from staging to "
-                + "commit...." + k + " : " + v));
+        snapshot.forEach((k, v) ->
+                System.out.println("NEWLY UPDATED SNAPSHOT: "
+                + k + " : " + v));
         System.out.println("confirming if commit object is complete....");
         System.out.println("commit message: " + commit.getMessage());
         System.out.println("commit SHA: " + commit.getSHA());
@@ -124,15 +133,71 @@ public class Repo {
     }
 
     /**
+     *  By default a commit is the same as its parent. Files staged
+     *  for addition and removal are the updates to the commit.
+     */
+    public Map<String, String> updateSnapshot() {
+        Commit HEAD = getHEAD();
+        Staging stage = this.stagingArea.load();
+        Map<String, String> parentSnapshot = HEAD.getSnapshot();
+        Map<String, String> stagedForAdditionFiles = stage.getFilesStagedForAddition();
+        stagedForAdditionFiles.forEach((file, SHA1) -> parentSnapshot.put(file,SHA1));
+        return parentSnapshot;
+    }
+
+    /**
      * Update the HEAD pointer of a branch by writing the last
      * commit node into a byte array.
      */
     public void setHEAD(String branchName, Commit commit) {
-        Branch branch = new Branch("master", commit);
+        Branch branch = new Branch(branchName, commit);
         System.out.println("CURRENT HEAD ====> " + commit.getSHA());
         System.out.println("CURRENT HEAD PARENT ====> " + commit.getFirstParentSHA1());
         File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, branchName);
         Utils.writeObject(branchFile, branch);
+    }
+
+    /**
+     * Set up the global HEAD, default to master
+     */
+    public void setupGlobalHead(String branchName, Commit commit) {
+        Branch branch = new Branch("master", commit);
+        File branchFile = Utils.join(Main.GITLET_FOLDER, "HEAD");
+        Utils.writeObject(branchFile, branch);
+    }
+
+    /**
+     * Remove a file from the staging area (hashmap). Unstage the file
+     * if it is currently staged for addition. If the file is tracked in
+     * the current commit, stage it for removal and remove the file
+     * from the working directory if the user has not already done so
+     * (do not remove it unless it is tracked in the current commit).
+     */
+    public void remove(String[] args) {
+        String fileName = args[1];
+        stagingArea = stagingArea.load();
+
+        if (stagingArea.containsFile(fileName)) {
+            stagingArea.remove(fileName);
+            stagingArea.unstage(fileName);
+        } else if (trackedByCurrCommit(fileName)) {
+            stagingArea.unstage(fileName);
+            String CWD = System.getProperty("user.dir");
+            File file = new File(CWD, fileName);
+            Utils.restrictedDelete(file);
+        } else {
+            Main.exitWithError("No reason to remove the file.");
+        }
+
+        stagingArea.save();
+    }
+
+    /**
+     * Check if a file is tracked by current commit (HEAD)
+     * */
+    public boolean trackedByCurrCommit(String fileName) {
+        Commit head = getHEAD();
+        return head.getSnapshot().containsKey(fileName);
     }
 
     /**
@@ -149,6 +214,7 @@ public class Repo {
             System.out.print("Date: " + commit.getTimestamp() + "\n");
             System.out.print(commit.getMessage() + "\n");
             System.out.println("");
+
             commit = commit.getParent();
         }
     }
@@ -180,12 +246,7 @@ public class Repo {
      * our CWD/commit tree.
      */
     public void status() {
-        /** To-do: create helper functions for each state */
-        System.out.println("=== Branches ===");
-        System.out.println("=== Staged Files ===");
-        System.out.println("=== Removed Files ===");
-        System.out.println("=== Modifications Not Staged For Commit ===");
-        System.out.println("=== Untracked Files ===");
+        Status.getGlobalStatus();
     }
 
     /**
@@ -197,12 +258,43 @@ public class Repo {
     public void checkoutFile(String filename) throws IOException {
         Map<String, String> snapshot = getHEAD().getSnapshot();
 
+        System.out.print(snapshot);
+
+        /**
+         * To-do: checkout should use abbreviated filename.
+         */
         if (snapshot.containsKey(filename)) {
             String blobSHA1 = snapshot.get(filename);
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
             Blob blob = Blob.load(blobFile);
             restoreFileInCWD(blob);
         }
+    }
+
+    /**
+     * Takes the version of the file as it exists in the commit with the given id,
+     * and puts it in the working directory, overwriting the version of the file
+     * that’s already there if there is one.
+     * The new version of the file is not staged.
+     */
+    public void checkoutCommit(String commitId, String fileName) throws IOException {
+        Commit commit = getHEAD();
+        String blobSHA1 = "";
+
+        /**
+         * To-do: FIX BUG
+         */
+        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+            if (commit.getSHA().equals(commitId)) {
+                blobSHA1 = commit.getSnapshot().get(fileName);
+                break;
+            }
+            commit = commit.getParent();
+        }
+
+        File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+        Blob blob = Blob.load(blobFile);
+        restoreFileInCWD(blob);
     }
 
     /**
@@ -215,13 +307,6 @@ public class Repo {
         File file = new File(CWD, blob.getFileName());
         file.createNewFile();
         Utils.writeContents(file, blob.getFileContent());
-    }
-
-    /**
-     * TBD.
-     */
-    public void checkoutCommit(String commitId, String fileName) {
-
     }
 
     /**
@@ -247,6 +332,9 @@ public class Repo {
 
     /**
      * TBD.
+     *
+     * checkout should use abbreviated filename.
+     *
      */
     public void reset(String commitId) {
 
