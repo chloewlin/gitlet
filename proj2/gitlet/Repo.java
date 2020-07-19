@@ -169,25 +169,18 @@ public class Repo {
      */
     public void remove(String[] args) {
         String fileName = args[1];
-        unstage(fileName);
-    }
-
-    public void unstage(String fileName) {
         this.stagingArea = this.stagingArea.load();
 
         if (this.stagingArea.containsFile(fileName)) {
             this.stagingArea.remove(fileName);
-        }
-
-        if (trackedByCurrCommit(fileName)) {
+        } else if (trackedByCurrCommit(fileName)) {
             this.stagingArea.unstage(fileName);
             String CWD = System.getProperty("user.dir");
             File file = new File(CWD, fileName);
             Utils.restrictedDelete(file);
         }
 
-        this.stagingArea.printTrackedFiles();
-        this.stagingArea.printUntrackedFiles();
+        Main.exitWithError("No reason to remove the file.");
     }
 
     /**
