@@ -27,13 +27,7 @@ public class Staging implements Serializable {
      * entry in the staging area with the new contents
      * */
     public void add(String fileName, String blobSHA1) {
-        System.out.print("inside Staging.add method...");
         this.trackedFiles.put(fileName, blobSHA1);
-    }
-
-    public void save(Staging stagedFiles) {
-        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "trackedFiles");
-        Utils.writeObject(currentTrackedFiles, stagedFiles);
     }
 
     public void save() {
@@ -57,7 +51,6 @@ public class Staging implements Serializable {
     }
 
     public void clear() {
-//        File trackedFiles = Utils.join(Main.GITLET_FOLDER, "staging" , "trackedFiles");
         Staging newStagingArea = new Staging();
         newStagingArea.save();
     }

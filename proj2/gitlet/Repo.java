@@ -48,9 +48,8 @@ public class Repo {
         Main.validateNumArgs(args);
         String fileName = args[1];
         Blob blob = new Blob(fileName);
-
-        stage(fileName, blob);
         blob.save();
+        stage(fileName, blob);
     }
 
     /**
@@ -59,23 +58,12 @@ public class Repo {
     private void stage(String fileName, Blob blob) throws IOException {
 
         this.stagingArea = this.stagingArea.load();
-
-        System.out.println("OLD STAGE HASHMP LENGTH: ");
-        System.out.println(this.stagingArea.getTrackedFiles().size());
-
-        if (!isSameVersionAsCWD(fileName)) {
-            System.out.println("================== NOT THE SAME VERSION! ================");
+        if (!isSameVersion(fileName)) {
             this.stagingArea.add(fileName, blob.getBlobSHA1());
             this.stagingArea.save();
-
-            System.out.println("Saving the new file into staging....");
-            System.out.println("Curr HASHMP LENGTH: ");
-            System.out.println(this.stagingArea.getTrackedFiles().size());
             this.stagingArea.print();
         } else {
-            System.out.println("unstaging file....");
-            /** TO-DO: Unstage file... */
-
+            System.out.println("Same version! Don't stage....");
             Main.validateFileToBeStaged();
         }
     }
@@ -98,34 +86,30 @@ public class Repo {
      * already there (as can happen when a file is changed,
      * added, and then changed back).
      * */
-    public boolean isSameVersionAsCWD(String currentVersionFileName) throws IOException {
+    public boolean isSameVersion(String currFileName) {
         String CWD = System.getProperty("user.dir");
-        File file = new File(CWD, currentVersionFileName);
-
-        Commit currentCommit = getHEAD();
-        String blobSHA1OfFileInCurrentCommit =
-                currentCommit.getSnapshot().get(currentVersionFileName);
-        if (blobSHA1OfFileInCurrentCommit == null) return false;
-        File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1OfFileInCurrentCommit);
+        File currentFile = new File(CWD, currFileName);
+        Commit currCommit = getHEAD();
+        String blobSHA1 = currCommit.getSnapshot().get(currFileName);
+        if (blobSHA1 == null) {
+            return false;
+        }
+        File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
         Blob blob = Blob.load(blobFile);
-
-        byte[] versionInCurrCommit = blob.getFileContent();
-        byte[] versionInCWD = Utils.readContents(file);
-
-        return Arrays.equals(versionInCurrCommit, versionInCWD);
+        return hasSameContent(currentFile, blob);
     }
 
-//    public boolean isSameVersion(Blob blob) {
-//        Commit head = getHEAD();
-////        System.out.println("hasBlob - current blob SHA1: " + blob.getBlobSHA1());
-////        System.out.println("head commit message: " + head.getMessage());
-////        System.out.println("head commit SHA: " + head.getSHA());
-////        System.out.println("head commit MAP: " + head.getSnapshot());
-//        Map<String, String> lastSnapshot = head.getSnapshot();
-////        System.out.println("hasBlobInLastCommit? "
-////                + lastSnapshot.containsValue(blob.getBlobSHA1()));
-//        return lastSnapshot.containsValue(blob.getBlobSHA1());
-//    }
+    /**
+     * Compares the byte array of the file in CWD and the byte array
+     * saved in the last commit/blob.
+     * @param currVersion file in CWD
+     * @blob blob the blob of the same file saved in current commit
+     * */
+    public boolean hasSameContent(File currVersion, Blob blob) {
+        byte[] versionInCurrCommit = blob.getFileContent();
+        byte[] versionInCWD = Utils.readContents(currVersion);
+        return Arrays.equals(versionInCurrCommit, versionInCWD);
+    }
 
     /**
      *  serialize added files into blobs, write blobs
@@ -248,8 +232,6 @@ public class Repo {
 
         if (snapshot.containsKey(filename)) {
             String blobSHA1 = snapshot.get(filename);
-
-            System.out.println("found older blob! " + blobSHA1);
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
             Blob blob = Blob.load(blobFile);
             restoreFileInCWD(blob);
