@@ -195,11 +195,7 @@ public class Repo {
     }
 
     /**
-     * Questions:
-     * 1. Does current commit means the last/most recent commit
-     * (AKA Head)?
-     * 2. Do we need to save a blob copy? Probably Not.
-     * Can we only save the file name of removed files?
+     * Check if a file is tracked by current commit (HEAD)
      * */
     public boolean trackedByCurrCommit(String fileName) {
         Commit head = getHEAD();
@@ -252,15 +248,7 @@ public class Repo {
      * our CWD/commit tree.
      */
     public void status() {
-        /** To-do: create helper functions for each state */
-        System.out.println("=== Branches ===");
-        Branch.getBranchStatus();
-        System.out.println("=== Staged Files ===");
-        this.stagingArea.getStagedFilesStatus();
-        System.out.println("=== Removed Files ===");
-        this.stagingArea.getRemovedFilesStatus();
-        System.out.println("=== Modifications Not Staged For Commit ===");
-        System.out.println("=== Untracked Files ===");
+        Status.getGlobalStatus();
     }
 
     /**
