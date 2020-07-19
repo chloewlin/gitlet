@@ -102,18 +102,18 @@ public class Repo {
      */
     public void commit(String[] args) throws IOException {
         Main.validateNumArgs(args);
-        String commitMessage = args[1];
-
-        Commit HEAD = getHEAD();
-        String parent = HEAD.getSHA();
+        String message = args[1];
+        String parentSHA1 = getHEAD().getSHA();
         Staging stage = Staging.load();
-        Commit commit = new Commit(commitMessage, parent, false, stage.getTrackedFiles());
+        Map<String, String> snapshot = updateSnapshot();
+
+        Commit commit = new Commit(message, parentSHA1, false, snapshot);
         System.out.println("saving staged map into commit....");
-        System.out.println("print parent commit: " + parent);
+        System.out.println("print parent commit: " + parentSHA1);
         System.out.println("print self commit: " + commit.getSHA());
-        stage.getTrackedFiles().forEach((k, v) ->
-                System.out.println("copy map from staging to "
-                + "commit...." + k + " : " + v));
+        snapshot.forEach((k, v) ->
+                System.out.println("NEWLY UPDATED SNAPSHOT: "
+                + k + " : " + v));
         System.out.println("confirming if commit object is complete....");
         System.out.println("commit message: " + commit.getMessage());
         System.out.println("commit SHA: " + commit.getSHA());
@@ -121,6 +121,19 @@ public class Repo {
         commit.save();
         setHEAD("master", commit);
         stage.clear();
+    }
+
+    /**
+     *  By default a commit is the same as its parent. Files staged
+     *  for addition and removal are the updates to the commit.
+     */
+    public Map<String, String> updateSnapshot() {
+        Commit HEAD = getHEAD();
+        Staging stage = Staging.load();
+        Map<String, String> parentSnapshot = HEAD.getSnapshot();
+        Map<String, String> trackedFiles = stage.getTrackedFiles();
+        trackedFiles.forEach((file, SHA1) -> parentSnapshot.put(file,SHA1));
+        return parentSnapshot;
     }
 
     /**
@@ -227,7 +240,6 @@ public class Repo {
         Blob blob = Blob.load(blobFile);
         restoreFileInCWD(blob);
     }
-
 
     /**
      * Restore file from blob, put it in current working directory,
