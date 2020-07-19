@@ -56,13 +56,17 @@ public class Staging implements Serializable {
         Utils.writeObject(currentTrackedFiles, stage);
     }
 
-    public static Staging load() {
+    public Staging load() {
         File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "index");
         return Utils.readObject(currentTrackedFiles, Staging.class);
     }
 
     public Map<String, String> getTrackedFiles() {
         return this.trackedFiles;
+    }
+
+    public HashSet<String> getUntrackedFiles() {
+        return this.untrackedFiles;
     }
 
     public void printTrackedFiles() {
@@ -75,6 +79,10 @@ public class Staging implements Serializable {
         untrackedFiles.forEach(s -> System.out.println(s));
     }
 
+    /**
+     * To-do: Can we also stop tracking the "removed files"?
+     * If not, we might not be able to instantiate a new staging obj
+     */
     public void clear() {
         Staging newStagingArea = new Staging();
         newStagingArea.save();

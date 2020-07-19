@@ -115,7 +115,7 @@ public class Repo {
         Main.validateNumArgs(args);
         String message = args[1];
         String parentSHA1 = getHEAD().getSHA();
-        Staging stage = Staging.load();
+        Staging stage = this.stagingArea.load();
         Map<String, String> snapshot = updateSnapshot();
 
         Commit commit = new Commit(message, parentSHA1, false, snapshot);
@@ -140,7 +140,7 @@ public class Repo {
      */
     public Map<String, String> updateSnapshot() {
         Commit HEAD = getHEAD();
-        Staging stage = Staging.load();
+        Staging stage = this.stagingArea.load();
         Map<String, String> parentSnapshot = HEAD.getSnapshot();
         Map<String, String> trackedFiles = stage.getTrackedFiles();
         trackedFiles.forEach((file, SHA1) -> parentSnapshot.put(file,SHA1));
@@ -186,9 +186,11 @@ public class Repo {
             String CWD = System.getProperty("user.dir");
             File file = new File(CWD, fileName);
             Utils.restrictedDelete(file);
+        } else {
+            Main.exitWithError("No reason to remove the file.");
         }
 
-        Main.exitWithError("No reason to remove the file.");
+        this.stagingArea.save();
     }
 
     /**
@@ -255,6 +257,7 @@ public class Repo {
         System.out.println("=== Staged Files ===");
         getStagedFilesStatus();
         System.out.println("=== Removed Files ===");
+        getRemovedFilesStatus();
         System.out.println("=== Modifications Not Staged For Commit ===");
         System.out.println("=== Untracked Files ===");
     }
@@ -288,6 +291,18 @@ public class Repo {
                 .forEach((name, SHA1) -> {
                     System.out.println(name);
                 });
+        System.out.println();
+    }
+
+
+    /**
+     * To-do: Can we also stop tracking the "removed files"?
+     */
+    public void getRemovedFilesStatus() {
+        this.stagingArea
+                .load()
+                .getUntrackedFiles()
+                .forEach(System.out::println);
         System.out.println();
     }
 
