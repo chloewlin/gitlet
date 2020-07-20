@@ -62,7 +62,7 @@ public class Main {
     /**
      * Usage: java gitlet.Main ARGS, where ARGS contains <COMMAND> <OPERAND>.
      */
-    public static void main(String... args) throws IOException { // {"checkout, --, filename "}
+    public static void main(String... args) throws IOException {
         validateNumCommand(args);
         switch (args[0]) {
         case "init":
@@ -83,8 +83,8 @@ public class Main {
             repo.log();
             break;
         case "status":
-             repo.status();
-             break;
+            repo.status();
+            break;
         case "checkout":
              validateCheckout(args);
              break;
@@ -98,17 +98,38 @@ public class Main {
     }
 
     /**
-     *  Validate the args when the operand is checkout.
-     *
-     *  To-do: Fix bugs
+     * Validate the args when the operand is checkout.
+     * @param args **this is the call args**
+     * @throws IOException
      */
     private static void validateCheckout(String[] args) throws IOException {
-        if (args[1].equals("--")) {
-            repo.checkoutFile(args[2]);
-        } else if (args[1] != null) {
+        if (args.length == 1) {
             repo.checkoutBranch(args[1]);
-        } else if (args[2].equals("--")) {
-            repo.checkoutCommit(args[1], args[3]);
+        }
+
+//       need to handle:  If the file does not exist in the previous commit, abort,
+//        printing the error message File does not exist in that commit.
+        if (args.length == 3) {
+            if (!args[1].equals("--")) {
+                exitWithError("incorrect Operation: Do git checkout -- [file name]");
+            }
+            if (!repo.checkoutFile(args[2])) {
+                exitWithError("File does not exist in that commit.");
+            }
+            repo.checkoutFile(args[2]);
+        }
+
+        if (args.length == 4) {
+            if (!args[2].equals("--")) {
+                exitWithError("incorrect Operation: git checkout [commit id] -- [file name]");
+            }
+            if (!repo.checkoutID(args[1])) {
+                exitWithError("No commit with that id exists.");
+            } else if (repo.checkoutID(args[1]) && !repo.checkoutFile(args[3])) {
+                exitWithError("File does not exist in that commit.");
+            } else {
+                repo.checkoutCommit(args[1], args[3]);
+            }
         }
     }
 
@@ -195,31 +216,26 @@ public class Main {
         boolean isValid = false;
         switch (args[0]) {
         case "init":
+        case "log":
+        case "status":
             if (n == 1) {
                 isValid = true;
             }
+            break;
         case "add":
             if (n == 2) {
                 isValid = true;
             }
+            break;
         case "commit":
             if (n == 1) {
                 validateCommitMessage();
             } else if (n == 2) {
                 isValid = true;
             }
-        case "log":
-            if (n == 1) {
-                isValid = true;
-            }
-        case "status":
-            if (n == 1) {
-                isValid = true;
-            }
+            break;
         default:
-            if (n == 2) {
-                isValid = true;
-            }
+            isValid = false;
         }
         if (!isValid) {
             exitWithError("Incorrect operands.");

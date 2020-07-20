@@ -218,10 +218,11 @@ public class Repo {
      * the front of the current branch, and puts it in the working
      * directory, overwriting the version of the file that’s already
      * there if there is one. The new version of the file is not staged.
+     * @return
      */
     public void checkoutFile(String filename) throws IOException {
         Map<String, String> snapshot = Head.getGlobalHEAD().getSnapshot();
-
+      
         /**
          * To-do: checkout should use abbreviated filename.
          */
@@ -231,6 +232,7 @@ public class Repo {
             Blob blob = Blob.load(blobFile);
             restoreFileInCWD(blob);
         }
+        return false;
     }
 
     /**
@@ -238,6 +240,7 @@ public class Repo {
      * and puts it in the working directory, overwriting the version of the file
      * that’s already there if there is one.
      * The new version of the file is not staged.
+     * @return
      */
     public void checkoutCommit(String commitId, String fileName) throws IOException {
         Commit commit = Head.getGlobalHEAD();
@@ -253,13 +256,32 @@ public class Repo {
             }
             commit = commit.getParent();
         }
-
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
         Blob blob = Blob.load(blobFile);
         restoreFileInCWD(blob);
     }
 
     /**
+     * Takes the version of the file as it exists in the commit with the given id,
+     * and puts it in the working directory, overwriting the version of the file
+     * that’s already there if there is one.
+     * The new version of the file is not staged.
+     * @param commitId
+     * @return
+     * @throws IOException
+     */
+    public boolean checkoutID(String commitId) throws IOException {
+        Map<String, String> snapshot = getHEAD().getSnapshot();
+
+        if (snapshot.containsKey(commitId)) {
+            String blobSHA1 = snapshot.get(commitId);
+            File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+            Blob blob = Blob.load(blobFile);
+            restoreFileInCWD(blob);
+        }
+        return false;
+    }
+
      * Update the global HEAD pointer to point to branch HEAD.
      */
     public void checkoutBranch(String branchName) {
