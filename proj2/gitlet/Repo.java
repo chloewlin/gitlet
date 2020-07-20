@@ -416,10 +416,18 @@ public class Repo {
         String commitId = args[1];
         Commit targetCommit = null;
 
+        // to-do: find untracked files in CWD
+        if (hasUntrackedFiles()) {
+            Main.exitWithError("There is an untracked file in the way;" +
+                    "delete it, or add and commit it first.");
+        }
+
         // find commit
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             if (findMatchId(commit.getSHA(), commitId)) {
                 targetCommit = commit;
+            } else {
+                Main.exitWithError("No commit with that id exists.");
             }
             commit = commit.getParent();
         }
@@ -429,6 +437,16 @@ public class Repo {
         restoreFilesAtCommit(currCommit, targetCommit);
         // reset global HEAD
         Head.setGlobalHEAD(currentBranchName(), targetCommit);
+    }
+
+    /**
+     * Returns if there are untracked files in CWD.
+     * */
+    public boolean hasUntrackedFiles() {
+        /**
+         * To-do
+         */
+        return false;
     }
 
     public void restoreFilesAtCommit(Commit currCommit, Commit checkoutCommit) {
