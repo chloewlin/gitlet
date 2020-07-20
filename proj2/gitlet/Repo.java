@@ -222,10 +222,7 @@ public class Repo {
      */
     public boolean checkoutFile(String filename) throws IOException {
         Map<String, String> snapshot = Head.getGlobalHEAD().getSnapshot();
-      
-        /**
-         * To-do: checkout should use abbreviated filename.
-         */
+
         if (snapshot.containsKey(filename)) {
             String blobSHA1 = snapshot.get(filename);
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
@@ -298,27 +295,6 @@ public class Repo {
     }
 
     /**
-     * Takes the version of the file as it exists in the commit with the given id,
-     * and puts it in the working directory, overwriting the version of the file
-     * that’s already there if there is one.
-     * The new version of the file is not staged.
-     * @param commitId
-     * @return
-     * @throws IOException
-     */
-    public boolean checkoutID(String commitId) throws IOException {
-        Map<String, String> snapshot = Head.getGlobalHEAD().getSnapshot();
-
-        if (snapshot.containsKey(commitId)) {
-            String blobSHA1 = snapshot.get(commitId);
-            File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
-            Blob blob = Blob.load(blobFile);
-            restoreFileInCWD(blob);
-        }
-        return false;
-    }
-
-    /**
      * Update the global HEAD pointer to point to branch HEAD.
      */
     public void checkoutBranch(String branchName) {
@@ -327,8 +303,8 @@ public class Repo {
         }
         Commit branchHEAD = Head.getBranchHEAD(branchName);
         Commit currHEAD = Head.getGlobalHEAD();
-        restoreFilesAtBranch(currHEAD, branchHEAD);
         this.head.setGlobalHEAD(branchName, branchHEAD);
+        restoreFilesAtBranch(currHEAD, branchHEAD);
         stagingArea.clear();
     }
 
@@ -384,9 +360,7 @@ public class Repo {
             }
         });
 
-        delete.forEach((file, blobSHA1) -> {
-           Utils.restrictedDelete(file);
-        });
+        delete.forEach((file, blobSHA1) -> Utils.restrictedDelete(file));
     }
 
     /**
@@ -405,8 +379,30 @@ public class Repo {
     /**
      * Remove the branch reference.
      */
-    public void rmBranch(String branchName) {
+    public void rmBranch(String[] args) {
+        String branchNameToRemove = args[1];
 
+        String currBranchName = currentBranchName();
+
+        if (currBranchName.equals(branchNameToRemove)) {
+            Main.exitWithError("Cannot remove the current branch.");
+        }
+        if (Branch.hasBranch(branchNameToRemove)) {
+            File branch = Utils.join(Main.HEADS_REFS_FOLDER, branchNameToRemove);
+            branch.delete();
+        } else {
+            Main.exitWithError("A branch with that name does not exist.");
+        }
+    }
+
+    /**
+     * Return the name of the current branch.
+     */
+    public String currentBranchName() {
+        File branchFile = (Utils.join(Main.GITLET_FOLDER, "HEAD"));
+        return Utils
+                .readObject(branchFile, Branch.class)
+                .getName();
     }
 
     /**

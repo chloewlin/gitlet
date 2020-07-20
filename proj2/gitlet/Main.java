@@ -96,6 +96,9 @@ public class Main {
         case "branch":
              repo.branch(args);
              break;
+        case "rm-branch":
+             repo.rmBranch(args);
+             break;
         default:
             validateCommand();
         }
@@ -108,7 +111,7 @@ public class Main {
      * @throws IOException
      */
     private static void validateCheckout(String[] args) throws IOException {
-        if (args.length == 1) {
+        if (args.length == 2) {
             repo.checkoutBranch(args[1]);
         }
 
