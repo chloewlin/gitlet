@@ -267,43 +267,10 @@ public class Repo {
         if (snapshot.containsKey(filename)) {
             String blobSHA1 = snapshot.get(filename);
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
-            Blob blob = Blob.load(blobFile);
-            restoreFileInCWD(blob);
         }
         return false;
     }
 
-    /**
-     * Takes the version of the file as it exists in the commit with the given id,
-     * and puts it in the working directory, overwriting the version of the file
-     * that’s already there if there is one.
-     * The new version of the file is not staged.
-     * @return
-     */
-    public void checkoutCommit(String commitId, String fileName) throws IOException {
-        Commit commit = getHEAD();
-        String blobSHA1 = "";
-
-<<<<<<< HEAD
-        while (!checkoutID(commitId)) {
-=======
-        /**
-         * To-do: FIX BUG
-         */
-        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
->>>>>>> 7c4b0dbbda343075ddcaf8d6e80345385a1312de
-            if (commit.getSHA().equals(commitId)) {
-                blobSHA1 = commit.getSnapshot().get(fileName);
-                break;
-            }
-            commit = commit.getParent();
-        }
-        File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
-        Blob blob = Blob.load(blobFile);
-        restoreFileInCWD(blob);
-    }
-
-<<<<<<< HEAD
     /**
      * Takes the version of the file as it exists in the commit with the given id,
      * and puts it in the working directory, overwriting the version of the file
@@ -325,9 +292,43 @@ public class Repo {
         return false;
     }
 
+    /**
+     * Takes the version of the file as it exists in the commit with the given id,
+     * and puts it in the working directory, overwriting the version of the file
+     * that’s already there if there is one.
+     * The new version of the file is not staged.
+     * @return
+     */
+    public void checkoutCommit(String commitId, String fileName) throws IOException {
+        Commit commit = getHEAD();
+        String blobSHA1 = "";
 
-=======
->>>>>>> 7c4b0dbbda343075ddcaf8d6e80345385a1312de
+        /**
+         * To-do: FIX BUG
+         */
+        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+            if (commit.getSHA().equals(commitId)) {
+                blobSHA1 = commit.getSnapshot().get(fileName);
+                break;
+            }
+            commit = commit.getParent();
+        }
+        File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+        Blob blob = Blob.load(blobFile);
+        restoreFileInCWD(blob);
+    }
+
+    /**
+     * TBD.
+     */
+    public void checkoutBranch(String branchName, String commitID) throws IOException{
+        Map<String, String> snapshot = getHEAD().ge
+
+        }
+
+
+    }
+
     /**
      * Restore file from blob, put it in current working directory,
      * and overwriting the version of the file that’s already
@@ -340,12 +341,6 @@ public class Repo {
         Utils.writeContents(file, blob.getFileContent());
     }
 
-    /**
-     * TBD.
-     */
-    public void checkoutBranch(String branchName) {
-
-    }
 
     /**
      * Create a new reference for current commit node.

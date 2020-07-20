@@ -2,6 +2,7 @@ package gitlet;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
@@ -63,4 +64,5 @@ public class Branch implements Serializable {
     public static Branch load(File branch) {
         return Utils.readObject(branch, Branch.class);
     }
+
 }

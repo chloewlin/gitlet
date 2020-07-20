@@ -100,15 +100,19 @@ public class Main {
      * @throws IOException
      */
     private static void validateCheckout(String[] args) throws IOException {
-        if (args.length == 1) {
+        if (args.length == 2) {
             repo.checkoutBranch(args[1]);
+            if (!repo.checkoutBranch(args[1])) {
+
+            }
         }
 
 //       need to handle:  If the file does not exist in the previous commit, abort,
 //        printing the error message File does not exist in that commit.
         if (args.length == 3) {
             if (!args[1].equals("--")) {
-                exitWithError("incorrect Operation: Do git checkout -- [file name]");
+                exitWithError("Incorrect Operation: Do git checkout -- [file name]");
+                return;
             }
             if (!repo.checkoutFile(args[2])) {
                 exitWithError("File does not exist in that commit.");
@@ -119,6 +123,7 @@ public class Main {
         if (args.length == 4) {
             if (!args[2].equals("--")) {
                 exitWithError("incorrect Operation: git checkout [commit id] -- [file name]");
+                return;
             }
             if (!repo.checkoutID(args[1])) {
                 exitWithError("No commit with that id exists.");
