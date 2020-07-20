@@ -248,8 +248,7 @@ public class Repo {
         Boolean found = false;
 
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
-            if (commit.getSHA().equals(commitId) ||
-                    commit.getSHA().substring(0, 6).equals(commitId)) {
+            if (findMatchId(commit.getSHA(), commitId)) {
                 blobSHA1 = commit.getSnapshot().get(fileName);
                 found = true;
                 break;
@@ -257,10 +256,45 @@ public class Repo {
             commit = commit.getParent();
         }
 
+        if (!found) {
+            return false;
+        }
+
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
         Blob blob = Blob.load(blobFile);
         restoreFileInCWD(blob);
-        return found;
+        return true;
+    }
+
+    /**
+     * Checks if a commit contains a given file
+     * */
+    public boolean containsFile(String commitId, String fileName) {
+        Commit commit = Head.getGlobalHEAD();
+        Boolean hasFile = false;
+
+        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+            if (findMatchId(commit.getSHA(), commitId)) {
+                if (commit.getSnapshot().containsKey(fileName)) {
+                    hasFile = true;
+                    break;
+                }
+            }
+            commit = commit.getParent();
+        }
+
+        return hasFile;
+    }
+
+    /**
+     * Checks if a given commit id, full or abbreviated, matches
+     * the SHA1 id of a commit node
+     * @param commitSHA1 the SHA1 id of a commit node
+     * @param commitId a given commitId we want to search
+     * */
+    public boolean findMatchId(String commitSHA1, String commitId) {
+        return commitSHA1.equals(commitId) ||
+                commitSHA1.substring(0, 6).equals(commitId);
     }
 
     /**

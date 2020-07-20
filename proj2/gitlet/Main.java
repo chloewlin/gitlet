@@ -128,14 +128,13 @@ public class Main {
             if (!args[2].equals("--")) {
                 exitWithError("incorrect Operation: git checkout [commit id] -- [file name]");
             }
+            if (!repo.containsFile(args[1], args[3])) {
+                exitWithError("File does not exist in that commit.");
+            }
+            if (!repo.checkoutCommit(args[1], args[3])) {
+                exitWithError("No commit with that id exists.");
+            }
             repo.checkoutCommit(args[1], args[3]);
-//            if (!repo.checkoutID(args[1])) {
-//                exitWithError("No commit with that id exists.");
-//            } else if (repo.checkoutID(args[1]) && !repo.checkoutFile(args[3])) {
-//                exitWithError("File does not exist in that commit.");
-//            } else {
-//                repo.checkoutCommit(args[1], args[3]);
-//            }
         }
     }
 
