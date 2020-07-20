@@ -99,14 +99,16 @@ public class Main {
 
     /**
      *  Validate the args when the operand is checkout.
+     *
+     *  To-do: Fix bugs
      */
     private static void validateCheckout(String[] args) throws IOException {
         if (args[1].equals("--")) {
             repo.checkoutFile(args[2]);
+        } else if (args[1] != null) {
+            repo.checkoutBranch(args[1]);
         } else if (args[2].equals("--")) {
             repo.checkoutCommit(args[1], args[3]);
-        } else {
-            repo.checkoutBranch(args[1]);
         }
     }
 
