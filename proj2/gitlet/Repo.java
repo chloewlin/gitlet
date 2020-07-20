@@ -242,20 +242,25 @@ public class Repo {
      * The new version of the file is not staged.
      * @return
      */
-    public void checkoutCommit(String commitId, String fileName) throws IOException {
+    public boolean checkoutCommit(String commitId, String fileName) throws IOException {
         Commit commit = Head.getGlobalHEAD();
         String blobSHA1 = "";
+        Boolean found = false;
 
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
-            if (commit.getSHA().equals(commitId)) {
+            if (commit.getSHA().equals(commitId) ||
+                    commit.getSHA().substring(0, 6).equals(commitId)) {
                 blobSHA1 = commit.getSnapshot().get(fileName);
+                found = true;
                 break;
             }
             commit = commit.getParent();
         }
+
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
         Blob blob = Blob.load(blobFile);
         restoreFileInCWD(blob);
+        return found;
     }
 
     /**
