@@ -46,7 +46,7 @@ public class Branch implements Serializable {
     /**
      * Return the last commit node of the current branch.
      */
-    public Commit getHead() {
+    public Commit getHEAD() {
         return this.head;
     }
 
