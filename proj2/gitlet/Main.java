@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Driver class for Gitlet, the tiny stupid version-control system.
@@ -63,7 +64,11 @@ public class Main {
      * Usage: java gitlet.Main ARGS, where ARGS contains <COMMAND> <OPERAND>.
      */
     public static void main(String... args) throws IOException {
+        // FIX-ME: Where to validate initialization?
+        // validateInitialization(args);
+
         validateNumCommand(args);
+
         switch (args[0]) {
         case "init":
             validateGitlet();
@@ -86,8 +91,11 @@ public class Main {
             repo.status();
             break;
         case "checkout":
-            validateCheckout(args);
-            break;
+             validateCheckout(args);
+             break;
+        case "branch":
+             repo.branch(args);
+             break;
         default:
             validateCommand();
         }
@@ -159,11 +167,11 @@ public class Main {
      *  @param args user's input of commands and operands
      */
     private static void validateInitialization(String[] args) {
-        String[] directories = CWD.list();
-        for (String d : directories) {
-            System.out.println(d);
+        List<String> files = Utils.plainFilenamesIn(CWD);
+
+        if (!files.contains(".gitlet")) {
+            exitWithError("Not in an initialized Gitlet directory.");
         }
-        exitWithError("Not in an initialized Gitlet directory.");
     }
 
     /**

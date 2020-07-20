@@ -46,7 +46,7 @@ public class Branch implements Serializable {
     /**
      * Return the last commit node of the current branch.
      */
-    public Commit getHead() {
+    public Commit getHEAD() {
         return this.head;
     }
 
@@ -58,6 +58,16 @@ public class Branch implements Serializable {
     }
 
     /**
+     * Create a new Branch reference as a file.
+     */
+    public void create() throws IOException {
+        Branch branch = new Branch(this.name, this.head);
+        File file = Utils.join(Main.HEADS_REFS_FOLDER, this.name);
+        file.createNewFile();
+        save(file, branch);
+    }
+
+    /**
      * Return a branch object from the byte array.
      * @param branch the byte array file of a branch object.
      */
@@ -65,4 +75,15 @@ public class Branch implements Serializable {
         return Utils.readObject(branch, Branch.class);
     }
 
+    /**
+     * Save a Branch object as a file.
+     */
+    public void save(File file, Branch branch) {
+        Utils.writeObject(file, branch);
+    }
+
+    public static Boolean hasBranch(String name) {
+        List<String> branches = Utils.plainFilenamesIn(Main.HEADS_REFS_FOLDER);
+        return branches.contains(name);
+    }
 }

@@ -183,6 +183,10 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
 
         Queue<Amoeba> queue= new LinkedList<Amoeba>();
 
+        //Alternative soln
+        // Queue<Amoeba> queue= new ArrayDeque<Amoeba>();
+
+
         /* AmoebaBFSIterator constructor. Sets up all of the initial information
            for the AmoebaBFSIterator. */
         public AmoebaBFSIterator() {
