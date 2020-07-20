@@ -74,7 +74,7 @@ public class BinaryTree<T> {
             if (left != null) {
                 left.printInorder();
             }
-            System.out.println((item + " "));
+            System.out.print((item + " "));
             if (right != null) {
                 right.printInorder();
             }
