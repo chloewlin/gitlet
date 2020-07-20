@@ -222,10 +222,7 @@ public class Repo {
      */
     public boolean checkoutFile(String filename) throws IOException {
         Map<String, String> snapshot = Head.getGlobalHEAD().getSnapshot();
-      
-        /**
-         * To-do: checkout should use abbreviated filename.
-         */
+
         if (snapshot.containsKey(filename)) {
             String blobSHA1 = snapshot.get(filename);
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
@@ -242,41 +239,59 @@ public class Repo {
      * The new version of the file is not staged.
      * @return
      */
-    public void checkoutCommit(String commitId, String fileName) throws IOException {
+    public boolean checkoutCommit(String commitId, String fileName) throws IOException {
         Commit commit = Head.getGlobalHEAD();
         String blobSHA1 = "";
+        Boolean found = false;
 
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
-            if (commit.getSHA().equals(commitId)) {
+            if (findMatchId(commit.getSHA(), commitId)) {
                 blobSHA1 = commit.getSnapshot().get(fileName);
+                found = true;
                 break;
             }
             commit = commit.getParent();
         }
+
+        if (!found) {
+            return false;
+        }
+
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
         Blob blob = Blob.load(blobFile);
         restoreFileInCWD(blob);
+        return true;
     }
 
     /**
-     * Takes the version of the file as it exists in the commit with the given id,
-     * and puts it in the working directory, overwriting the version of the file
-     * that’s already there if there is one.
-     * The new version of the file is not staged.
-     * @param commitId
-     * @return
-     * @throws IOException
-     */
-    public boolean checkoutID(String commitId) throws IOException {
-        Map<String, String> snapshot = Head.getGlobalHEAD().getSnapshot();
+     * Checks if a commit contains a given file
+     * */
+    public boolean containsFile(String commitId, String fileName) {
+        Commit commit = Head.getGlobalHEAD();
+        Boolean hasFile = false;
 
-        if (snapshot.containsKey(commitId)) {
-            String blobSHA1 = snapshot.get(commitId);
-            File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
-            Blob blob = Blob.load(blobFile);
-            restoreFileInCWD(blob);
+        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+            if (findMatchId(commit.getSHA(), commitId)) {
+                if (commit.getSnapshot().containsKey(fileName)) {
+                    hasFile = true;
+                    break;
+                }
+            }
+            commit = commit.getParent();
         }
-        return false;
+
+        return hasFile;
+    }
+
+    /**
+     * Checks if a given commit id, full or abbreviated, matches
+     * the SHA1 id of a commit node
+     * @param commitSHA1 the SHA1 id of a commit node
+     * @param commitId a given commitId we want to search
+     * */
+    public boolean findMatchId(String commitSHA1, String commitId) {
+        return commitSHA1.equals(commitId) ||
+                commitSHA1.substring(0, 6).equals(commitId);
     }
 
     /**
@@ -288,8 +303,8 @@ public class Repo {
         }
         Commit branchHEAD = Head.getBranchHEAD(branchName);
         Commit currHEAD = Head.getGlobalHEAD();
-        restoreFilesAtBranch(currHEAD, branchHEAD);
         this.head.setGlobalHEAD(branchName, branchHEAD);
+        restoreFilesAtBranch(currHEAD, branchHEAD);
         stagingArea.clear();
     }
 
@@ -345,9 +360,7 @@ public class Repo {
             }
         });
 
-        delete.forEach((file, blobSHA1) -> {
-           Utils.restrictedDelete(file);
-        });
+        delete.forEach((file, blobSHA1) -> Utils.restrictedDelete(file));
     }
 
     /**
@@ -366,8 +379,30 @@ public class Repo {
     /**
      * Remove the branch reference.
      */
-    public void rmBranch(String branchName) {
+    public void rmBranch(String[] args) {
+        String branchNameToRemove = args[1];
 
+        String currBranchName = currentBranchName();
+
+        if (currBranchName.equals(branchNameToRemove)) {
+            Main.exitWithError("Cannot remove the current branch.");
+        }
+        if (Branch.hasBranch(branchNameToRemove)) {
+            File branch = Utils.join(Main.HEADS_REFS_FOLDER, branchNameToRemove);
+            branch.delete();
+        } else {
+            Main.exitWithError("A branch with that name does not exist.");
+        }
+    }
+
+    /**
+     * Return the name of the current branch.
+     */
+    public String currentBranchName() {
+        File branchFile = (Utils.join(Main.GITLET_FOLDER, "HEAD"));
+        return Utils
+                .readObject(branchFile, Branch.class)
+                .getName();
     }
 
     /**
@@ -376,8 +411,75 @@ public class Repo {
      * checkout should use abbreviated filename.
      *
      */
-    public void reset(String commitId) {
+    public void reset(String[] args) {
+        Commit commit = Head.getGlobalHEAD();
+        String commitId = args[1];
+        Commit targetCommit = null;
 
+        // to-do: find untracked files in CWD
+        if (hasUntrackedFiles()) {
+            Main.exitWithError("There is an untracked file in the way;" +
+                    "delete it, or add and commit it first.");
+        }
+
+        // find commit
+        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+            if (findMatchId(commit.getSHA(), commitId)) {
+                targetCommit = commit;
+            } else {
+                Main.exitWithError("No commit with that id exists.");
+            }
+            commit = commit.getParent();
+        }
+
+        // checkout to that commit
+        Commit currCommit = Head.getGlobalHEAD();
+        restoreFilesAtCommit(currCommit, targetCommit);
+        // reset global HEAD
+        Head.setGlobalHEAD(currentBranchName(), targetCommit);
+    }
+
+    /**
+     * Returns if there are untracked files in CWD.
+     * */
+    public boolean hasUntrackedFiles() {
+        /**
+         * To-do
+         */
+        return false;
+    }
+
+    public void restoreFilesAtCommit(Commit currCommit, Commit checkoutCommit) {
+        Map<String, String> currSnapshot = currCommit.getSnapshot();
+        Map<String, String> checkoutSnapshot = checkoutCommit.getSnapshot();
+        Map<String, String> overwrite = new HashMap<>();
+        Map<String, String> delete = new HashMap<>();
+
+        currSnapshot.forEach((fileName, blobSHA1) -> {
+            if (checkoutSnapshot.containsKey(fileName)) {
+                overwrite.put(fileName, checkoutSnapshot.get(fileName));
+            } else {
+                delete.put(fileName, blobSHA1);
+            }
+        });
+
+        checkoutSnapshot.forEach((fileName, blobSHA1) -> {
+            if (!overwrite.containsKey(fileName)) {
+                overwrite.put(fileName, blobSHA1);
+            }
+        });
+
+        overwrite.forEach((file, blobSHA1) -> {
+            File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+            Blob blob = Blob.load(blobFile);
+            try {
+                restoreFileInCWD(blob);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        delete.forEach((file, blobSHA1) -> Utils.restrictedDelete(file));
     }
 
     /**

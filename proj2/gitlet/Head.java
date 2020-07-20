@@ -6,7 +6,7 @@ public class Head {
     /**
      * Set up the global HEAD, default to master
      */
-    public void setGlobalHEAD(String branchName, Commit commit) {
+    public static void setGlobalHEAD(String branchName, Commit commit) {
         Branch branch = new Branch(branchName, commit);
         File branchFile = Utils.join(Main.GITLET_FOLDER, "HEAD");
         Utils.writeObject(branchFile, branch);
