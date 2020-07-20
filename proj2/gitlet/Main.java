@@ -64,8 +64,11 @@ public class Main {
      * Usage: java gitlet.Main ARGS, where ARGS contains <COMMAND> <OPERAND>.
      */
     public static void main(String... args) throws IOException {
-        validateInitialization(args);
+        // FIX-ME: Where to validate initialization?
+        // validateInitialization(args);
+
         validateNumCommand(args);
+
         switch (args[0]) {
         case "init":
             validateGitlet();
