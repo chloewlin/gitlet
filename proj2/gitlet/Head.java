@@ -9,7 +9,7 @@ public class Head {
     public void setGlobalHEAD(String branchName, Commit commit) {
         Branch branch = new Branch(branchName, commit);
         File branchFile = Utils.join(Main.GITLET_FOLDER, "HEAD");
-        System.out.println("Setting up gloabl HEAD to branch " + branchName);
+        System.out.println("======================== Currently on: " + branchName);
         Utils.writeObject(branchFile, branch);
     }
 

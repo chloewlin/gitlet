@@ -279,6 +279,21 @@ public class Repo {
     }
 
     /**
+     * Update the global HEAD pointer to point to branch HEAD.
+     */
+    public void checkoutBranch(String branchName) {
+        if (!Branch.hasBranch(branchName)) {
+            Main.exitWithError("No such branch exists.");
+        }
+        Commit branchHEAD = this.head.getBranchHEAD(branchName);
+        Commit currHEAD = this.head.getGlobalHEAD();
+        // restore all the files at that branch head if not at init
+        restoreFilesAtBranch(currHEAD, branchHEAD);
+        // set the global head to branch head
+        this.head.setGlobalHEAD(branchName, branchHEAD);
+    }
+
+    /**
      * Restore file from blob, put it in current working directory,
      * and overwriting the version of the file that’s already
      * there if there is one.
@@ -291,24 +306,46 @@ public class Repo {
     }
 
     /**
-     * Update the global HEAD pointer to point to branch HEAD.
+     * Compare the snapshots hashmaps of currBranch and targetBranch.
+     *
+     * Any files that are tracked in the current branch but are
+     * not present in the checked-out branch are deleted.
+     * @param currBranch
+     * @param checkoutBranch
      */
-    public void checkoutBranch(String branchName) {
-        if (!Branch.hasBranch(branchName)) {
-            Main.exitWithError("No such branch exists.");
-        }
-        // get branch head
-        Commit branchHEAD = this.head.getBranchHEAD(branchName);
+    public void restoreFilesAtBranch(Commit currBranch, Commit checkoutBranch) {
+        Map<String, String> currSnapshot = currBranch.getSnapshot();
+        Map<String, String> checkoutSnapshot = checkoutBranch.getSnapshot();
+//        System.out.println("======== CURRENT: =======");
+//        currSnapshot.forEach((file, blob) -> System.out.println(file + " " + blob));
+//        System.out.println("");
+//        System.out.println("======== CHECK-OUT =======");
+//        checkoutSnapshot.forEach((file, blob) -> System.out.println(file + " " + blob));
+        Map<String, String> overwrite = new HashMap<String, String>();
+        Map<String, String> delete = new HashMap<String, String>();
 
-        // restore all the files at that branch head
-        restoreFilesAtBranch(branchHEAD.getSnapshot());
+        currSnapshot.forEach((fileName, blobSHA1) -> {
+            if (checkoutSnapshot.containsKey(fileName)) {
+                overwrite.put(fileName, checkoutSnapshot.get(fileName));
+            } else {
+                delete.put(fileName, blobSHA1);
+            }
+        });
 
-        // set the global head to branch head
-        this.head.setGlobalHEAD(branchName, branchHEAD);
-    }
+        checkoutSnapshot.forEach((fileName, blobSHA1) -> {
+            if (!overwrite.containsKey(fileName)) {
+                overwrite.put(fileName, blobSHA1);
+            }
+        });
 
-    public void restoreFilesAtBranch(Map<String, String> snapshot) {
-        snapshot.forEach((fileName, blobSHA1) -> {
+        System.out.println("");
+        System.out.println("======== THERE NEED TO BE OVERWRITTEN OR ADDED =======");
+        overwrite.forEach((file, blob) -> System.out.println(file + " " + blob));
+        System.out.println("");
+        System.out.println("======== THESE NEED TO BE DELETED =======");
+        delete.forEach((file, blob) -> System.out.println(file + " " + blob));
+
+        overwrite.forEach((file, blobSHA1) -> {
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
             Blob blob = Blob.load(blobFile);
             try {
@@ -316,6 +353,10 @@ public class Repo {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        });
+
+        delete.forEach((file, blobSHA1) -> {
+           Utils.restrictedDelete(file);
         });
     }
 
