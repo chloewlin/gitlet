@@ -220,7 +220,7 @@ public class Repo {
      * there if there is one. The new version of the file is not staged.
      * @return
      */
-    public void checkoutFile(String filename) throws IOException {
+    public boolean checkoutFile(String filename) throws IOException {
         Map<String, String> snapshot = Head.getGlobalHEAD().getSnapshot();
       
         /**
@@ -271,7 +271,7 @@ public class Repo {
      * @throws IOException
      */
     public boolean checkoutID(String commitId) throws IOException {
-        Map<String, String> snapshot = getHEAD().getSnapshot();
+        Map<String, String> snapshot = Head.getGlobalHEAD().getSnapshot();
 
         if (snapshot.containsKey(commitId)) {
             String blobSHA1 = snapshot.get(commitId);
@@ -282,6 +282,7 @@ public class Repo {
         return false;
     }
 
+    /**
      * Update the global HEAD pointer to point to branch HEAD.
      */
     public void checkoutBranch(String branchName) {
