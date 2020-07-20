@@ -25,7 +25,7 @@ public class Main {
     /**
      * file for storing trackedFiles and file/blob mapping.
      */
-    static final File TRACKEDFILES = Utils.join(STAGING_FOLDER, "trackedFiles");
+    static final File INDEX = Utils.join(STAGING_FOLDER, "index");
     /**
      * directory for storing commits and blobs.
      */
@@ -39,13 +39,9 @@ public class Main {
      */
     static final File BLOBS_FOLDER = Utils.join(OBJECTS_FOLDER, "blobs");
     /**
-     * commit hash current head.
+     * commit hash of HEAD of the current branch.
      */
-    static final File HEAD = new File("head");
-    /**
-     * directory for storing branch and related commit has.
-     */
-    static final File BRANCHES = new File("branch");
+    static final File HEAD = Utils.join(GITLET_FOLDER, "HEAD");
     /**
      * directory for storing all commit logs for HEAD and branches.
      */
@@ -72,13 +68,16 @@ public class Main {
         case "init":
             validateGitlet();
             setupPersistence();
-            repo.createInitialCommit();
+            repo.initialize();
             break;
         case "add":
             repo.add(args);
             break;
         case "commit":
             repo.commit(args);
+            break;
+        case "rm":
+            repo.remove(args);
             break;
         case "log":
             repo.log();
@@ -87,8 +86,11 @@ public class Main {
             repo.status();
             break;
         case "checkout":
-            validateCheckout(args);
-            break;
+             validateCheckout(args);
+             break;
+        case "branch":
+             repo.branch(args);
+             break;
         default:
             validateCommand();
         }
@@ -139,11 +141,12 @@ public class Main {
         REFS_FOLDER.mkdir();
         HEADS_REFS_FOLDER.mkdir();
         STAGING_FOLDER.mkdir();
-        TRACKEDFILES.createNewFile();
+        INDEX.createNewFile();
         LOGS_FOLDER.mkdir();
         OBJECTS_FOLDER.mkdir();
         COMMITS_FOLDER.mkdir();
         BLOBS_FOLDER.mkdir();
+        HEAD.createNewFile();
     }
 
     /**
