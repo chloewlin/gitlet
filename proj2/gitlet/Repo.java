@@ -63,7 +63,6 @@ public class Repo {
         if (!isSameVersion(fileName)) {
             stagingArea.add(fileName, blob.getBlobSHA1());
             stagingArea.save();
-            stagingArea.printTrackedFiles();
         } else {
             if (stagingArea.containsFile(fileName)) {
                 stagingArea.remove(fileName);
@@ -117,8 +116,6 @@ public class Repo {
         Map<String, String> snapshot = updateSnapshot();
 
         Commit commit = new Commit(message, parentSHA1, false, snapshot);
-        System.out.println("confirming if commit object is complete....");
-        System.out.println("commit SHA: " + commit.getSHA());
         commit.save();
 
         Branch currBranch = Utils
@@ -224,8 +221,6 @@ public class Repo {
      */
     public void checkoutFile(String filename) throws IOException {
         Map<String, String> snapshot = Head.getGlobalHEAD().getSnapshot();
-
-        System.out.print(snapshot);
 
         /**
          * To-do: checkout should use abbreviated filename.
