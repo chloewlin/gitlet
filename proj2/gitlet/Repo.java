@@ -411,7 +411,8 @@ public class Repo {
      * checkout should use abbreviated filename.
      *
      */
-    public void reset(String commitId) {
+    public void reset(String[] args) {
+        String commitId = args[1];
 
     }
 

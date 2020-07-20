@@ -99,6 +99,9 @@ public class Main {
         case "rm-branch":
              repo.rmBranch(args);
              break;
+        case "reset":
+             repo.reset(args);
+             break;
         default:
             validateCommand();
         }
