@@ -297,11 +297,26 @@ public class Repo {
         if (!Branch.hasBranch(branchName)) {
             Main.exitWithError("No such branch exists.");
         }
-        // get the head of the branch
-        Commit HEAD = this.head.getBranchHEAD(branchName);
+        // get branch head
+        Commit branchHEAD = this.head.getBranchHEAD(branchName);
 
-        // set the global head pointer to that head commit
-        this.head.setGlobalHEAD(branchName, HEAD);
+        // restore all the files at that branch head
+        restoreFilesAtBranch(branchHEAD.getSnapshot());
+
+        // set the global head to branch head
+        this.head.setGlobalHEAD(branchName, branchHEAD);
+    }
+
+    public void restoreFilesAtBranch(Map<String, String> snapshot) {
+        snapshot.forEach((fileName, blobSHA1) -> {
+            File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+            Blob blob = Blob.load(blobFile);
+            try {
+                restoreFileInCWD(blob);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     /**
