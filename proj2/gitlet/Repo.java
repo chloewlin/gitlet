@@ -23,15 +23,9 @@ public class Repo {
         Commit initialCommit = new Commit("initial commit", sentinel.getSHA(), true, new HashMap<>());
         sentinel.save();
         initialCommit.saveInit();
-
-        // Update both global and branch heads
         this.head.setGlobalHEAD("master", initialCommit);
         this.head.setBranchHEAD("master", initialCommit);
-//        setHEAD("master", initialCommit);
-//        setupGlobalHead("master", initialCommit);
-
-        /** initialize + save initial stage */
-        this.stagingArea.save();
+        stagingArea.save();
     }
 
     /**
@@ -48,7 +42,6 @@ public class Repo {
      * may have modified it, write it back to your file system.
      */
     public void add(String[] args) throws IOException {
-        /** To-do: lazy loading and caching */
         Main.validateNumArgs(args);
         String fileName = args[1];
         Blob blob = new Blob(fileName);
@@ -65,15 +58,15 @@ public class Repo {
      * added, and then changed back).
      * */
     private void stage(String fileName, Blob blob) throws IOException {
-        this.stagingArea = this.stagingArea.load();
+        stagingArea = stagingArea.load();
 
         if (!isSameVersion(fileName)) {
-            this.stagingArea.add(fileName, blob.getBlobSHA1());
-            this.stagingArea.save();
-            this.stagingArea.printTrackedFiles();
+            stagingArea.add(fileName, blob.getBlobSHA1());
+            stagingArea.save();
+            stagingArea.printTrackedFiles();
         } else {
-            if (this.stagingArea.containsFile(fileName)) {
-                this.stagingArea.remove(fileName);
+            if (stagingArea.containsFile(fileName)) {
+                stagingArea.remove(fileName);
             }
             Main.validateFileToBeStaged();
         }
@@ -86,7 +79,7 @@ public class Repo {
     public boolean isSameVersion(String currFileName) {
         String CWD = System.getProperty("user.dir");
         File currentFile = new File(CWD, currFileName);
-        Commit currCommit = this.head.getGlobalHEAD();
+        Commit currCommit = Head.getGlobalHEAD();
         String blobSHA1 = currCommit.getSnapshot().get(currFileName);
         if (blobSHA1 == null) {
             return false;
@@ -117,10 +110,10 @@ public class Repo {
     public void commit(String[] args) throws IOException {
         Main.validateNumArgs(args);
         String message = args[1];
-        Commit parent = this.head.getGlobalHEAD();
+        Commit parent = Head.getGlobalHEAD();
         String parentSHA1 = parent.getSHA();
 
-        Staging stage = this.stagingArea.load();
+        Staging stage = stagingArea.load();
         Map<String, String> snapshot = updateSnapshot();
 
         Commit commit = new Commit(message, parentSHA1, false, snapshot);
@@ -130,11 +123,8 @@ public class Repo {
 
         Branch currBranch = Utils
                 .readObject((Utils.join(Main.GITLET_FOLDER, "HEAD")), Branch.class);
-
-        // Update both global and branch heads
         head.setGlobalHEAD(currBranch.getName(), commit);
         head.setBranchHEAD(currBranch.getName(), commit);
-
         stage.clear();
     }
 
@@ -143,12 +133,11 @@ public class Repo {
      *  for addition and removal are the updates to the commit.
      */
     public Map<String, String> updateSnapshot() {
-        // here
-        Commit HEAD = this.head.getGlobalHEAD();
-        Staging stage = this.stagingArea.load();
+        Commit HEAD = Head.getGlobalHEAD();
+        Staging stage = stagingArea.load();
         Map<String, String> parentSnapshot = HEAD.getSnapshot();
         Map<String, String> stagedForAdditionFiles = stage.getFilesStagedForAddition();
-        stagedForAdditionFiles.forEach((file, SHA1) -> parentSnapshot.put(file,SHA1));
+        stagedForAdditionFiles.forEach(parentSnapshot::put);
         return parentSnapshot;
     }
 
@@ -182,8 +171,7 @@ public class Repo {
      * Check if a file is tracked by current commit (HEAD)
      * */
     public boolean trackedByCurrCommit(String fileName) {
-        // here
-        Commit HEAD = this.head.getGlobalHEAD();
+        Commit HEAD = Head.getGlobalHEAD();
         return HEAD.getSnapshot().containsKey(fileName);
     }
 
@@ -193,8 +181,7 @@ public class Repo {
      * each commit backwards along the commit tree until the initial commit.
      */
     public void log() {
-        // here
-        Commit commit = this.head.getGlobalHEAD();
+        Commit commit = Head.getGlobalHEAD();
 
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             System.out.print("===" + "\n");
@@ -236,7 +223,7 @@ public class Repo {
      * there if there is one. The new version of the file is not staged.
      */
     public void checkoutFile(String filename) throws IOException {
-        Map<String, String> snapshot = this.head.getGlobalHEAD().getSnapshot();
+        Map<String, String> snapshot = Head.getGlobalHEAD().getSnapshot();
 
         System.out.print(snapshot);
 
@@ -258,8 +245,7 @@ public class Repo {
      * The new version of the file is not staged.
      */
     public void checkoutCommit(String commitId, String fileName) throws IOException {
-        // here
-        Commit commit = this.head.getGlobalHEAD();
+        Commit commit = Head.getGlobalHEAD();
         String blobSHA1 = "";
 
         /**
@@ -285,12 +271,11 @@ public class Repo {
         if (!Branch.hasBranch(branchName)) {
             Main.exitWithError("No such branch exists.");
         }
-        Commit branchHEAD = this.head.getBranchHEAD(branchName);
-        Commit currHEAD = this.head.getGlobalHEAD();
-        // restore all the files at that branch head if not at init
+        Commit branchHEAD = Head.getBranchHEAD(branchName);
+        Commit currHEAD = Head.getGlobalHEAD();
         restoreFilesAtBranch(currHEAD, branchHEAD);
-        // set the global head to branch head
         this.head.setGlobalHEAD(branchName, branchHEAD);
+        stagingArea.clear();
     }
 
     /**
@@ -306,23 +291,20 @@ public class Repo {
     }
 
     /**
+     * TBD: May contain bugs. Write tests.
+     *
      * Compare the snapshots hashmaps of currBranch and targetBranch.
      *
      * Any files that are tracked in the current branch but are
      * not present in the checked-out branch are deleted.
-     * @param currBranch
-     * @param checkoutBranch
+     * @param currBranch the commit node at current branch
+     * @param checkoutBranch the commit node at checkout branch
      */
     public void restoreFilesAtBranch(Commit currBranch, Commit checkoutBranch) {
         Map<String, String> currSnapshot = currBranch.getSnapshot();
         Map<String, String> checkoutSnapshot = checkoutBranch.getSnapshot();
-//        System.out.println("======== CURRENT: =======");
-//        currSnapshot.forEach((file, blob) -> System.out.println(file + " " + blob));
-//        System.out.println("");
-//        System.out.println("======== CHECK-OUT =======");
-//        checkoutSnapshot.forEach((file, blob) -> System.out.println(file + " " + blob));
-        Map<String, String> overwrite = new HashMap<String, String>();
-        Map<String, String> delete = new HashMap<String, String>();
+        Map<String, String> overwrite = new HashMap<>();
+        Map<String, String> delete = new HashMap<>();
 
         currSnapshot.forEach((fileName, blobSHA1) -> {
             if (checkoutSnapshot.containsKey(fileName)) {
@@ -337,13 +319,6 @@ public class Repo {
                 overwrite.put(fileName, blobSHA1);
             }
         });
-
-        System.out.println("");
-        System.out.println("======== THERE NEED TO BE OVERWRITTEN OR ADDED =======");
-        overwrite.forEach((file, blob) -> System.out.println(file + " " + blob));
-        System.out.println("");
-        System.out.println("======== THESE NEED TO BE DELETED =======");
-        delete.forEach((file, blob) -> System.out.println(file + " " + blob));
 
         overwrite.forEach((file, blobSHA1) -> {
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
@@ -366,8 +341,7 @@ public class Repo {
     public void branch(String[] args) throws IOException {
         String branchName = args[1];
         if (!Branch.hasBranch(branchName)) {
-            // here
-            Branch branch = new Branch(branchName, this.head.getGlobalHEAD());
+            Branch branch = new Branch(branchName, Head.getGlobalHEAD());
             branch.create();
         } else {
             Main.exitWithError("A branch with that name already exists.");
