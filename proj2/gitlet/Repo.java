@@ -412,8 +412,56 @@ public class Repo {
      *
      */
     public void reset(String[] args) {
+        Commit commit = Head.getGlobalHEAD();
         String commitId = args[1];
+        Commit targetCommit = null;
 
+        // find commit
+        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+            if (findMatchId(commit.getSHA(), commitId)) {
+                targetCommit = commit;
+            }
+            commit = commit.getParent();
+        }
+
+        // checkout to that commit
+        Commit currCommit = Head.getGlobalHEAD();
+        restoreFilesAtCommit(currCommit, targetCommit);
+        // reset global HEAD
+        Head.setGlobalHEAD(currentBranchName(), targetCommit);
+    }
+
+    public void restoreFilesAtCommit(Commit currCommit, Commit checkoutCommit) {
+        Map<String, String> currSnapshot = currCommit.getSnapshot();
+        Map<String, String> checkoutSnapshot = checkoutCommit.getSnapshot();
+        Map<String, String> overwrite = new HashMap<>();
+        Map<String, String> delete = new HashMap<>();
+
+        currSnapshot.forEach((fileName, blobSHA1) -> {
+            if (checkoutSnapshot.containsKey(fileName)) {
+                overwrite.put(fileName, checkoutSnapshot.get(fileName));
+            } else {
+                delete.put(fileName, blobSHA1);
+            }
+        });
+
+        checkoutSnapshot.forEach((fileName, blobSHA1) -> {
+            if (!overwrite.containsKey(fileName)) {
+                overwrite.put(fileName, blobSHA1);
+            }
+        });
+
+        overwrite.forEach((file, blobSHA1) -> {
+            File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+            Blob blob = Blob.load(blobFile);
+            try {
+                restoreFileInCWD(blob);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        delete.forEach((file, blobSHA1) -> Utils.restrictedDelete(file));
     }
 
     /**
