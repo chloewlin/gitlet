@@ -1,0 +1,17 @@
+> init
+<<<
++ ShibaInu.txt ShibaInu.txt
+> add ShibaInu.txt
+<<<
+> commit "Add ShibaInu.txt"
+<<<
+> branch fruit
+<<<
++ Beagle.txt Beagle.txt
+> add Beagle.txt
+<<<
+> commit "Add Beagle.txt"
+<<<
+> merge fruit
+Given branch is an ancestor of the current branch.
+<<<
