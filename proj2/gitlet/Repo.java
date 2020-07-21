@@ -1,5 +1,6 @@
 package gitlet;
 
+import javax.sound.midi.Soundbank;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -24,8 +25,8 @@ public class Repo {
         Commit initialCommit = new Commit("initial commit", sentinel.getSHA(), true, new HashMap<>());
         sentinel.save();
         initialCommit.saveInit();
-        this.head.setGlobalHEAD("master", initialCommit);
-        this.head.setBranchHEAD("master", initialCommit);
+        Head.setGlobalHEAD("master", initialCommit);
+        Head.setBranchHEAD("master", initialCommit);
         stagingArea.save();
     }
 
@@ -304,7 +305,7 @@ public class Repo {
         }
         Commit branchHEAD = Head.getBranchHEAD(branchName);
         Commit currHEAD = Head.getGlobalHEAD();
-        this.head.setGlobalHEAD(branchName, branchHEAD);
+        Head.setGlobalHEAD(branchName, branchHEAD);
         restoreFilesAtBranch(currHEAD, branchHEAD);
         stagingArea.clear();
     }

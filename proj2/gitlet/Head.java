@@ -24,7 +24,7 @@ public class Head {
      * Update the HEAD pointer of a branch by writing the last
      * commit node into a byte array.
      */
-    public void setBranchHEAD(String branchName, Commit commit) {
+    public static void setBranchHEAD(String branchName, Commit commit) {
         Branch branch = new Branch(branchName, commit);
         File branchFile = Utils.join(Main.HEADS_REFS_FOLDER, branchName);
         Utils.writeObject(branchFile, branch);

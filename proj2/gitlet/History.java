@@ -1,8 +1,12 @@
 package gitlet;
 
+import java.util.*;
+
 public class History {
 
     public void merge(String branchName) {
+        Commit currHEAD = Head.getGlobalHEAD();
+        Commit branchHEAD = Head.getBranchHEAD(branchName);
 
         // find split point/latest common ancestor
 
@@ -11,13 +15,13 @@ public class History {
         // go up branch
         // find depth of first parent and second parent
         // use min depth as your split point
-        latestCommonAncestor();
+        Commit SP = latestCommonAncestor(currHEAD, branchHEAD);
 
         // edge cases:
         // 1. If the split point is the same commit as the given branch, then we
         // do nothing; the merge is complete, and the operation ends with the message
         // Given branch is an ancestor of the current branch.
-        branchHeadIsSP();
+        branchHeadIsSP(SP, branchHEAD);
 
         // 2. If the split point is the current branch, then the effect is to check
         // out the given branch, and the operation ends after printing the message
@@ -25,10 +29,6 @@ public class History {
         currHeadIsSP();
 
         // Otherwise, we continue with the steps below.
-
-        Commit SP = latestCommonAncestor();
-        Commit currHEAD = Head.getGlobalHEAD();
-        Commit branchHEAD = Head.getBranchHEAD(branchName);
 
         // 1. We need to compare three commit nodes
         // 1. SP (split point)
@@ -73,12 +73,37 @@ public class History {
         commitMerge();
     }
 
-    public Commit latestCommonAncestor() {
-        return new Commit("delete me");
+    public Commit latestCommonAncestor(Commit currHead, Commit branchHead) {
+        ArrayList<Commit> currPath = new ArrayList<>();
+        Commit SP = null;
+
+        while (!currHead.getFirstParentSHA1().equals(Repo.INIT_PARENT_SHA1)) {
+            currPath.add(currHead);
+            currHead = currHead.getParent();
+        }
+
+        loop:
+        while (!branchHead.getFirstParentSHA1().equals(Repo.INIT_PARENT_SHA1)) {
+            for (int i = 0; i < currPath.size(); i++) {
+                if (branchHead.getSHA().equals(currPath.get(i).getSHA())) {
+                    SP = currPath.get(i);
+                    break loop;
+                }
+            }
+            branchHead = branchHead.getParent();
+        }
+
+        return SP;
     }
 
-    public boolean branchHeadIsSP() {
-        return false;
+    // edge cases:
+    // 1. If the split point is the same commit as the given branch, then we
+    // do nothing; the merge is complete, and the operation ends with the message
+    // Given branch is an ancestor of the current branch.
+    public void branchHeadIsSP(Commit SP, Commit branchHead) {
+        if (SP.getSHA().equals(branchHead.getSHA())) {
+            Main.exitWithError("Given branch is an ancestor of the current branch.");
+        }
     }
 
     public boolean currHeadIsSP() {
