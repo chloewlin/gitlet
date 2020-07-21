@@ -102,6 +102,8 @@ public class Main {
         case "reset":
             repo.reset(args);
             break;
+        case "find":
+            repo.find(args);
         default:
             validateCommand();
         }
@@ -233,7 +235,12 @@ public class Main {
                 isValid = true;
             }
             break;
+        case "find":
         case "add":
+        case "rm":
+        case "branch":
+        case "rm-branch":
+        case "reset":
             if (n == 2) {
                 isValid = true;
             }
