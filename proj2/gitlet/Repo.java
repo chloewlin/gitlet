@@ -480,6 +480,7 @@ public class Repo {
         });
 
         delete.forEach((file, blobSHA1) -> Utils.restrictedDelete(file));
+        delete.forEach((file, blobSHA1) -> Utils.restrictedDelete(file));
     }
 
     /**
