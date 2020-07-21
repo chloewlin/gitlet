@@ -102,6 +102,9 @@ public class Main {
         case "reset":
              repo.reset(args);
              break;
+        case "merge":
+             repo.merge(args);
+             break;
         default:
             validateCommand();
         }

@@ -14,6 +14,7 @@ public class Repo {
     static final String INIT_PARENT_SHA1 = "0000000000000000000000000000000000000000";
     static Staging stagingArea = new Staging();
     Head head = new Head();
+    History history = new History();
 
     /**
      * Create initial commit and set up branch and HEAD pointer.
@@ -484,10 +485,11 @@ public class Repo {
     }
 
     /**
-     * TBD.
+     * Merge given branch into current branch.
      */
-    public void merge(String branchName) {
-
+    public void merge(String[] args) {
+        String givenBranch = args[1];
+        history.merge(givenBranch);
     }
 
     /**

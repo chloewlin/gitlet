@@ -55,9 +55,17 @@ ${DATE}
 initial commit
 
 <<<*
+
 > checkout master
 <<<
 E ShibaInu.txt
+E Munchkin.txt
+E BritishShorthair.txt
+* Samoyed.txt
+
+> rm ShibaInu.txt
+<<<
+* ShibaInu.txt
 E Munchkin.txt
 E BritishShorthair.txt
 * Samoyed.txt
