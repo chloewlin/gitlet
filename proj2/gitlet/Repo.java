@@ -205,13 +205,15 @@ public class Repo {
      * @param commitMsg
      */
     public void find(String[] commitMsg) {
-        String commits = Head.getGlobalHEAD().getMessage();
-        if (commits.length() < 1) {
-            System.out.println("Found no commit with that message.");
-        }
-        if (commits.compareTo(String.valueOf(commitMsg)) == 0) {
-            System.out.println(commits);
-        }
+
+//        String commits = Head.getGlobalHEAD().getMessage();
+//        if (commits.length() < 1) {
+//            System.out.println("Found no commit with that message.");
+//        }
+//        if (commits.compareTo(String.valueOf(commitMsg)) == 0) {
+//            System.out.println(commits);
+//        }
+
     }
 
     /**
@@ -466,9 +468,6 @@ public class Repo {
      * and would be overwritten by the checkout.
      * */
     public boolean hasUntrackedFilesForCheckoutBranch(Commit branchHEAD) {
-
-        //may have bugs
-
         List<String> untrackedFiles = new ArrayList<String>();
         stagingArea = stagingArea.load();
         List<String> fileInCWD = Utils.plainFilenamesIn("./");

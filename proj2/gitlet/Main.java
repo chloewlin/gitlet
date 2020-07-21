@@ -125,7 +125,7 @@ public class Main {
                 exitWithError("Incorrect Operation");
                 return;
             }
-            if (!repo.checkoutFile(args[2])) {
+            if (!repo.containsFile(Head.getGlobalHEAD().getSHA(), args[2])) {
                 exitWithError("File does not exist in that commit.");
             }
             repo.checkoutFile(args[2]);

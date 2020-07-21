@@ -6,4 +6,8 @@
 > commit "added wug"
 <<<
 + wug.txt notwug.txt
- 
+
+# Must change
+> checkout -- wug.txt
+<<<
+= wug.txt wug.txt
