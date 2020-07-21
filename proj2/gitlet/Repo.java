@@ -66,7 +66,7 @@ public class Repo {
             stagingArea.add(fileName, blob.getBlobSHA1());
             stagingArea.save();
         } else {
-            if (stagingArea.containsFile(fileName)) {
+            if (stagingArea.containsFileForAddition(fileName)) {
                 stagingArea.remove(fileName);
             }
             Main.validateFileToBeStaged();
@@ -151,7 +151,7 @@ public class Repo {
         String fileName = args[1];
         stagingArea = stagingArea.load();
 
-        if (stagingArea.containsFile(fileName)) {
+        if (stagingArea.containsFileForAddition(fileName)) {
             stagingArea.remove(fileName);
             stagingArea.unstage(fileName);
         } else if (trackedByCurrCommit(fileName)) {
@@ -202,9 +202,16 @@ public class Repo {
 
     /**
      * Search for commits that have the given commit message.
+     * @param commitMsg
      */
-    public void find(String commitId) {
-        /** To-do: search and traverse the entire commit tree */
+    public void find(String[] commitMsg) {
+        String commits = Head.getGlobalHEAD().getMessage();
+        if (commits.length() < 1) {
+            System.out.println("Found no commit with that message.");
+        }
+        if (commits.compareTo(String.valueOf(commitMsg)) == 0) {
+            System.out.println(commits);
+        }
     }
 
     /**
@@ -300,8 +307,19 @@ public class Repo {
      * Update the global HEAD pointer to point to branch HEAD.
      */
     public void checkoutBranch(String branchName) {
+
+        //may have bugs//
+
+        String currBranchName = currentBranchName();
         if (!Branch.hasBranch(branchName)) {
             Main.exitWithError("No such branch exists.");
+        }
+        if (currBranchName.equals(branchName)) {
+            Main.exitWithError("No need to checkout the current branch.");
+        }
+        if (hasUntrackedFiles()) {
+            Main.exitWithError("There is an untracked file in the way; delete it, " +
+                    "or add and commit it first.");
         }
         Commit branchHEAD = Head.getBranchHEAD(branchName);
         Commit currHEAD = Head.getGlobalHEAD();
@@ -445,9 +463,17 @@ public class Repo {
      * Returns if there are untracked files in CWD.
      * */
     public boolean hasUntrackedFiles() {
-        /**
-         * To-do
-         */
+
+        //may have bugs
+
+        stagingArea = stagingArea.load();
+        List<String> fileInCWD = Utils.plainFilenamesIn("./");
+        for (String fileName : fileInCWD) {
+            if (!stagingArea.containsFileForAddition(fileName)
+                    && !stagingArea.containsFileForRemoval(fileName)) {
+                return true;
+            }
+        }
         return false;
     }
 

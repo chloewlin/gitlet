@@ -40,8 +40,13 @@ public class Staging implements Serializable {
         this.stagedForAddition.remove(fileName);
     }
 
-    public boolean containsFile(String fileName) {
+    public boolean containsFileForAddition(String fileName) {
+
         return this.stagedForAddition.containsKey(fileName);
+    }
+
+    public boolean containsFileForRemoval(String fileName) {
+        return this.stagedForRemoval.contains(fileName);
     }
 
     public void unstage(String fileName) {
@@ -74,13 +79,13 @@ public class Staging implements Serializable {
         return this.stagedForRemoval;
     }
 
-    public void printTrackedFiles() {
-        System.out.println("Currently tracked files on Staging....");
+    public void printStagedForAddition() {
+        System.out.println("Currently added files on Staging....");
         stagedForAddition.forEach((key, value) -> System.out.println(key + " : " + value));
     }
 
-    public void printUntrackedFiles() {
-        System.out.println("Currently untracked files on Staging....");
+    public void printStagedForRemoval() {
+        System.out.println("Currently removed files on Staging....");
         stagedForRemoval.forEach(s -> System.out.println(s));
     }
 

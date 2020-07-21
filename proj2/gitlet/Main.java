@@ -91,20 +91,22 @@ public class Main {
             repo.status();
             break;
         case "checkout":
-             validateCheckout(args);
-             break;
+            validateCheckout(args);
+            break;
         case "branch":
-             repo.branch(args);
-             break;
+            repo.branch(args);
+            break;
         case "rm-branch":
-             repo.rmBranch(args);
-             break;
+            repo.rmBranch(args);
+            break;
         case "reset":
              repo.reset(args);
              break;
         case "merge":
              repo.merge(args);
              break;
+        case "find":
+            repo.find(args);
         default:
             validateCommand();
         }
@@ -121,11 +123,10 @@ public class Main {
             repo.checkoutBranch(args[1]);
         }
 
-//       need to handle:  If the file does not exist in the previous commit, abort,
-//        printing the error message File does not exist in that commit.
         if (args.length == 3) {
             if (!args[1].equals("--")) {
-                exitWithError("incorrect Operation: Do git checkout -- [file name]");
+                exitWithError("Incorrect Operation");
+                return;
             }
             if (!repo.checkoutFile(args[2])) {
                 exitWithError("File does not exist in that commit.");
@@ -135,7 +136,8 @@ public class Main {
 
         if (args.length == 4) {
             if (!args[2].equals("--")) {
-                exitWithError("incorrect Operation: git checkout [commit id] -- [file name]");
+                exitWithError("Incorrect Operation");
+                return;
             }
             if (!repo.containsFile(args[1], args[3])) {
                 exitWithError("File does not exist in that commit.");
@@ -236,7 +238,12 @@ public class Main {
                 isValid = true;
             }
             break;
+        case "find":
         case "add":
+        case "rm":
+        case "branch":
+        case "rm-branch":
+        case "reset":
             if (n == 2) {
                 isValid = true;
             }
