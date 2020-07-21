@@ -29,7 +29,7 @@ public class BST<T> {
 
         BSTNode node = new BSTNode(list.get(mid));
         node.left = sortedListToBST(list, low, mid - 1);
-        node.right = sortedListToBST(list,mid + 1, high);
+        node.right = sortedListToBST(list, mid + 1, high);
 
         return node;
     }
