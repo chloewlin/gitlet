@@ -64,7 +64,7 @@ public class Repo {
             stagingArea.add(fileName, blob.getBlobSHA1());
             stagingArea.save();
         } else {
-            if (stagingArea.containsFile(fileName)) {
+            if (stagingArea.containsFileForAddition(fileName)) {
                 stagingArea.remove(fileName);
             }
             Main.validateFileToBeStaged();
@@ -149,7 +149,7 @@ public class Repo {
         String fileName = args[1];
         stagingArea = stagingArea.load();
 
-        if (stagingArea.containsFile(fileName)) {
+        if (stagingArea.containsFileForAddition(fileName)) {
             stagingArea.remove(fileName);
             stagingArea.unstage(fileName);
         } else if (trackedByCurrCommit(fileName)) {
@@ -454,7 +454,18 @@ public class Repo {
      * Returns if there are untracked files in CWD.
      * */
     public boolean hasUntrackedFiles() {
-        //** to do
+
+        //may have bugs
+
+        stagingArea = stagingArea.load();
+        List<String> fileInCWD = Utils.plainFilenamesIn("./");
+        for (String fileName : fileInCWD) {
+            if (!stagingArea.containsFileForAddition(fileName)
+                    && !stagingArea.containsFileForRemoval(fileName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void restoreFilesAtCommit(Commit currCommit, Commit checkoutCommit) {
