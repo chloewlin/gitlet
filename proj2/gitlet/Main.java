@@ -173,7 +173,6 @@ public class Main {
         boolean found = false;
 
         for (File f : directories) {
-            System.out.println(f.getName());
             if (f.getName().equals(".gitlet")) {
                 found = true;
             }

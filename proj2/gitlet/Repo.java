@@ -311,18 +311,20 @@ public class Repo {
         //may have bugs//
 
         String currBranchName = currentBranchName();
+        Commit branchHEAD = Head.getBranchHEAD(branchName);
+        Commit currHEAD = Head.getGlobalHEAD();
+
+        if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+            Main.exitWithError("There is an untracked file in the way; delete it, " +
+                    "or add and commit it first.");
+        }
         if (!Branch.hasBranch(branchName)) {
             Main.exitWithError("No such branch exists.");
         }
         if (currBranchName.equals(branchName)) {
             Main.exitWithError("No need to checkout the current branch.");
         }
-        if (hasUntrackedFiles()) {
-            Main.exitWithError("There is an untracked file in the way; delete it, " +
-                    "or add and commit it first.");
-        }
-        Commit branchHEAD = Head.getBranchHEAD(branchName);
-        Commit currHEAD = Head.getGlobalHEAD();
+
         Head.setGlobalHEAD(branchName, branchHEAD);
         restoreFilesAtBranch(currHEAD, branchHEAD);
         stagingArea.clear();
@@ -457,6 +459,28 @@ public class Repo {
         restoreFilesAtCommit(currCommit, targetCommit);
         // reset global HEAD
         Head.setGlobalHEAD(currentBranchName(), targetCommit);
+    }
+
+    /**
+     * Checks if a working file is untracked in the HEAD of current branch
+     * and would be overwritten by the checkout.
+     * */
+    public boolean hasUntrackedFilesForCheckoutBranch(Commit branchHEAD) {
+
+        //may have bugs
+
+        List<String> untrackedFiles = new ArrayList<String>();
+        stagingArea = stagingArea.load();
+        List<String> fileInCWD = Utils.plainFilenamesIn("./");
+
+        for (String fileName : fileInCWD) {
+            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
+                    && branchHEAD.getSnapshot().containsKey(fileName)) {
+                untrackedFiles.add(fileName);
+            }
+        }
+
+        return untrackedFiles.size() > 0;
     }
 
     /**
