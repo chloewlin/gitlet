@@ -42,7 +42,7 @@ public class Branch implements Serializable {
     public String getName() {
         return this.name;
     }
-  
+
     /**
      * Return the last commit node of the current branch.
      */
@@ -77,11 +77,17 @@ public class Branch implements Serializable {
 
     /**
      * Save a Branch object as a file.
+     * @param file the file
+     * @param branch the branch
      */
     public void save(File file, Branch branch) {
         Utils.writeObject(file, branch);
     }
 
+    /**
+     * check if has this Branch
+     * @param name the name
+     */
     public static Boolean hasBranch(String name) {
         List<String> branches = Utils.plainFilenamesIn(Main.HEADS_REFS_FOLDER);
         return branches.contains(name);

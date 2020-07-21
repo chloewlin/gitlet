@@ -33,10 +33,19 @@ public class Blob implements Serializable {
         this.blobSHA1 = Utils.sha1(this.fileContent);
     }
 
+    /**
+     * Blob Constructor.
+     * @param filename the filename
+     * @param blobSHA1 the blobSHA1
+     * @param fileContent the fileContent
+     */
+
     public Blob(String filename, byte[] fileContent, String blobSHA1) {
         this.fileName = filename;
         this.fileContent = fileContent;
         this.blobSHA1 = blobSHA1;
+        //style check error: param name should be different with this.blobSHA1
+        //also for fileContent
     }
 
     /**
@@ -51,6 +60,7 @@ public class Blob implements Serializable {
 
     /**
      * Return a blob object from the byte array.
+     * @param blob the blob
      */
     public static Blob load(File blob) {
         return Utils.readObject(blob, Blob.class);
