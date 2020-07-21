@@ -116,9 +116,6 @@ public class Main {
     private static void validateCheckout(String[] args) throws IOException {
         if (args.length == 2) {
             repo.checkoutBranch(args[1]);
-            if (!repo.checkoutBranch(args[1])) {
-
-            }
         }
 
 //       need to handle:  If the file does not exist in the previous commit, abort,

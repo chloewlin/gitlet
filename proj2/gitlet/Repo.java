@@ -298,8 +298,19 @@ public class Repo {
      * Update the global HEAD pointer to point to branch HEAD.
      */
     public void checkoutBranch(String branchName) {
+
+        //may have bugs//
+
+        String currBranchName = currentBranchName();
         if (!Branch.hasBranch(branchName)) {
             Main.exitWithError("No such branch exists.");
+        }
+        if (currBranchName.equals(branchName)) {
+            Main.exitWithError("No need to checkout the current branch.");
+        }
+        if (hasUntrackedFiles()) {
+            Main.exitWithError("There is an untracked file in the way; delete it, " +
+                    "or add and commit it first.");
         }
         Commit branchHEAD = Head.getBranchHEAD(branchName);
         Commit currHEAD = Head.getGlobalHEAD();
@@ -443,10 +454,7 @@ public class Repo {
      * Returns if there are untracked files in CWD.
      * */
     public boolean hasUntrackedFiles() {
-        /**
-         * To-do
-         */
-        return false;
+        //** to do
     }
 
     public void restoreFilesAtCommit(Commit currCommit, Commit checkoutCommit) {
