@@ -316,8 +316,8 @@ public class Repo {
         Commit currHEAD = Head.getGlobalHEAD();
 
         if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
-            Main.exitWithError("There is an untracked file in the way; delete it, " +
-                    "or add and commit it first.");
+            Main.exitWithError("There is an untracked file in the way; " +
+                    "delete it, or add and commit it first.");
         }
         if (!Branch.hasBranch(branchName)) {
             Main.exitWithError("No such branch exists.");
