@@ -74,13 +74,13 @@ public class Staging implements Serializable {
         return this.stagedForRemoval;
     }
 
-    public void printTrackedFiles() {
-        System.out.println("Currently tracked files on Staging....");
+    public void printStagedForAddition() {
+        System.out.println("Currently added files on Staging....");
         stagedForAddition.forEach((key, value) -> System.out.println(key + " : " + value));
     }
 
-    public void printUntrackedFiles() {
-        System.out.println("Currently untracked files on Staging....");
+    public void printStagedForRemoval() {
+        System.out.println("Currently removed files on Staging....");
         stagedForRemoval.forEach(s -> System.out.println(s));
     }
 
