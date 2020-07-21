@@ -81,8 +81,22 @@ public class RedBlackTree<T extends Comparable<T>> {
     }
 
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
-        // TODO: YOUR CODE HERE
-        return null;
+        /* If no node, insert a new child node */
+        if (node == null) {
+            return new RBTreeNode<>(false, item);
+        }
+        /* Insert into BST */
+        if (item.compareTo(node.item) == 0) {
+            return node;
+        } else if (item.compareTo(node.item) > 1) {
+            node.right = insert(node.right, item);
+        } else {
+            node.left = insert(node.left, item);
+        }
+
+        /* Edge case: right leaning tree */
+
+        /* Edge case:  */
     }
 
     /* Returns whether the given node NODE is red. Null nodes (children of leaf
