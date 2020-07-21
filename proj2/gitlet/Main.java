@@ -64,11 +64,6 @@ public class Main {
      * Usage: java gitlet.Main ARGS, where ARGS contains <COMMAND> <OPERAND>.
      */
     public static void main(String... args) throws IOException {
-        // FIX-ME: Where to validate initialization?
-        // validateInitialization(args);
-
-        validateNumCommand(args);
-
         switch (args[0]) {
         case "init":
             validateGitlet();
@@ -108,7 +103,9 @@ public class Main {
         case "find":
             repo.find(args);
         default:
+            validateInitialization();
             validateCommand();
+            validateNumCommand(args);
         }
         return;
     }
@@ -170,12 +167,19 @@ public class Main {
      *  being in an initialized Gitlet working directory (i.e., one
      *  containing a .gitlet subdirectory), but is not in such a
      *  directory.
-     *  @param args user's input of commands and operands
      */
-    private static void validateInitialization(String[] args) {
-        List<String> files = Utils.plainFilenamesIn(CWD);
+    private static void validateInitialization() {
+        File[] directories = new File(".").listFiles(File::isDirectory);
+        boolean found = false;
 
-        if (!files.contains(".gitlet")) {
+        for (File f : directories) {
+            System.out.println(f.getName());
+            if (f.getName().equals(".gitlet")) {
+                found = true;
+            }
+        }
+
+        if (!found) {
             exitWithError("Not in an initialized Gitlet directory.");
         }
     }
