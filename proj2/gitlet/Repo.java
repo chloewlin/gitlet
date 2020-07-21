@@ -200,9 +200,16 @@ public class Repo {
 
     /**
      * Search for commits that have the given commit message.
+     * @param commitMsg
      */
-    public void find(String commitId) {
-        /** To-do: search and traverse the entire commit tree */
+    public void find(String[] commitMsg) {
+        String commits = Head.getGlobalHEAD().getMessage();
+        if (commits.length() < 1) {
+            System.out.println("Found no commit with that message.");
+        }
+        if (commits.compareTo(String.valueOf(commitMsg)) == 0) {
+            System.out.println(commits);
+        }
     }
 
     /**
