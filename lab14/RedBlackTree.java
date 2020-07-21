@@ -95,8 +95,21 @@ public class RedBlackTree<T extends Comparable<T>> {
         }
 
         /* Edge case: right leaning tree */
+        if (!isRed(node.left) && isRed(node.right)) {
+            node = rotateLeft(node);
+        }
 
-        /* Edge case:  */
+        /* Edge case: overflow */
+        if (isRed(node.left) && isRed(node.right)) {
+            flipColors(node);
+        }
+
+        /* Edge case: a black node has a red left node which also has red left node */
+        if (isRed(node.left) && isRed(node.left.left)) {
+            node = rotateRight(node);
+        }
+
+        return node;
     }
 
     /* Returns whether the given node NODE is red. Null nodes (children of leaf
