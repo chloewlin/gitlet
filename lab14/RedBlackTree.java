@@ -88,9 +88,19 @@ public class RedBlackTree<T extends Comparable<T>> {
         if (item.compareTo(node.item) == 0) {
             return node;
         } else if (item.compareTo(node.item) < 0) {
-            node.left = insert(node.left, item);
+            if (node.left == null) {
+                node.left = new RBTreeNode<T>(false, item, null, null);
+            } else {
+                node.left = insert(node.left, item);
+            }
         } else {
-            node.right = insert(node.right, item);
+            if (node.right == null) {
+                node.right = new
+                        RBTreeNode<T>(false, item, null, null);
+            } else {
+                node.right = insert(node.right, item);
+            }
+
         }
 
         /* Edge case: right leaning tree */
