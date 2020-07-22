@@ -203,14 +203,14 @@ public class RedBlackTree<T extends Comparable<T>> {
 //        rbt1.print();
 
 //        ========== test2
-//
-//             (3, 5, 8)                        5
-//          /    |  |   \           --->       /  \
-//        (1,2)  4  6    (10, 16)             3*    8*
-//                                           /\      /\
-//                                          2  4    6  16
-//                                         /           /
-//                                        1*          10*
+//                                            (my output)      or should this be right?
+//             (3, 5, 8)                        5                    5
+//          /    |  |   \           --->       /  \                 /  \
+//        (1,2)  4  6    (10, 16)             3*    8*            3*    8*
+//                                           /\      /\          / \    / \
+//                                          1  4    6  10       2   4  6   16
+//                                           \          \       /          /
+//                                            2*        16*    1*         10
 //
 //        BTree<Integer> bt2 = new BTree<>();
 //        BTree.TwoThreeFourNode<Integer> t4 = new BTree.TwoThreeFourNode<>(3, 5, 8);
