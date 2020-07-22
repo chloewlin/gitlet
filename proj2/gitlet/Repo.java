@@ -112,7 +112,7 @@ public class Repo {
         Main.validateNumArgs(args);
         String message = args[1];
 
-        if (message.isEmpty()) {
+        if (message.isEmpty() || message.isBlank()) {
             Main.exitWithError("No changes added to the commit.");
         }
 
