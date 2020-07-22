@@ -83,7 +83,7 @@ public class RedBlackTree<T extends Comparable<T>> {
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
         /* If no node, insert a new child node */
         if (node == null) {
-            return new RBTreeNode<>(false, item);
+            node = new RBTreeNode<>(false, item);
         }
         /* Insert into BST */
         if (item.compareTo(node.item) == 0) {
