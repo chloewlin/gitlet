@@ -47,7 +47,7 @@ public class BST<T> {
     }
 
     /* Prints the tree represented by ROOT. */
-    public void print() {
+    private void print() {
         print(root, 0);
     }
 

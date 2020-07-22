@@ -11,7 +11,7 @@ public class Main {
         list.add(3);
         list.add(2);
         BST bst = new BST(list);
-        bst.print();
+//        bst.print();
         // 4
         //    2
         //        1
