@@ -82,10 +82,10 @@ public class RedBlackTree<T extends Comparable<T>> {
         /* Insert into BST */
         if (item.compareTo(node.item) == 0) {
             return node;
-        } else if (item.compareTo(node.item) > 1) {
-            node.right = insert(node.right, item);
-        } else {
+        } else if (item.compareTo(node.item) < 0) {
             node.left = insert(node.left, item);
+        } else {
+            node.right = insert(node.right, item);
         }
 
         /* Edge case: right leaning tree */
