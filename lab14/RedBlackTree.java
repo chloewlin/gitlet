@@ -105,7 +105,7 @@ public class RedBlackTree<T extends Comparable<T>> {
             flipColors(node);
         } else if (isRed(node.left) && isRed(node.left.right)) {
             /* Cast 2.c */
-            node = rotateLeft(node);
+            node.left = rotateLeft(node.left);
             node = rotateRight(node);
             flipColors(node);
         }
@@ -142,36 +142,6 @@ public class RedBlackTree<T extends Comparable<T>> {
             this.right = right;
         }
     }
-
-//    public static void main(String[] args) {
-//        BTree Btree = new BTree();
-//        BTree.TwoThreeFourNode n1 = new BTree.TwoThreeFourNode(3, 5, 8);
-//        BTree.TwoThreeFourNode n2 = new BTree.TwoThreeFourNode(1, 2);
-//        BTree.TwoThreeFourNode n3 = new BTree.TwoThreeFourNode(4);
-//        BTree.TwoThreeFourNode n4 = new BTree.TwoThreeFourNode(6);
-//        BTree.TwoThreeFourNode n5 = new BTree.TwoThreeFourNode(10, 16);
-//
-//        Btree.root = n1;
-//        n1.setChildAt(0, n2);
-//        n1.setChildAt(1, n3);
-//        n1.setChildAt(2, n4);
-//        n1.setChildAt(3, n5);
-//
-//        RedBlackTree RBTree = new RedBlackTree(Btree);
-//        print(RBTree.root, 0);
-//
-//        System.out.println("======");
-//        BTree Btree2 = new BTree();
-//        Btree2.root = new BTree.TwoThreeFourNode(3);
-//
-//        RedBlackTree RB1 = new RedBlackTree(Btree2);
-//        RB1.insert(RB1.root,5);
-//        print(RB1.root,0);
-//
-//        System.out.println("======");
-//        RB1.insert(RB1.root,10);
-//        print(RB1.root,0);
-//    }
 
     private static String isBlackNode(boolean isBlack) {
         if (isBlack) return "black";
@@ -218,7 +188,7 @@ public class RedBlackTree<T extends Comparable<T>> {
 //        BTree.TwoThreeFourNode<Integer> t5 = new BTree.TwoThreeFourNode<>(1, 2);
 //        BTree.TwoThreeFourNode<Integer> t6 = new BTree.TwoThreeFourNode<>(4);
 //        BTree.TwoThreeFourNode<Integer> t7 = new BTree.TwoThreeFourNode<>(6);
-//        BTree.TwoThreeFourNode<Inte:wger> t8 = new BTree.TwoThreeFourNode<>(10, 16);
+//        BTree.TwoThreeFourNode<Integer> t8 = new BTree.TwoThreeFourNode<>(10, 16);
 //
 //        bt2.root = t4;
 //        t4.setChildAt(0, t5);
@@ -265,6 +235,34 @@ public class RedBlackTree<T extends Comparable<T>> {
 //        bt.root = ttf;
 //        RedBlackTree<Integer> rbt = new RedBlackTree<>(bt);
 //        rbt.print();
+
+//        BTree Btree = new BTree();
+//        BTree.TwoThreeFourNode n1 = new BTree.TwoThreeFourNode(3, 5, 8);
+//        BTree.TwoThreeFourNode n2 = new BTree.TwoThreeFourNode(1, 2);
+//        BTree.TwoThreeFourNode n3 = new BTree.TwoThreeFourNode(4);
+//        BTree.TwoThreeFourNode n4 = new BTree.TwoThreeFourNode(6);
+//        BTree.TwoThreeFourNode n5 = new BTree.TwoThreeFourNode(10, 16);
+//
+//        Btree.root = n1;
+//        n1.setChildAt(0, n2);
+//        n1.setChildAt(1, n3);
+//        n1.setChildAt(2, n4);
+//        n1.setChildAt(3, n5);
+//
+//        RedBlackTree RBTree = new RedBlackTree(Btree);
+//        print(RBTree.root, 0);
+//
+//        System.out.println("======");
+//        BTree Btree2 = new BTree();
+//        Btree2.root = new BTree.TwoThreeFourNode(3);
+//
+//        RedBlackTree RB1 = new RedBlackTree(Btree2);
+//        RB1.insert(RB1.root,5);
+//        print(RB1.root,0);
+//
+//        System.out.println("======");
+//        RB1.insert(RB1.root,10);
+//        print(RB1.root,0);
     }
 
     private void print(RBTreeNode<T> node, int d) {
