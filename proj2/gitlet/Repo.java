@@ -62,15 +62,15 @@ public class Repo {
     private void stage(String fileName, Blob blob) throws IOException {
         stagingArea = stagingArea.load();
 
-        if (!isSameVersion(fileName)) {
-            stagingArea.add(fileName, blob.getBlobSHA1());
-            stagingArea.save();
-        } else {
+        if (isSameVersion(fileName)) {
+            System.out.println("File is the same version as prev!");
             if (stagingArea.containsFileForAddition(fileName)) {
-                stagingArea.remove(fileName);
+                stagingArea.removeFromStagedForRemoval(fileName);
             }
-            Main.validateFileToBeStaged();
+            //            Main.validateFileToBeStaged();
         }
+        stagingArea.add(fileName, blob.getBlobSHA1());
+        stagingArea.save();
     }
 
     /**
