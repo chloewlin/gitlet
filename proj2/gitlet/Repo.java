@@ -63,11 +63,10 @@ public class Repo {
         stagingArea = stagingArea.load();
 
         if (isSameVersion(fileName)) {
-            System.out.println("File is the same version as prev!");
+            Main.validateFileToBeStaged();
             if (stagingArea.containsFileForAddition(fileName)) {
                 stagingArea.removeFromStagedForRemoval(fileName);
             }
-            //            Main.validateFileToBeStaged();
         }
         stagingArea.add(fileName, blob.getBlobSHA1());
         stagingArea.save();
