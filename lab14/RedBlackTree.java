@@ -22,30 +22,30 @@ public class RedBlackTree<T extends Comparable<T>> {
         }
 
         if (r.getItemCount() == 1) {
-            RBTreeNode tree = new RBTreeNode(true, r.getItemAt(0));
+            RBTreeNode tree = new RBTreeNode<>(true, r.getItemAt(0));
             if (r.getChildrenCount() != 0) {
                 tree.left = buildRedBlackTree(r.getChildAt(0));
                 tree.right = buildRedBlackTree(r.getChildAt(1));
             }
-            return tree;
+            return root;
         } else if (r.getItemCount() == 2) {
-            RBTreeNode tree = new RBTreeNode(true, r.getItemAt(0));
+            RBTreeNode tree = new RBTreeNode<>(true, r.getItemAt(0));
+            tree.right = new RBTreeNode(false, r.getItemAt(1));
             if (r.getChildrenCount() != 0) {
                 tree.left = buildRedBlackTree(r.getChildAt(0));
-                tree.right = new RBTreeNode(false, r.getItemAt(1),
-                        buildRedBlackTree(r.getChildAt(1)),
-                        buildRedBlackTree(r.getChildAt(2)));
+                tree.right.left = buildRedBlackTree(r.getChildAt(1));
+                tree.right.right = buildRedBlackTree(r.getChildAt(2));
             }
             return tree;
         } else {
-            RBTreeNode tree = new RBTreeNode(true, r.getItemAt(1));
+            RBTreeNode tree = new RBTreeNode<>(true, r.getItemAt(1));
+            tree.left = new RBTreeNode(false, r.getItemAt(0));
+            tree.right = new RBTreeNode(false, r.getItemAt(2));
             if (r.getChildrenCount() != 0) {
-                tree.left = new RBTreeNode(false, r.getItemAt(0),
-                    buildRedBlackTree(r.getChildAt(0)),
-                    buildRedBlackTree(r.getChildAt(1)));
-                tree.right = new RBTreeNode(false, r.getItemAt(2),
-                    buildRedBlackTree(r.getChildAt(2)),
-                    buildRedBlackTree(r.getChildAt(3)));
+                tree.left.left = buildRedBlackTree(r.getChildAt(0));
+                tree.left.right = buildRedBlackTree(r.getChildAt(1));
+                tree.right.left = buildRedBlackTree(r.getChildAt(2));
+                tree.right.right = buildRedBlackTree(r.getChildAt(3);
             }
             return tree;
         }
