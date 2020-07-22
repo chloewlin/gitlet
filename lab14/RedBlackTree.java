@@ -45,7 +45,7 @@ public class RedBlackTree<T extends Comparable<T>> {
                 tree.left.left = buildRedBlackTree(r.getChildAt(0));
                 tree.left.right = buildRedBlackTree(r.getChildAt(1));
                 tree.right.left = buildRedBlackTree(r.getChildAt(2));
-                tree.right.right = buildRedBlackTree(r.getChildAt(3);
+                tree.right.right = buildRedBlackTree(r.getChildAt(3));
             }
             return tree;
         }
