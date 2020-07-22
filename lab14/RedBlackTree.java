@@ -28,8 +28,8 @@ public class RedBlackTree<T extends Comparable<T>> {
             }
             return tree;
         } else if (r.getItemCount() == 2) {
-            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(1));
-            tree.right =  new RBTreeNode<T>(false, r.getItemAt(0));
+            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(0));
+            tree.right =  new RBTreeNode<T>(false, r.getItemAt(1));
             if (r.getChildrenCount() != 0) {
                 tree.left = buildRedBlackTree(r.getChildAt(0));
                 tree.right.left = buildRedBlackTree(r.getChildAt(1));
@@ -187,8 +187,8 @@ public class RedBlackTree<T extends Comparable<T>> {
 //               (5, 9)                5
 //            /    |   \      --->   /   \
 //            4    6    10          4     9*
-//                                 /       \
-//                                6         10
+//                                       / \
+//                                      6  10
 //        BTree<Integer> bt1 = new BTree<>();
 //        BTree.TwoThreeFourNode<Integer> t = new BTree.TwoThreeFourNode<>(5, 9);
 //        BTree.TwoThreeFourNode<Integer> t1 = new BTree.TwoThreeFourNode<>(4);
@@ -263,7 +263,7 @@ public class RedBlackTree<T extends Comparable<T>> {
         ttf2.setChildAt(3, ttf9);
         bt.root = ttf;
         RedBlackTree<Integer> rbt = new RedBlackTree<>(bt);
-        rbt.print();
+//        rbt.print();
     }
 
     private void print(RBTreeNode<T> node, int d) {
