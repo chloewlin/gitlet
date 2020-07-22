@@ -113,7 +113,7 @@ public class Repo {
         String message = args[1];
 
         if (message.isEmpty() || message.isBlank()) {
-            Main.exitWithError("No changes added to the commit.");
+            Main.validateCommitMessage();
         }
 
         Commit parent = Head.getGlobalHEAD();

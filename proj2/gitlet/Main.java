@@ -218,7 +218,7 @@ public class Main {
     /**
      *  print the message if a commit has a blank message.
      */
-    private static void validateCommitMessage() {
+    public static void validateCommitMessage() {
         exitWithError("Please enter a commit message.");
     }
 
