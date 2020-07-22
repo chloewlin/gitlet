@@ -39,10 +39,6 @@ public class Commit implements Serializable {
      */
     private Map<String, String> snapshot;
     /**
-     * the CommitsLog for all the commits that are made
-     */
-    private ArrayList<String> commitsLog;
-    /**
      * a flag for the first commit node.
      */
     private boolean init = false;
@@ -61,7 +57,6 @@ public class Commit implements Serializable {
         this.timestamp = generateDate(initial);
         this.snapshot = map;
         this.init = initial;
-        this.commitsLog = new ArrayList<String>();
     }
 
     public Commit(String msg) {
@@ -78,8 +73,11 @@ public class Commit implements Serializable {
         Commit commit = new Commit(this.message, this.parents[0],
                 true, this.snapshot);
         File commitFile = Utils.join(Main.COMMITS_FOLDER, this.sha1);
+        File commitLogs = Utils.join(Main.LOGS_FOLDER, this.sha1);
         commitFile.createNewFile();
+        commitLogs.createNewFile();
         Utils.writeObject(commitFile, commit);
+        Utils.writeObject(commitLogs, commit);
     }
 
     /**
@@ -89,8 +87,11 @@ public class Commit implements Serializable {
         Commit commit = new Commit(this.message, this.parents[0],
                 this.init, this.snapshot);
         File commitFile = Utils.join(Main.COMMITS_FOLDER, this.sha1);
+        File commitLogs = Utils.join(Main.LOGS_FOLDER, this.sha1);
         commitFile.createNewFile();
+        commitLogs.createNewFile();
         Utils.writeObject(commitFile, commit);
+        Utils.writeObject(commitLogs, commit);
     }
 
     /**
