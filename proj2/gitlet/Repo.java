@@ -200,7 +200,21 @@ public class Repo {
      * Print print all of the commit metadata.
      */
     public void globalLog() {
-        /** To-do: traverse the entire commit tree */
+        Commit commit = Head.getGlobalHEAD();
+
+        for (String c : CommitsMap) {
+            File allCommits = new File(Main.COMMITS_FOLDER, c);
+        }
+
+        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+            System.out.print("===" + "\n");
+            System.out.print("commit " + commit.getSHA() + "\n");
+            System.out.print("Date: " + commit.getTimestamp() + "\n");
+            System.out.print(commit.getMessage() + "\n");
+            System.out.println("");
+
+            commit = commit.getParent();
+        }
     }
 
     /**

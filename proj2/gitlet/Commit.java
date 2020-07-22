@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * A Commit class represents a commit node and
@@ -42,6 +39,10 @@ public class Commit implements Serializable {
      */
     private Map<String, String> snapshot;
     /**
+     * the CommitsLog for all the commits that are made
+     */
+    private ArrayList<String> commitsLog;
+    /**
      * a flag for the first commit node.
      */
     private boolean init = false;
@@ -60,6 +61,7 @@ public class Commit implements Serializable {
         this.timestamp = generateDate(initial);
         this.snapshot = map;
         this.init = initial;
+        this.commitsLog = new ArrayList<String>();
     }
 
     public Commit(String msg) {
