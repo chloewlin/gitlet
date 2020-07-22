@@ -122,6 +122,9 @@ public class Main {
      */
     private static void validateCheckout(String[] args) throws IOException {
         if (args.length == 2) {
+            if (!Branch.hasBranch(args[1])) {
+                Main.exitWithError("No such branch exists.");
+            }
             repo.checkoutBranch(args[1]);
         }
 
@@ -141,11 +144,11 @@ public class Main {
                 exitWithError("Incorrect Operation");
                 return;
             }
-            if (!repo.containsFile(args[1], args[3])) {
-                exitWithError("File does not exist in that commit.");
-            }
-            if (!repo.checkoutCommit(args[1], args[3])) {
+            if (!repo.containsCommitId(args[1])) {
                 exitWithError("No commit with that id exists.");
+            }
+            if (!repo.containsFile(Head.getGlobalHEAD().getSHA(), args[2])) {
+                exitWithError("File does not exist in that commit.");
             }
             repo.checkoutCommit(args[1], args[3]);
         }

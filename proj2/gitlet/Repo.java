@@ -253,28 +253,21 @@ public class Repo {
      * The new version of the file is not staged.
      * @return
      */
-    public boolean checkoutCommit(String commitId, String fileName) throws IOException {
+    public void checkoutCommit(String commitId, String fileName) throws IOException {
         Commit commit = Head.getGlobalHEAD();
         String blobSHA1 = "";
-        Boolean found = false;
 
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             if (findMatchId(commit.getSHA(), commitId)) {
                 blobSHA1 = commit.getSnapshot().get(fileName);
-                found = true;
                 break;
             }
             commit = commit.getParent();
         }
 
-        if (!found) {
-            return false;
-        }
-
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
         Blob blob = Blob.load(blobFile);
         restoreFileInCWD(blob);
-        return true;
     }
 
     /**
@@ -297,6 +290,22 @@ public class Repo {
         return hasFile;
     }
 
+    /** check if a commit id exists in our repo */
+    public boolean containsCommitId(String commitId) {
+        Commit commit = Head.getGlobalHEAD();
+        Boolean found = false;
+
+        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+            if (findMatchId(commit.getSHA(), commitId)) {
+                found = true;
+                break;
+            }
+            commit = commit.getParent();
+        }
+
+        return found;
+    }
+
     /**
      * Checks if a given commit id, full or abbreviated, matches
      * the SHA1 id of a commit node
@@ -313,21 +322,16 @@ public class Repo {
      */
     public void checkoutBranch(String branchName) {
 
-        //may have bugs//
-
         String currBranchName = currentBranchName();
         Commit branchHEAD = Head.getBranchHEAD(branchName);
         Commit currHEAD = Head.getGlobalHEAD();
 
+        if (currBranchName.equals(branchName)) {
+            Main.exitWithError("No need to checkout the current branch.");
+        }
         if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
             Main.exitWithError("There is an untracked file in the way; " +
                     "delete it, or add and commit it first.");
-        }
-        if (!Branch.hasBranch(branchName)) {
-            Main.exitWithError("No such branch exists.");
-        }
-        if (currBranchName.equals(branchName)) {
-            Main.exitWithError("No need to checkout the current branch.");
         }
 
         Head.setGlobalHEAD(branchName, branchHEAD);
