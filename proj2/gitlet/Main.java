@@ -82,6 +82,12 @@ public class Main {
         case "log":
             repo.log();
             break;
+        case "global-log":
+            repo.globalLog();
+            break;
+        case "find":
+            repo.find(args);
+            break;
         case "status":
             repo.status();
             break;
@@ -100,8 +106,6 @@ public class Main {
         case "merge":
              repo.merge(args);
              break;
-        case "find":
-            repo.find(args);
         default:
             validateInitialization();
             validateCommand();
