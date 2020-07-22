@@ -1,6 +1,5 @@
 package gitlet;
 
-import javax.sound.midi.Soundbank;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -15,7 +14,7 @@ public class Repo {
     static final String INIT_PARENT_SHA1 = "0000000000000000000000000000000000000000";
     static Staging stagingArea = new Staging();
     Head head = new Head();
-    History history = new History();
+    Merge merge = new Merge();
 
     /**
      * Create initial commit and set up branch and HEAD pointer.
@@ -546,7 +545,7 @@ public class Repo {
      */
     public void merge(String[] args) {
         String givenBranch = args[1];
-        history.merge(givenBranch);
+        merge.merge(givenBranch);
     }
 
     /**
