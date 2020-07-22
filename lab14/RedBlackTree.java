@@ -20,15 +20,12 @@ public class RedBlackTree<T extends Comparable<T>> {
         if (r == null) {
             return null;
         }
-        if (r.getItemCount() == 3) {
-            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(1));
-            tree.left = new RBTreeNode<T>(false, r.getItemAt(0));
-            tree.right =  new RBTreeNode<T>(false, r.getItemAt(2));
+
+        if (r.getItemCount() == 1) {
+            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(0));
             if(!(r.getChildrenCount() == 0)) {
-                tree.left.left = buildRedBlackTree(r.getChildAt(0));
-                tree.left.right = buildRedBlackTree(r.getChildAt(1));
-                tree.right.left = buildRedBlackTree(r.getChildAt(2));
-                tree.right.right = buildRedBlackTree(r.getChildAt(3));
+                tree.left = buildRedBlackTree(r.getChildAt(0));
+                tree.right = buildRedBlackTree(r.getChildAt(1));
             }
             return tree;
         } else if (r.getItemCount() == 2) {
@@ -41,10 +38,14 @@ public class RedBlackTree<T extends Comparable<T>> {
             }
             return tree;
         } else {
-            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(0));
+            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(1));
+            tree.left = new RBTreeNode<T>(false, r.getItemAt(0));
+            tree.right =  new RBTreeNode<T>(false, r.getItemAt(2));
             if(!(r.getChildrenCount() == 0)) {
-                tree.left = buildRedBlackTree(r.getChildAt(0));
-                tree.right = buildRedBlackTree(r.getChildAt(1));
+                tree.left.left = buildRedBlackTree(r.getChildAt(0));
+                tree.left.right = buildRedBlackTree(r.getChildAt(1));
+                tree.right.left = buildRedBlackTree(r.getChildAt(2));
+                tree.right.right = buildRedBlackTree(r.getChildAt(3));
             }
             return tree;
         }
@@ -115,7 +116,7 @@ public class RedBlackTree<T extends Comparable<T>> {
             flipColors(node);
         } else if (isRed(node.left) && isRed(node.left.right)) {
             /* Cast 2.c */
-            node = rotateLeft(node.left);
+            node = rotateLeft(node);
             node = rotateRight(node);
             flipColors(node);
         }
