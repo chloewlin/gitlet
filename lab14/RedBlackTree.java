@@ -20,27 +20,32 @@ public class RedBlackTree<T extends Comparable<T>> {
         if (r == null) {
             return null;
         }
-
-        if (r.getItemCount() == 1) {
-            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(0),
-                    buildRedBlackTree(r.getChildAt(0)),
-                    buildRedBlackTree(r.getChildAt(1)));
+        if (r.getItemCount() == 3) {
+            RBTreeNode tree = new RBTreeNode(true, r.getItemAt(1));
+            tree.left = new RBTreeNode(false, r.getItemAt(0));
+            tree.right =  new RBTreeNode(false, r.getItemAt(2));
+            if(!(r.getChildrenCount() == 0)) {
+                tree.left.left = buildRedBlackTree(r.getChildAt(0));
+                tree.left.right = buildRedBlackTree(r.getChildAt(1));
+                tree.right.left = buildRedBlackTree(r.getChildAt(2));
+                tree.right.right = buildRedBlackTree(r.getChildAt(3));
+            }
             return tree;
         } else if (r.getItemCount() == 2) {
-            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(1));
-            tree.left = buildRedBlackTree(r.getChildAt(0));
-            tree.right = new RBTreeNode<T>(false, r.getItemAt(0),
-                    buildRedBlackTree(r.getChildAt(1)),
-                    buildRedBlackTree(r.getChildAt(2)));
+            RBTreeNode tree = new RBTreeNode(true, r.getItemAt(0));
+            tree.right =  new RBTreeNode(false, r.getItemAt(1));
+            if(!(r.getChildrenCount() == 0)) {
+                tree.left = buildRedBlackTree(r.getChildAt(0));
+                tree.right.left = buildRedBlackTree(r.getChildAt(1));
+                tree.right.right = buildRedBlackTree(r.getChildAt(2));
+            }
             return tree;
         } else {
-            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(1));
-            tree.left = new RBTreeNode<T>(false, r.getItemAt(0),
-                    buildRedBlackTree(r.getChildAt(0)),
-                    buildRedBlackTree(r.getChildAt(1)));
-            tree.right = new RBTreeNode(false, r.getItemAt(2),
-                    buildRedBlackTree(r.getChildAt(2)),
-                    buildRedBlackTree(r.getChildAt(3)));
+            RBTreeNode tree = new RBTreeNode(true, r.getItemAt(0));
+            if(!(r.getChildrenCount() == 0)) {
+                tree.left = buildRedBlackTree(r.getChildAt(0));
+                tree.right = buildRedBlackTree(r.getChildAt(1));
+            }
             return tree;
         }
     }
@@ -69,9 +74,9 @@ public class RedBlackTree<T extends Comparable<T>> {
         return new RBTreeNode<T>(node.isBlack, node.right.item, leftTree, node.right.right);
     }
 
-    public void insert(T item) {   
-        root = insert(root, item);  
-        root.isBlack = true;    
+    public void insert(T item) {
+        root = insert(root, item);
+        root.isBlack = true;
     }
 
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
