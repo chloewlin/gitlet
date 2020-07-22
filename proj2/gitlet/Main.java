@@ -71,6 +71,7 @@ public class Main {
             repo.initialize();
             break;
         case "add":
+            validateFileToBeAdded(args);
             repo.add(args);
             break;
         case "commit":
@@ -215,10 +216,26 @@ public class Main {
         exitWithError("No command with that name exists.");
     }
 
+
+    private static void validateFileToBeAdded(String[] args) {
+        String fileName = args[1];
+        List<String> fileInCWD = Utils.plainFilenamesIn("./");
+        boolean found = false;
+
+        for (String file : fileInCWD) {
+            if (file.equals(fileName)) {
+                found = true;
+            }
+        }
+
+        if (!found) {
+            exitWithError("File does not exist.");
+        }
+    }
     /**
      *  print the message if a commit has a blank message.
      */
-    private static void validateCommitMessage() {
+    public static void validateCommitMessage() {
         exitWithError("Please enter a commit message.");
     }
 

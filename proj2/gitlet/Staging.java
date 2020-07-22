@@ -40,6 +40,10 @@ public class Staging implements Serializable {
         this.stagedForAddition.remove(fileName);
     }
 
+    public void removeFromStagedForRemoval(String fileName) {
+        this.stagedForRemoval.remove(fileName);
+    }
+
     public boolean containsFileForAddition(String fileName) {
 
         return this.stagedForAddition.containsKey(fileName);

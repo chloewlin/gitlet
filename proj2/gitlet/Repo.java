@@ -62,15 +62,14 @@ public class Repo {
     private void stage(String fileName, Blob blob) throws IOException {
         stagingArea = stagingArea.load();
 
-        if (!isSameVersion(fileName)) {
-            stagingArea.add(fileName, blob.getBlobSHA1());
-            stagingArea.save();
-        } else {
-            if (stagingArea.containsFileForAddition(fileName)) {
-                stagingArea.remove(fileName);
-            }
+        if (isSameVersion(fileName)) {
             Main.validateFileToBeStaged();
+            if (stagingArea.containsFileForAddition(fileName)) {
+                stagingArea.removeFromStagedForRemoval(fileName);
+            }
         }
+        stagingArea.add(fileName, blob.getBlobSHA1());
+        stagingArea.save();
     }
 
     /**
@@ -111,6 +110,11 @@ public class Repo {
     public void commit(String[] args) throws IOException {
         Main.validateNumArgs(args);
         String message = args[1];
+
+        if (message.isEmpty() || message.isBlank()) {
+            Main.validateCommitMessage();
+        }
+
         Commit parent = Head.getGlobalHEAD();
         String parentSHA1 = parent.getSHA();
 
@@ -153,7 +157,6 @@ public class Repo {
 
         if (stagingArea.containsFileForAddition(fileName)) {
             stagingArea.remove(fileName);
-            stagingArea.unstage(fileName);
         } else if (trackedByCurrCommit(fileName)) {
             stagingArea.unstage(fileName);
             String CWD = System.getProperty("user.dir");
