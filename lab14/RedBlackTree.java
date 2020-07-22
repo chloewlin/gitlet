@@ -94,7 +94,7 @@ public class RedBlackTree<T extends Comparable<T>> {
         }
 
         /* Case 1 */
-        if (node.right.item.equals(item) || node.left == null && isRed(node.right)) {
+        if (node.left == null && isRed(node.right)) {
             node = rotateLeft(node);
         } else if (isRed(node.left) && isRed(node.right)) {
             /* Cast 2.a */
@@ -263,6 +263,27 @@ public class RedBlackTree<T extends Comparable<T>> {
 //        System.out.println("======");
 //        RB1.insert(RB1.root,10);
 //        print(RB1.root,0);
+
+        BTree Btree = new BTree();
+        BTree.TwoThreeFourNode n1 = new BTree.TwoThreeFourNode(3, 5, 8);
+        BTree.TwoThreeFourNode n2 = new BTree.TwoThreeFourNode(1, 2);
+        BTree.TwoThreeFourNode n3 = new BTree.TwoThreeFourNode(4);
+        BTree.TwoThreeFourNode n4 = new BTree.TwoThreeFourNode(6);
+        BTree.TwoThreeFourNode n5 = new BTree.TwoThreeFourNode(10, 16);
+
+        Btree.root = n1;
+        n1.setChildAt(0, n2);
+        n1.setChildAt(1, n3);
+        n1.setChildAt(2, n4);
+        n1.setChildAt(3, n5);
+
+        RedBlackTree RBTree = new RedBlackTree(Btree);
+        RBTree.insert(0);
+        RBTree.insert(30);
+        RBTree.insert(7);
+        RBTree.insert(9);
+        RBTree.insert(13);
+        RBTree.print();
     }
 
     private void print(RBTreeNode<T> node, int d) {
