@@ -1,5 +1,6 @@
 package gitlet;
 
+import javax.sound.midi.Soundbank;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -439,9 +440,9 @@ public class Repo {
         String commitId = args[1];
         Commit targetCommit = null;
 
-        // to-do: find untracked files in CWD
+        // TODO: TEST THIS FUNCTIONALITY
         if (hasUntrackedFiles()) {
-            Main.exitWithError("There is an untracked file in the way;" +
+            Main.exitWithError("There is an untracked file in the way; " +
                     "delete it, or add and commit it first.");
         }
 
@@ -449,10 +450,12 @@ public class Repo {
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             if (findMatchId(commit.getSHA(), commitId)) {
                 targetCommit = commit;
-            } else {
-                Main.exitWithError("No commit with that id exists.");
             }
             commit = commit.getParent();
+        }
+
+        if (targetCommit == null) {
+            Main.exitWithError("No commit with that id exists.");
         }
 
         // checkout to that commit
@@ -460,6 +463,8 @@ public class Repo {
         restoreFilesAtCommit(currCommit, targetCommit);
         // reset global HEAD
         Head.setGlobalHEAD(currentBranchName(), targetCommit);
+
+        stagingArea.clear();
     }
 
     /**
