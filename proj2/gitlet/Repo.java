@@ -111,6 +111,11 @@ public class Repo {
     public void commit(String[] args) throws IOException {
         Main.validateNumArgs(args);
         String message = args[1];
+
+        if (message.isEmpty()) {
+            Main.exitWithError("No changes added to the commit.");
+        }
+
         Commit parent = Head.getGlobalHEAD();
         String parentSHA1 = parent.getSHA();
 
