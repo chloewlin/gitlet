@@ -21,7 +21,7 @@ public class RedBlackTree<T extends Comparable<T>> {
             return null;
         }
 
-        if (r.getItemCount() == 2) {
+        if (r.getItemCount() == 1) {
             RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(0),
                     buildRedBlackTree(r.getChildAt(0)),
                     buildRedBlackTree(r.getChildAt(1)));
