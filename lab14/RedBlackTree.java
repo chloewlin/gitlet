@@ -94,17 +94,13 @@ public class RedBlackTree<T extends Comparable<T>> {
         }
 
         /* Edge case: right leaning tree */
-        if (!isRed(node.left) && isRed(node.right)) {
+        if (node.right.item.equals(item) || node.left == null && isRed(node.right)) {
             node = rotateLeft(node);
-        }
-
-        /* Edge case: overflow */
-        if (isRed(node.left) && isRed(node.right)) {
+        } else if (isRed(node.left) && isRed(node.right)) {
+            /* Edge case: overflow */
             flipColors(node);
-        }
-
-        /* Edge case: a black node has a red left node which also has red left node */
-        if (isRed(node.left) && isRed(node.left.left)) {
+        } else if (isRed(node.left) && isRed(node.left.left)) {
+            /* Edge case: a black node has a red left node which also has red left node */
             node = rotateRight(node);
         }
 
