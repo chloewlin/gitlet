@@ -1,4 +1,3 @@
-# A simple test of adding, committing, modifying, and checking out.
 > init
 <<<
 + wug.txt wug.txt
@@ -7,6 +6,7 @@
 > commit "added wug"
 <<<
 + wug.txt notwug.txt
+
 # Must change
 > checkout -- wug.txt
 <<<

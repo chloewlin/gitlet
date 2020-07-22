@@ -3,10 +3,10 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -57,7 +57,7 @@ public class Commit implements Serializable {
         this.message = msg;
         this.parents[0] = parent;
         this.sha1 = Utils.sha1("COMMIT" + message);
-        this.timestamp = generateDate(init);
+        this.timestamp = generateDate(initial);
         this.snapshot = map;
         this.init = initial;
     }
@@ -66,7 +66,7 @@ public class Commit implements Serializable {
         this.message = msg;
         this.parents[0] = Repo.INIT_PARENT_SHA1;
         this.sha1 = Utils.sha1("COMMIT" + message);
-        this.timestamp = generateDate(init);
+        this.timestamp = generateDate(false);
     }
 
     /**
@@ -145,13 +145,12 @@ public class Commit implements Serializable {
 
     /**
      * Generate a timestamp for a commit node.
-     * @return a timestamp
      * @param initial returns true if it is the first commit
      */
     public String generateDate(boolean initial) {
         TimeZone tz = TimeZone.getTimeZone("PST");
         Calendar cal = Calendar.getInstance(tz);
-        if (initial) {
+        if (initial == true) {
             cal.setTimeInMillis(0);
         }
         DateFormat sdf = new SimpleDateFormat("EEE LLL d HH:mm:ss y Z");

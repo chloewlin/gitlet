@@ -64,11 +64,6 @@ public class Main {
      * Usage: java gitlet.Main ARGS, where ARGS contains <COMMAND> <OPERAND>.
      */
     public static void main(String... args) throws IOException {
-        // FIX-ME: Where to validate initialization?
-        // validateInitialization(args);
-
-        validateNumCommand(args);
-
         switch (args[0]) {
         case "init":
             validateGitlet();
@@ -87,17 +82,34 @@ public class Main {
         case "log":
             repo.log();
             break;
+        case "global-log":
+            repo.globalLog();
+            break;
+        case "find":
+            repo.find(args);
+            break;
         case "status":
             repo.status();
             break;
         case "checkout":
-             validateCheckout(args);
-             break;
+            validateCheckout(args);
+            break;
         case "branch":
-             repo.branch(args);
+            repo.branch(args);
+            break;
+        case "rm-branch":
+            repo.rmBranch(args);
+            break;
+        case "reset":
+             repo.reset(args);
+             break;
+        case "merge":
+             repo.merge(args);
              break;
         default:
+            validateInitialization();
             validateCommand();
+            validateNumCommand(args);
         }
         return;
     }
@@ -108,17 +120,16 @@ public class Main {
      * @throws IOException
      */
     private static void validateCheckout(String[] args) throws IOException {
-        if (args.length == 1) {
+        if (args.length == 2) {
             repo.checkoutBranch(args[1]);
         }
 
-//       need to handle:  If the file does not exist in the previous commit, abort,
-//        printing the error message File does not exist in that commit.
         if (args.length == 3) {
             if (!args[1].equals("--")) {
-                exitWithError("incorrect Operation: Do git checkout -- [file name]");
+                exitWithError("Incorrect Operation");
+                return;
             }
-            if (!repo.checkoutFile(args[2])) {
+            if (!repo.containsFile(Head.getGlobalHEAD().getSHA(), args[2])) {
                 exitWithError("File does not exist in that commit.");
             }
             repo.checkoutFile(args[2]);
@@ -126,15 +137,16 @@ public class Main {
 
         if (args.length == 4) {
             if (!args[2].equals("--")) {
-                exitWithError("incorrect Operation: git checkout [commit id] -- [file name]");
+                exitWithError("Incorrect Operation");
+                return;
             }
-            if (!repo.checkoutID(args[1])) {
-                exitWithError("No commit with that id exists.");
-            } else if (repo.checkoutID(args[1]) && !repo.checkoutFile(args[3])) {
+            if (!repo.containsFile(args[1], args[3])) {
                 exitWithError("File does not exist in that commit.");
-            } else {
-                repo.checkoutCommit(args[1], args[3]);
             }
+            if (!repo.checkoutCommit(args[1], args[3])) {
+                exitWithError("No commit with that id exists.");
+            }
+            repo.checkoutCommit(args[1], args[3]);
         }
     }
 
@@ -159,12 +171,18 @@ public class Main {
      *  being in an initialized Gitlet working directory (i.e., one
      *  containing a .gitlet subdirectory), but is not in such a
      *  directory.
-     *  @param args user's input of commands and operands
      */
-    private static void validateInitialization(String[] args) {
-        List<String> files = Utils.plainFilenamesIn(CWD);
+    private static void validateInitialization() {
+        File[] directories = new File(".").listFiles(File::isDirectory);
+        boolean found = false;
 
-        if (!files.contains(".gitlet")) {
+        for (File f : directories) {
+            if (f.getName().equals(".gitlet")) {
+                found = true;
+            }
+        }
+
+        if (!found) {
             exitWithError("Not in an initialized Gitlet directory.");
         }
     }
@@ -227,7 +245,12 @@ public class Main {
                 isValid = true;
             }
             break;
+        case "find":
         case "add":
+        case "rm":
+        case "branch":
+        case "rm-branch":
+        case "reset":
             if (n == 2) {
                 isValid = true;
             }
