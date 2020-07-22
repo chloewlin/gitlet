@@ -27,9 +27,9 @@ public class RedBlackTree<T extends Comparable<T>> {
                     buildRedBlackTree(r.getChildAt(1)));
             return tree;
         } else if (r.getItemCount() == 2) {
-            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(0));
+            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(1));
             tree.left = buildRedBlackTree(r.getChildAt(0));
-            tree.right = new RBTreeNode<T>(false, r.getItemAt(1),
+            tree.right = new RBTreeNode<T>(false, r.getItemAt(0),
                     buildRedBlackTree(r.getChildAt(1)),
                     buildRedBlackTree(r.getChildAt(2)));
             return tree;
@@ -102,6 +102,7 @@ public class RedBlackTree<T extends Comparable<T>> {
         if (isRed(node.left) && isRed(node.left.left)) {
             node = rotateRight(node);
         }
+
         return node;
     }
 
@@ -135,4 +136,50 @@ public class RedBlackTree<T extends Comparable<T>> {
         }
     }
 
+    public static void main(String[] args) {
+        BTree Btree = new BTree();
+        BTree.TwoThreeFourNode n1 = new BTree.TwoThreeFourNode(3, 5, 8);
+        BTree.TwoThreeFourNode n2 = new BTree.TwoThreeFourNode(1, 2);
+        BTree.TwoThreeFourNode n3 = new BTree.TwoThreeFourNode(4);
+        BTree.TwoThreeFourNode n4 = new BTree.TwoThreeFourNode(6);
+        BTree.TwoThreeFourNode n5 = new BTree.TwoThreeFourNode(10, 16);
+
+        Btree.root = n1;
+        n1.setChildAt(0, n2);
+        n1.setChildAt(1, n3);
+        n1.setChildAt(2, n4);
+        n1.setChildAt(3, n5);
+
+        RedBlackTree RBTree = new RedBlackTree(Btree);
+        print(RBTree.root, 0);
+
+        System.out.println("======");
+        BTree Btree2 = new BTree();
+        Btree2.root = new BTree.TwoThreeFourNode(3);
+
+        RedBlackTree RB1 = new RedBlackTree(Btree2);
+        RB1.insert(RB1.root,5);
+        print(RB1.root,0);
+
+        System.out.println("======");
+        RB1.insert(RB1.root,10);
+        print(RB1.root,0);
+    }
+
+    private static String isBlackNode(boolean isBlack) {
+        if (isBlack) return "black";
+        else return "red";
+    }
+
+    private static void print(RBTreeNode node, int d) {
+        if (node == null) {
+            return;
+        }
+        for (int i = 0; i < d; i++) {
+            System.out.print("  ");
+        }
+        System.out.println(node.item + " " + isBlackNode(node.isBlack));
+        print(node.left, d + 1);
+        print(node.right, d + 1);
+    }
 }
