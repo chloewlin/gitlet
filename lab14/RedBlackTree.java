@@ -21,9 +21,9 @@ public class RedBlackTree<T extends Comparable<T>> {
             return null;
         }
         if (r.getItemCount() == 3) {
-            RBTreeNode tree = new RBTreeNode(true, r.getItemAt(1));
-            tree.left = new RBTreeNode(false, r.getItemAt(0));
-            tree.right =  new RBTreeNode(false, r.getItemAt(2));
+            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(1));
+            tree.left = new RBTreeNode<T>(false, r.getItemAt(0));
+            tree.right =  new RBTreeNode<T>(false, r.getItemAt(2));
             if(!(r.getChildrenCount() == 0)) {
                 tree.left.left = buildRedBlackTree(r.getChildAt(0));
                 tree.left.right = buildRedBlackTree(r.getChildAt(1));
@@ -32,8 +32,8 @@ public class RedBlackTree<T extends Comparable<T>> {
             }
             return tree;
         } else if (r.getItemCount() == 2) {
-            RBTreeNode tree = new RBTreeNode(true, r.getItemAt(0));
-            tree.right =  new RBTreeNode(false, r.getItemAt(1));
+            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(0));
+            tree.right =  new RBTreeNode<T>(false, r.getItemAt(1));
             if(!(r.getChildrenCount() == 0)) {
                 tree.left = buildRedBlackTree(r.getChildAt(0));
                 tree.right.left = buildRedBlackTree(r.getChildAt(1));
@@ -41,7 +41,7 @@ public class RedBlackTree<T extends Comparable<T>> {
             }
             return tree;
         } else {
-            RBTreeNode tree = new RBTreeNode(true, r.getItemAt(0));
+            RBTreeNode tree = new RBTreeNode<T>(true, r.getItemAt(0));
             if(!(r.getChildrenCount() == 0)) {
                 tree.left = buildRedBlackTree(r.getChildAt(0));
                 tree.right = buildRedBlackTree(r.getChildAt(1));
@@ -62,7 +62,7 @@ public class RedBlackTree<T extends Comparable<T>> {
        this subtree. */
     RBTreeNode<T> rotateRight(RBTreeNode<T> node) {
         RBTreeNode<T> rightTree =
-                new RBTreeNode(false, node.item, node.left.right, node.right);
+                new RBTreeNode<T>(false, node.item, node.left.right, node.right);
         return new RBTreeNode<T>(node.isBlack, node.left.item, node.left.left, rightTree);
     }
 
@@ -70,7 +70,7 @@ public class RedBlackTree<T extends Comparable<T>> {
        this subtree. */
     RBTreeNode<T> rotateLeft(RBTreeNode<T> node) {
         RBTreeNode<T> leftTree =
-                new RBTreeNode(false, node.item, node.left, node.right.left);
+                new RBTreeNode<T>(false, node.item, node.left, node.right.left);
         return new RBTreeNode<T>(node.isBlack, node.right.item, leftTree, node.right.right);
     }
 
