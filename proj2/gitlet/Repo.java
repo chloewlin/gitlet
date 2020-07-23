@@ -346,10 +346,10 @@ public class Repo {
         if (currBranchName.equals(branchName)) {
             Main.exitWithError("No need to checkout the current branch.");
         }
-//        if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
-//            Main.exitWithError("There is an untracked file in the way; " +
-//                    "delete it, or add and commit it first.");
-//        }
+        if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+            Main.exitWithError("There is an untracked file in the way; " +
+                    "delete it, or add and commit it first.");
+        }
 
         Head.setGlobalHEAD(branchName, branchHEAD);
         restoreFilesAtBranch(currHEAD, branchHEAD);
@@ -499,19 +499,22 @@ public class Repo {
      * and would be overwritten by the checkout.
      * */
     public boolean hasUntrackedFilesForCheckoutBranch(Commit branchHEAD) {
-        // TODO: HAS BUGS
         List<String> untrackedFiles = new ArrayList<String>();
+
         stagingArea = stagingArea.load();
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
 
-        for (String fileName : fileInCWD) {
-            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
-                    && branchHEAD.getSnapshot().containsKey(fileName)) {
-                untrackedFiles.add(fileName);
-            }
-        }
-
-        return untrackedFiles.size() > 0;
+        // TODO: DEBUG
+        // check if a file is (1) NOT saved in the current HEAD of branch
+        // and (2) IS saved in the target HEAD of branch
+//        for (String fileName : fileInCWD) {
+//            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
+//                    && branchHEAD.getSnapshot().containsKey(fileName)) {
+//                untrackedFiles.add(fileName);
+//            }
+//        }
+//
+//        return untrackedFiles.size() > 0;
     }
 
     /**
