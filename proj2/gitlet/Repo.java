@@ -254,7 +254,7 @@ public class Repo {
      * there if there is one. The new version of the file is not staged.
      * @return
      */
-    public boolean checkoutFile(String filename) throws IOException {
+    public void checkoutFile(String filename) throws IOException {
         Map<String, String> snapshot = Head.getGlobalHEAD().getSnapshot();
 
         if (snapshot.containsKey(filename)) {
@@ -262,8 +262,9 @@ public class Repo {
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
             Blob blob = Blob.load(blobFile);
             restoreFileInCWD(blob);
+        } else {
+            Main.exitWithError("File does not exist in that commit.");
         }
-        return false;
     }
 
     /**
@@ -276,13 +277,19 @@ public class Repo {
     public void checkoutCommit(String commitId, String fileName) throws IOException {
         Commit commit = Head.getGlobalHEAD();
         String blobSHA1 = "";
+        boolean found = false;
 
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             if (findMatchId(commit.getSHA(), commitId)) {
                 blobSHA1 = commit.getSnapshot().get(fileName);
+                found = true;
                 break;
             }
             commit = commit.getParent();
+        }
+
+        if (!found) {
+            Main.exitWithError("File does not exist in that commit.");
         }
 
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
@@ -400,11 +407,6 @@ public class Repo {
                 overwrite.put(fileName, blobSHA1);
             }
         });
-
-//        System.out.println("overwrite array: ");
-//        overwrite.forEach((k, v) -> System.out.println(k + " : " + v));
-//        System.out.println("delete array: ");
-//        delete.forEach((k, v) -> System.out.println(k + " : " + v));
 
         overwrite.forEach((file, blobSHA1) -> {
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
