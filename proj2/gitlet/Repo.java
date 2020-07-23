@@ -1,6 +1,5 @@
 package gitlet;
 
-import javax.sound.midi.Soundbank;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -12,18 +11,21 @@ import java.util.*;
  */
 public class Repo {
 
+    static final String SENTINEL_COMMIT_ID = "6cf73ef132f3f89a94f4c73ec879aa79ba529e86";
     static final String INIT_PARENT_SHA1 = "0000000000000000000000000000000000000000";
     static Staging stagingArea = new Staging();
     Head head = new Head();
-    History history = new History();
+    Merge merge = new Merge();
 
     /**
      * Create initial commit and set up branch and HEAD pointer.
      */
     public void initialize() throws IOException {
-        Commit sentinel = new Commit("sentinel");
-        Commit initialCommit = new Commit("initial commit", sentinel.getSHA(), true, new HashMap<>());
-        sentinel.save();
+        Map<String, String> sentinelMap = new HashMap<>();
+        Commit sentinel = new Commit("sentinel", sentinelMap);
+        Commit initialCommit = new Commit("initial commit", sentinel.getSHA(),
+                true, new HashMap<>());
+        sentinel.saveInit();
         initialCommit.saveInit();
         Head.setGlobalHEAD("master", initialCommit);
         Head.setBranchHEAD("master", initialCommit);
@@ -197,26 +199,44 @@ public class Repo {
     }
 
     /**
-     * Print print all of the commit metadata.
+     * Print all of the commits in this repo.
      */
     public void globalLog() {
-        /** To-do: traverse the entire commit tree */
+        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
+        String[] commits = commitDir.list();
+
+        for (String commitId : commits) {
+            Commit commit = Commit.load(commitId);
+            if (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+                System.out.print("===" + "\n");
+                System.out.print("commit " + commit.getSHA() + "\n");
+                System.out.print("Date: " + commit.getTimestamp() + "\n");
+                System.out.print(commit.getMessage() + "\n");
+                System.out.println("");
+            }
+        }
     }
 
     /**
      * Search for commits that have the given commit message.
-     * @param commitMsg
      */
-    public void find(String[] commitMsg) {
+    public void find(String[] args) {
+        String commitMessage = args[1];
+        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
+        String[] commits = commitDir.list();
+        Boolean found = false;
 
-//        String commits = Head.getGlobalHEAD().getMessage();
-//        if (commits.length() < 1) {
-//            System.out.println("Found no commit with that message.");
-//        }
-//        if (commits.compareTo(String.valueOf(commitMsg)) == 0) {
-//            System.out.println(commits);
-//        }
+        for (String commitId : commits) {
+            Commit commit = Commit.load(commitId);
+            if (commit.getMessage().equals(commitMessage)) {
+                found = true;
+                System.out.println(commit.getSHA());
+            }
+        }
 
+        if (!found) {
+            Main.exitWithError("Found no commit with that message.");
+        }
     }
 
     /**
@@ -234,7 +254,7 @@ public class Repo {
      * there if there is one. The new version of the file is not staged.
      * @return
      */
-    public boolean checkoutFile(String filename) throws IOException {
+    public void checkoutFile(String filename) throws IOException {
         Map<String, String> snapshot = Head.getGlobalHEAD().getSnapshot();
 
         if (snapshot.containsKey(filename)) {
@@ -242,8 +262,9 @@ public class Repo {
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
             Blob blob = Blob.load(blobFile);
             restoreFileInCWD(blob);
+        } else {
+            Main.exitWithError("File does not exist in that commit.");
         }
-        return false;
     }
 
     /**
@@ -256,38 +277,24 @@ public class Repo {
     public void checkoutCommit(String commitId, String fileName) throws IOException {
         Commit commit = Head.getGlobalHEAD();
         String blobSHA1 = "";
+        boolean found = false;
 
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             if (findMatchId(commit.getSHA(), commitId)) {
                 blobSHA1 = commit.getSnapshot().get(fileName);
+                found = true;
                 break;
             }
             commit = commit.getParent();
         }
 
+        if (!found) {
+            Main.exitWithError("File does not exist in that commit.");
+        }
+
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
         Blob blob = Blob.load(blobFile);
         restoreFileInCWD(blob);
-    }
-
-    /**
-     * Checks if a commit contains a given file
-     * */
-    public boolean containsFile(String commitId, String fileName) {
-        Commit commit = Head.getGlobalHEAD();
-        Boolean hasFile = false;
-
-        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
-            if (findMatchId(commit.getSHA(), commitId)) {
-                if (commit.getSnapshot().containsKey(fileName)) {
-                    hasFile = true;
-                    break;
-                }
-            }
-            commit = commit.getParent();
-        }
-
-        return hasFile;
     }
 
     /** check if a commit id exists in our repo */
@@ -479,6 +486,7 @@ public class Repo {
      * and would be overwritten by the checkout.
      * */
     public boolean hasUntrackedFilesForCheckoutBranch(Commit branchHEAD) {
+        // TODO: HAS BUGS
         List<String> untrackedFiles = new ArrayList<String>();
         stagingArea = stagingArea.load();
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
@@ -498,7 +506,7 @@ public class Repo {
      * */
     public boolean hasUntrackedFiles() {
 
-        //may have bugs
+        // TODO: HAS BUGS
 
         stagingArea = stagingArea.load();
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
@@ -550,7 +558,7 @@ public class Repo {
      */
     public void merge(String[] args) {
         String givenBranch = args[1];
-        history.merge(givenBranch);
+        merge.merge(givenBranch);
     }
 
     /**

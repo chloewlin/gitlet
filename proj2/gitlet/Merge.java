@@ -2,7 +2,7 @@ package gitlet;
 
 import java.util.*;
 
-public class History {
+public class Merge {
 
     public void merge(String branchName) {
         Commit currHEAD = Head.getGlobalHEAD();

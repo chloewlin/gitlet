@@ -45,7 +45,6 @@ public class Staging implements Serializable {
     }
 
     public boolean containsFileForAddition(String fileName) {
-
         return this.stagedForAddition.containsKey(fileName);
     }
 
