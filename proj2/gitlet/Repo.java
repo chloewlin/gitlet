@@ -50,11 +50,11 @@ public class Repo {
         String fileName = args[1];
 
         if (isSameVersionAsLastCommit(fileName)) {
-            // TODO: May have bugs
             if (stagingArea.containsFileForRemoval(fileName)) {
                 stagingArea.removeFromStagedForRemoval(fileName);
             }
             stagingArea.save();
+            return;
         }
 
         Blob blob = new Blob(fileName);
