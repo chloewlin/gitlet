@@ -466,7 +466,7 @@ public class Repo {
         String commitId = args[1];
         Commit targetCommit = null;
 
-        // TODO: TEST THIS FUNCTIONALITY
+        // TODO: FIX BUG
 //        if (hasUntrackedFiles()) {
 //            Main.exitWithError("There is an untracked file in the way; " +
 //                    "delete it, or add and commit it first.");
@@ -515,6 +515,7 @@ public class Repo {
 //        }
 //
 //        return untrackedFiles.size() > 0;
+        return false;
     }
 
     /**
