@@ -306,8 +306,8 @@ public class Repo {
                 blobSHA1 = commit.getSnapshot().get(fileName);
                 found = true;
                 break;
-            } else {
-                Main.exitWithError("No commit with that id exists.");
+//            } else {
+//                Main.exitWithError("No commit with that id exists.");
             }
             commit = commit.getParent();
         }
@@ -320,19 +320,19 @@ public class Repo {
         restoreFileInCWD(blob);
     }
 
-//    /** check if a commit id exists in our repo */
-//    public boolean containsCommitId(String targetCommitId) {
-//        Boolean found = false;
-//        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
-//        String[] commits = commitDir.list();
-//
-//        for (String commitId : commits) {
-//            if (findMatchId(commitId, targetCommitId)) {
-//                found = true;
-//            }
-//        }
-//        return found;
-//    }
+    /** check if a commit id exists in our repo */
+    public boolean containsCommitId(String targetCommitId) {
+        Boolean found = false;
+        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
+        String[] commits = commitDir.list();
+
+        for (String commitId : commits) {
+            if (findMatchId(commitId, targetCommitId)) {
+                found = true;
+            }
+        }
+        return found;
+    }
 
     /**
      * Checks if a given commit id, full or abbreviated, matches
@@ -342,7 +342,7 @@ public class Repo {
      * */
     public boolean findMatchId(String commitSHA1, String commitId) {
         return commitSHA1.equals(commitId) ||
-                commitSHA1.substring(0, 6).equals(commitId);
+                commitSHA1.substring(0, commitId.length()).equals(commitId);
     }
 
     /**
