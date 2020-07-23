@@ -56,6 +56,10 @@ public class Staging implements Serializable {
         this.stagedForRemoval.add(fileName);
     }
 
+    public boolean stagedForAdditionIsEmpty() {
+        return this.stagedForAddition.isEmpty();
+    }
+
     public Blob getBlobOfFile(String fileName) {
         String blobSHA1 = this.stagedForAddition.get(fileName);
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
@@ -65,13 +69,13 @@ public class Staging implements Serializable {
 
     public void save() {
         Staging stage = new Staging(this.stagedForAddition, this.stagedForRemoval);
-        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "index");
-        Utils.writeObject(currentTrackedFiles, stage);
+        File index = Utils.join(Main.STAGING_FOLDER, "index");
+        Utils.writeObject(index, stage);
     }
 
     public Staging load() {
-        File currentTrackedFiles = Utils.join(Main.STAGING_FOLDER, "index");
-        return Utils.readObject(currentTrackedFiles, Staging.class);
+        File index = Utils.join(Main.STAGING_FOLDER, "index");
+        return Utils.readObject(index, Staging.class);
     }
 
     public Map<String, String> getFilesStagedForAddition() {
@@ -96,8 +100,8 @@ public class Staging implements Serializable {
      * To-do: Can we also stop tracking the "removed files"?
      * If not, we might not be able to instantiate a new staging obj
      */
-    public void clear() {
-        Staging newStagingArea = new Staging();
-        newStagingArea.save();
-    }
+//    public Staging clear() {
+//        Staging newStagingArea = new Staging();
+//        return newStagingArea;
+//    }
 }

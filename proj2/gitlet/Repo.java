@@ -50,7 +50,10 @@ public class Repo {
         String fileName = args[1];
 
         if (isSameVersionAsLastCommit(fileName)) {
-            stagingArea.removeFromStagedForRemoval(fileName);
+            // TODO: May have bugs
+            if (stagingArea.containsFileForRemoval(fileName)) {
+                stagingArea.removeFromStagedForRemoval(fileName);
+            }
             stagingArea.save();
             Main.validateFileToBeStaged();
         }
@@ -116,13 +119,17 @@ public class Repo {
         Main.validateNumArgs(args);
         String message = args[1];
 
+        stagingArea = stagingArea.load();
+
+        if (stagingArea.stagedForAdditionIsEmpty()) {
+            Main.validateFileToBeStaged();
+        }
         if (message.isEmpty() || message.isBlank()) {
             Main.validateCommitMessage();
         }
 
         String currHeadSHA1 = Head.getGlobalHEAD().getSHA();
 
-        stagingArea.load();
         Map<String, String> snapshot = updateSnapshot();
 
         Commit commit = new Commit(message, currHeadSHA1, false, snapshot);
@@ -134,7 +141,7 @@ public class Repo {
         head.setGlobalHEAD(currBranch.getName(), commit);
         head.setBranchHEAD(currBranch.getName(), commit);
 
-        stagingArea.clear();
+        stagingArea = new Staging();
         stagingArea.save();
     }
 
@@ -348,7 +355,9 @@ public class Repo {
 
         Head.setGlobalHEAD(branchName, branchHEAD);
         restoreFilesAtBranch(currHEAD, branchHEAD);
-        stagingArea.clear();
+
+        stagingArea = new Staging();
+        stagingArea.save();
     }
 
     /**
@@ -483,7 +492,8 @@ public class Repo {
         // reset global HEAD
         Head.setGlobalHEAD(currentBranchName(), targetCommit);
 
-        stagingArea.clear();
+        stagingArea = new Staging();
+        stagingArea.save();
     }
 
     /**
