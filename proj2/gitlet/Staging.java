@@ -56,8 +56,8 @@ public class Staging implements Serializable {
         this.stagedForRemoval.add(fileName);
     }
 
-    public boolean stagedForAdditionIsEmpty() {
-        return this.stagedForAddition.isEmpty();
+    public boolean isEmpty() {
+        return this.stagedForAddition.isEmpty() && this.stagedForRemoval.isEmpty();
     }
 
     public Blob getBlobOfFile(String fileName) {
