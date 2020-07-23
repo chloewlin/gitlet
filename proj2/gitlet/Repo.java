@@ -48,6 +48,13 @@ public class Repo {
     public void add(String[] args) throws IOException {
         Main.validateNumArgs(args);
         String fileName = args[1];
+
+        if (isSameVersionAsLastCommit(fileName)) {
+            stagingArea.removeFromStagedForRemoval(fileName);
+            stagingArea.save();
+            Main.validateFileToBeStaged();
+        }
+
         Blob blob = new Blob(fileName);
         blob.save();
         stage(fileName, blob);
@@ -63,13 +70,6 @@ public class Repo {
      * */
     private void stage(String fileName, Blob blob) throws IOException {
         stagingArea = stagingArea.load();
-
-        if (isSameVersion(fileName)) {
-            Main.validateFileToBeStaged();
-            if (stagingArea.containsFileForAddition(fileName)) {
-                stagingArea.removeFromStagedForRemoval(fileName);
-            }
-        }
         stagingArea.add(fileName, blob.getBlobSHA1());
         stagingArea.save();
     }
@@ -78,17 +78,19 @@ public class Repo {
      * Checks if the current working version of the file is identical
      * to the version in the current commit.
      */
-    public boolean isSameVersion(String currFileName) {
+    public boolean isSameVersionAsLastCommit(String currFileName) {
         String CWD = System.getProperty("user.dir");
         File currentFile = new File(CWD, currFileName);
+
         Commit currCommit = Head.getGlobalHEAD();
         String blobSHA1 = currCommit.getSnapshot().get(currFileName);
+
         if (blobSHA1 == null) {
             return false;
         }
-        File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
-        Blob blob = Blob.load(blobFile);
-        return hasSameContent(currentFile, blob);
+        File blobOfPrevVersion = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+
+        return hasSameContent(currentFile, blobOfPrevVersion);
     }
 
     /**
@@ -97,7 +99,8 @@ public class Repo {
      * @param currVersion file in CWD
      * @blob blob the blob of the same file saved in current commit
      * */
-    public boolean hasSameContent(File currVersion, Blob blob) {
+    public boolean hasSameContent(File currVersion, File blobOfPrevVersion) {
+        Blob blob = Blob.load(blobOfPrevVersion);
         byte[] versionInCurrCommit = blob.getFileContent();
         byte[] versionInCWD = Utils.readContents(currVersion);
         return Arrays.equals(versionInCurrCommit, versionInCWD);
@@ -117,20 +120,22 @@ public class Repo {
             Main.validateCommitMessage();
         }
 
-        Commit parent = Head.getGlobalHEAD();
-        String parentSHA1 = parent.getSHA();
+        String currHeadSHA1 = Head.getGlobalHEAD().getSHA();
 
-        Staging stage = stagingArea.load();
+        stagingArea.load();
         Map<String, String> snapshot = updateSnapshot();
 
-        Commit commit = new Commit(message, parentSHA1, false, snapshot);
+        Commit commit = new Commit(message, currHeadSHA1, false, snapshot);
         commit.save();
 
         Branch currBranch = Utils
                 .readObject((Utils.join(Main.GITLET_FOLDER, "HEAD")), Branch.class);
+
         head.setGlobalHEAD(currBranch.getName(), commit);
         head.setBranchHEAD(currBranch.getName(), commit);
-        stage.clear();
+
+        stagingArea.clear();
+        stagingArea.save();
     }
 
     /**
@@ -336,10 +341,10 @@ public class Repo {
         if (currBranchName.equals(branchName)) {
             Main.exitWithError("No need to checkout the current branch.");
         }
-        if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
-            Main.exitWithError("There is an untracked file in the way; " +
-                    "delete it, or add and commit it first.");
-        }
+//        if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+//            Main.exitWithError("There is an untracked file in the way; " +
+//                    "delete it, or add and commit it first.");
+//        }
 
         Head.setGlobalHEAD(branchName, branchHEAD);
         restoreFilesAtBranch(currHEAD, branchHEAD);
@@ -455,10 +460,10 @@ public class Repo {
         Commit targetCommit = null;
 
         // TODO: TEST THIS FUNCTIONALITY
-        if (hasUntrackedFiles()) {
-            Main.exitWithError("There is an untracked file in the way; " +
-                    "delete it, or add and commit it first.");
-        }
+//        if (hasUntrackedFiles()) {
+//            Main.exitWithError("There is an untracked file in the way; " +
+//                    "delete it, or add and commit it first.");
+//        }
 
         // find commit
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
