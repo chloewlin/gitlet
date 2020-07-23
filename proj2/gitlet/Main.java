@@ -141,9 +141,9 @@ public class Main {
                 exitWithError("Incorrect Operation");
                 return;
             }
-            if (!repo.containsCommitId(args[1])) {
-                exitWithError("No commit with that id exists.");
-            }
+//            if (!repo.containsCommitId(args[1])) {
+//                exitWithError("No commit with that id exists.");
+//            }
             repo.checkoutCommit(args[1], args[3]);
         }
     }
