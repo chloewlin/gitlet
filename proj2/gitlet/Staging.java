@@ -30,9 +30,9 @@ public class Staging implements Serializable {
      * stagedForRemoval.
      * */
     public void add(String fileName, String blobSHA1) {
-        if (this.stagedForRemoval.contains(fileName)) {
-            this.stagedForRemoval.remove(fileName);
-        }
+//        if (this.stagedForRemoval.contains(fileName)) {
+//            this.stagedForRemoval.remove(fileName);
+//        }
         this.stagedForAddition.put(fileName, blobSHA1);
     }
 

@@ -151,9 +151,21 @@ public class Repo {
     public Map<String, String> updateSnapshot() {
         Commit HEAD = Head.getGlobalHEAD();
         Staging stage = stagingArea.load();
+
         Map<String, String> parentSnapshot = HEAD.getSnapshot();
         Map<String, String> stagedForAdditionFiles = stage.getFilesStagedForAddition();
+        Set<String> stagedForRemovalFiles = stage.getFilesStagedForRemoval();
+
         stagedForAdditionFiles.forEach(parentSnapshot::put);
+
+        stagedForRemovalFiles.forEach((file) -> {
+            if (parentSnapshot.containsKey(file)) {
+                parentSnapshot.remove(file);
+            }
+        });
+
+//        System.out.println("========= parent snapshot ======== ");
+//        parentSnapshot.forEach((k, v) -> System.out.println(k + ": " + v));
         return parentSnapshot;
     }
 
@@ -371,7 +383,6 @@ public class Repo {
     }
 
     /**
-     * TBD: May contain bugs. Write tests.
      *
      * Compare the snapshots hashmaps of currBranch and targetBranch.
      *
@@ -386,7 +397,10 @@ public class Repo {
         Map<String, String> overwrite = new HashMap<>();
         Map<String, String> delete = new HashMap<>();
 
+        // TODO: FIX BUGS
+//        System.out.println("===== Curr Snapshot ===== ");
         currSnapshot.forEach((fileName, blobSHA1) -> {
+//            System.out.println(fileName + ": " + blobSHA1);
             if (checkoutSnapshot.containsKey(fileName)) {
                 overwrite.put(fileName, checkoutSnapshot.get(fileName));
             } else {
@@ -394,13 +408,20 @@ public class Repo {
             }
         });
 
+//        System.out.println();
+//        System.out.println("===== Checkout Snapshot ===== ");
         checkoutSnapshot.forEach((fileName, blobSHA1) -> {
+//            System.out.println(fileName + ": " + blobSHA1);
             if (!overwrite.containsKey(fileName)) {
                 overwrite.put(fileName, blobSHA1);
             }
         });
 
+//        System.out.println();
+//        System.out.println("===== Files To Overwrite ===== ");
         overwrite.forEach((file, blobSHA1) -> {
+//            System.out.println(file + ": " + blobSHA1);
+
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
             Blob blob = Blob.load(blobFile);
             try {
@@ -410,7 +431,12 @@ public class Repo {
             }
         });
 
-        delete.forEach((file, blobSHA1) -> Utils.restrictedDelete(file));
+//        System.out.println();
+//        System.out.println("===== Files To Delete ===== ");
+        delete.forEach((file, blobSHA1) -> {
+//            System.out.println(file + ": " + blobSHA1);
+            Utils.restrictedDelete(file);
+        });
     }
 
     /**
@@ -509,7 +535,7 @@ public class Repo {
         // and (2) IS saved in the target HEAD of branch
         for (String fileName : fileInCWD) {
 
-            // check if a file is saved in the current HEAD of a branch
+            // check if a file is saved in the branch HEAD BUT NOT in current HEAD
             if (branchHEAD.getSnapshot().containsKey(fileName)) {
 
                 String blobFileNameOfFileInTargetBranch =
@@ -521,10 +547,19 @@ public class Repo {
                 if (!blobFileNameOfCurrFile.equals(blobFileNameOfFileInTargetBranch)) {
                     untrackedFiles.add(fileName);
                 }
+
+                // check if the current file in CWD is tracked in the current branch HEAD
+                // current branch HEAD should have the exact key-value (filename: blobSHA1)
+                // match
+                if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
+                        && !Head.getGlobalHEAD()
+                                .getSnapshot().containsValue(blobFileNameOfCurrFile)) {
+                    untrackedFiles.add(fileName);
+                }
             }
         }
 
-//        System.out.println("Untracked Files....");
+//        System.out.println(" =========== Untracked Files =============");
 //        untrackedFiles.forEach((s) -> System.out.println(s));
 
         return untrackedFiles.size() > 0;
