@@ -1,6 +1,5 @@
 package gitlet;
 
-import javax.sound.midi.Soundbank;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -12,19 +11,22 @@ import java.util.*;
  */
 public class Repo {
 
+    static final String SENTINEL_COMMIT_ID = "6cf73ef132f3f89a94f4c73ec879aa79ba529e86";
     static final String INIT_PARENT_SHA1 = "0000000000000000000000000000000000000000";
     static Staging stagingArea = new Staging();
     Head head = new Head();
-    History history = new History();
+    Merge merge = new Merge();
 
 
     /**
      * Create initial commit and set up branch and HEAD pointer.
      */
     public void initialize() throws IOException {
-        Commit sentinel = new Commit("sentinel");
-        Commit initialCommit = new Commit("initial commit", sentinel.getSHA(), true, new HashMap<>());
-        sentinel.save();
+        Map<String, String> sentinelMap = new HashMap<>();
+        Commit sentinel = new Commit("sentinel", sentinelMap);
+        Commit initialCommit = new Commit("initial commit", sentinel.getSHA(),
+                true, new HashMap<>());
+        sentinel.saveInit();
         initialCommit.saveInit();
         Head.setGlobalHEAD("master", initialCommit);
         Head.setBranchHEAD("master", initialCommit);
@@ -47,6 +49,15 @@ public class Repo {
     public void add(String[] args) throws IOException {
         Main.validateNumArgs(args);
         String fileName = args[1];
+
+        if (isSameVersionAsLastCommit(fileName)) {
+            if (stagingArea.containsFileForRemoval(fileName)) {
+                stagingArea.removeFromStagedForRemoval(fileName);
+            }
+            stagingArea.save();
+            return;
+        }
+
         Blob blob = new Blob(fileName);
         blob.save();
         stage(fileName, blob);
@@ -62,13 +73,6 @@ public class Repo {
      * */
     private void stage(String fileName, Blob blob) throws IOException {
         stagingArea = stagingArea.load();
-
-        if (isSameVersion(fileName)) {
-            Main.validateFileToBeStaged();
-            if (stagingArea.containsFileForAddition(fileName)) {
-                stagingArea.removeFromStagedForRemoval(fileName);
-            }
-        }
         stagingArea.add(fileName, blob.getBlobSHA1());
         stagingArea.save();
     }
@@ -77,17 +81,19 @@ public class Repo {
      * Checks if the current working version of the file is identical
      * to the version in the current commit.
      */
-    public boolean isSameVersion(String currFileName) {
+    public boolean isSameVersionAsLastCommit(String currFileName) {
         String CWD = System.getProperty("user.dir");
         File currentFile = new File(CWD, currFileName);
+
         Commit currCommit = Head.getGlobalHEAD();
         String blobSHA1 = currCommit.getSnapshot().get(currFileName);
+
         if (blobSHA1 == null) {
             return false;
         }
-        File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
-        Blob blob = Blob.load(blobFile);
-        return hasSameContent(currentFile, blob);
+        File blobOfPrevVersion = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+
+        return hasSameContent(currentFile, blobOfPrevVersion);
     }
 
     /**
@@ -96,7 +102,8 @@ public class Repo {
      * @param currVersion file in CWD
      * @blob blob the blob of the same file saved in current commit
      * */
-    public boolean hasSameContent(File currVersion, Blob blob) {
+    public boolean hasSameContent(File currVersion, File blobOfPrevVersion) {
+        Blob blob = Blob.load(blobOfPrevVersion);
         byte[] versionInCurrCommit = blob.getFileContent();
         byte[] versionInCWD = Utils.readContents(currVersion);
         return Arrays.equals(versionInCurrCommit, versionInCWD);
@@ -112,24 +119,30 @@ public class Repo {
         Main.validateNumArgs(args);
         String message = args[1];
 
+        stagingArea = stagingArea.load();
+
+        if (stagingArea.isEmpty()) {
+            Main.exitWithError("No changes added to the commit.");
+        }
         if (message.isEmpty() || message.isBlank()) {
-            Main.validateCommitMessage();
+            Main.exitWithError("Please enter a commit message.");
         }
 
-        Commit parent = Head.getGlobalHEAD();
-        String parentSHA1 = parent.getSHA();
+        String currHeadSHA1 = Head.getGlobalHEAD().getSHA();
 
-        Staging stage = stagingArea.load();
         Map<String, String> snapshot = updateSnapshot();
 
-        Commit commit = new Commit(message, parentSHA1, false, snapshot);
+        Commit commit = new Commit(message, currHeadSHA1, false, snapshot);
         commit.save();
 
         Branch currBranch = Utils
                 .readObject((Utils.join(Main.GITLET_FOLDER, "HEAD")), Branch.class);
+
         head.setGlobalHEAD(currBranch.getName(), commit);
         head.setBranchHEAD(currBranch.getName(), commit);
-        stage.clear();
+
+        stagingArea = new Staging();
+        stagingArea.save();
     }
 
     /**
@@ -198,26 +211,44 @@ public class Repo {
     }
 
     /**
-     * Print print all of the commit metadata.
+     * Print all of the commits in this repo.
      */
     public void globalLog() {
+        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
+        String[] commits = commitDir.list();
 
+        for (String commitId : commits) {
+            Commit commit = Commit.load(commitId);
+            if (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+                System.out.print("===" + "\n");
+                System.out.print("commit " + commit.getSHA() + "\n");
+                System.out.print("Date: " + commit.getTimestamp() + "\n");
+                System.out.print(commit.getMessage() + "\n");
+                System.out.println("");
+            }
+        }
     }
 
     /**
      * Search for commits that have the given commit message.
-     * @param commitMsg
      */
-    public void find(String[] commitMsg) {
+    public void find(String[] args) {
+        String commitMessage = args[1];
+        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
+        String[] commits = commitDir.list();
+        Boolean found = false;
 
-//        String commits = Head.getGlobalHEAD().getMessage();
-//        if (commits.length() < 1) {
-//            System.out.println("Found no commit with that message.");
-//        }
-//        if (commits.compareTo(String.valueOf(commitMsg)) == 0) {
-//            System.out.println(commits);
-//        }
+        for (String commitId : commits) {
+            Commit commit = Commit.load(commitId);
+            if (commit.getMessage().equals(commitMessage)) {
+                found = true;
+                System.out.println(commit.getSHA());
+            }
+        }
 
+        if (!found) {
+            Main.exitWithError("Found no commit with that message.");
+        }
     }
 
     /**
@@ -235,7 +266,7 @@ public class Repo {
      * there if there is one. The new version of the file is not staged.
      * @return
      */
-    public boolean checkoutFile(String filename) throws IOException {
+    public void checkoutFile(String filename) throws IOException {
         Map<String, String> snapshot = Head.getGlobalHEAD().getSnapshot();
 
         if (snapshot.containsKey(filename)) {
@@ -243,8 +274,9 @@ public class Repo {
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
             Blob blob = Blob.load(blobFile);
             restoreFileInCWD(blob);
+        } else {
+            Main.exitWithError("File does not exist in that commit.");
         }
-        return false;
     }
 
     /**
@@ -257,13 +289,19 @@ public class Repo {
     public void checkoutCommit(String commitId, String fileName) throws IOException {
         Commit commit = Head.getGlobalHEAD();
         String blobSHA1 = "";
+        boolean found = false;
 
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             if (findMatchId(commit.getSHA(), commitId)) {
                 blobSHA1 = commit.getSnapshot().get(fileName);
+                found = true;
                 break;
             }
             commit = commit.getParent();
+        }
+
+        if (!found) {
+            Main.exitWithError("File does not exist in that commit.");
         }
 
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
@@ -271,37 +309,16 @@ public class Repo {
         restoreFileInCWD(blob);
     }
 
-    /**
-     * Checks if a commit contains a given file
-     * */
-    public boolean containsFile(String commitId, String fileName) {
-        Commit commit = Head.getGlobalHEAD();
-        Boolean hasFile = false;
-
-        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
-            if (findMatchId(commit.getSHA(), commitId)) {
-                if (commit.getSnapshot().containsKey(fileName)) {
-                    hasFile = true;
-                    break;
-                }
-            }
-            commit = commit.getParent();
-        }
-
-        return hasFile;
-    }
-
     /** check if a commit id exists in our repo */
-    public boolean containsCommitId(String commitId) {
-        Commit commit = Head.getGlobalHEAD();
+    public boolean containsCommitId(String targetCommitId) {
         Boolean found = false;
+        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
+        String[] commits = commitDir.list();
 
-        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
-            if (findMatchId(commit.getSHA(), commitId)) {
+        for (String commitId : commits) {
+            if (commitId.equals(targetCommitId)) {
                 found = true;
-                break;
             }
-            commit = commit.getParent();
         }
 
         return found;
@@ -337,7 +354,9 @@ public class Repo {
 
         Head.setGlobalHEAD(branchName, branchHEAD);
         restoreFilesAtBranch(currHEAD, branchHEAD);
-        stagingArea.clear();
+
+        stagingArea = new Staging();
+        stagingArea.save();
     }
 
     /**
@@ -448,11 +467,11 @@ public class Repo {
         String commitId = args[1];
         Commit targetCommit = null;
 
-        // TODO: TEST THIS FUNCTIONALITY
-        if (hasUntrackedFiles()) {
-            Main.exitWithError("There is an untracked file in the way; " +
-                    "delete it, or add and commit it first.");
-        }
+        // TODO: FIX BUG
+//        if (hasUntrackedFiles()) {
+//            Main.exitWithError("There is an untracked file in the way; " +
+//                    "delete it, or add and commit it first.");
+//        }
 
         // find commit
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
@@ -472,7 +491,8 @@ public class Repo {
         // reset global HEAD
         Head.setGlobalHEAD(currentBranchName(), targetCommit);
 
-        stagingArea.clear();
+        stagingArea = new Staging();
+        stagingArea.save();
     }
 
     /**
@@ -481,15 +501,32 @@ public class Repo {
      * */
     public boolean hasUntrackedFilesForCheckoutBranch(Commit branchHEAD) {
         List<String> untrackedFiles = new ArrayList<String>();
+
         stagingArea = stagingArea.load();
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
 
+        // TODO: DEBUG
+        // check if a file is (1) NOT saved in the current HEAD of branch
+        // and (2) IS saved in the target HEAD of branch
         for (String fileName : fileInCWD) {
-            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
-                    && branchHEAD.getSnapshot().containsKey(fileName)) {
-                untrackedFiles.add(fileName);
+
+            // check if a file is saved in the current HEAD of a branch
+            if (branchHEAD.getSnapshot().containsKey(fileName)) {
+
+                String blobFileNameOfFileInTargetBranch =
+                        branchHEAD.getSnapshot().get(fileName);
+                // compare the blob saved in the branch head with current file
+                Blob blobOfCurrFile = new Blob(fileName);
+                String blobFileNameOfCurrFile = blobOfCurrFile.getBlobSHA1();
+
+                if (!blobFileNameOfCurrFile.equals(blobFileNameOfFileInTargetBranch)) {
+                    untrackedFiles.add(fileName);
+                }
             }
         }
+
+//        System.out.println("Untracked Files....");
+//        untrackedFiles.forEach((s) -> System.out.println(s));
 
         return untrackedFiles.size() > 0;
     }
@@ -499,7 +536,7 @@ public class Repo {
      * */
     public boolean hasUntrackedFiles() {
 
-        //may have bugs
+        // TODO: HAS BUGS
 
         stagingArea = stagingArea.load();
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
@@ -551,7 +588,7 @@ public class Repo {
      */
     public void merge(String[] args) {
         String givenBranch = args[1];
-        history.merge(givenBranch);
+        merge.merge(givenBranch);
     }
 
     /**
