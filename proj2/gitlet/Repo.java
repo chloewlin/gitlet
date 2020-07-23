@@ -504,18 +504,42 @@ public class Repo {
         stagingArea = stagingArea.load();
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
 
+//        System.out.print("current global head: ");
+//        System.out.println(Head.getGlobalHEAD().getMessage());
+//        System.out.println(Head.getGlobalHEAD().getSnapshot());
+//
+//        System.out.print("current branch head: ");
+//        System.out.println(branchHEAD.getMessage());
+//        System.out.println(branchHEAD.getSnapshot());
+
         // TODO: DEBUG
         // check if a file is (1) NOT saved in the current HEAD of branch
         // and (2) IS saved in the target HEAD of branch
-//        for (String fileName : fileInCWD) {
-//            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
-//                    && branchHEAD.getSnapshot().containsKey(fileName)) {
+        for (String fileName : fileInCWD) {
+//            System.out.println(fileName);
+//            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)) {
+//                return false;
+//            }
+
+            String blobFileNameOfFileSavedInOtherBranch =
+                    Head.getGlobalHEAD().getSnapshot().get(fileName);
+            // compare the blob saved in the branch head with current file
+            Blob blobOfCurrFile = new Blob(fileName);
+            String blobFileNameOfCurrFile = blobOfCurrFile.getBlobSHA1();
+
+//            System.out.println("blobFileNameOfFileSavedInOtherBranch  " + blobFileNameOfFileSavedInOtherBranch);
+//            System.out.println("blobFileNameOfCurrFile  " + blobFileNameOfCurrFile);
+
+//            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName) &&
+//                    branchHEAD.getSnapshot().containsKey(fileName)) {
 //                untrackedFiles.add(fileName);
 //            }
-//        }
-//
-//        return untrackedFiles.size() > 0;
-        return false;
+            if (!blobFileNameOfCurrFile.equals(blobFileNameOfFileSavedInOtherBranch)) {
+                return true;
+            }
+        }
+
+        return untrackedFiles.size() > 0;
     }
 
     /**
