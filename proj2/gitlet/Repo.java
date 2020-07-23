@@ -238,6 +238,7 @@ public class Repo {
         String[] commits = commitDir.list();
         Boolean found = false;
 
+        // TODO: FIX BUG
         for (String commitId : commits) {
             Commit commit = Commit.load(commitId);
             if (commit.getMessage().equals(commitMessage)) {
