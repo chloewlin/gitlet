@@ -21,9 +21,11 @@ public class Repo {
      * Create initial commit and set up branch and HEAD pointer.
      */
     public void initialize() throws IOException {
-        Commit sentinel = new Commit("sentinel");
-        Commit initialCommit = new Commit("initial commit", sentinel.getSHA(), true, new HashMap<>());
-        sentinel.save();
+        Map<String, String> sentinelMap = new HashMap<>();
+        Commit sentinel = new Commit("sentinel", sentinelMap);
+        Commit initialCommit = new Commit("initial commit", sentinel.getSHA(),
+                true, new HashMap<>());
+        sentinel.saveInit();
         initialCommit.saveInit();
         Head.setGlobalHEAD("master", initialCommit);
         Head.setBranchHEAD("master", initialCommit);
@@ -204,8 +206,8 @@ public class Repo {
         String[] commits = commitDir.list();
 
         for (String commitId : commits) {
-            if (!commitId.equals(SENTINEL_COMMIT_ID)) {
-                Commit commit = Commit.load(commitId);
+            Commit commit = Commit.load(commitId);
+            if (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
                 System.out.print("===" + "\n");
                 System.out.print("commit " + commit.getSHA() + "\n");
                 System.out.print("Date: " + commit.getTimestamp() + "\n");
@@ -385,6 +387,11 @@ public class Repo {
                 overwrite.put(fileName, blobSHA1);
             }
         });
+
+//        System.out.println("overwrite array: ");
+//        overwrite.forEach((k, v) -> System.out.println(k + " : " + v));
+//        System.out.println("delete array: ");
+//        delete.forEach((k, v) -> System.out.println(k + " : " + v));
 
         overwrite.forEach((file, blobSHA1) -> {
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);

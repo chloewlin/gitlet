@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * A Commit class represents a commit node and
@@ -54,17 +51,25 @@ public class Commit implements Serializable {
      * @param map the file-blob hashmap
      */
     public Commit(String msg, String parent, boolean initial, Map<String, String> map) {
+        List<String> list = new ArrayList<String>(map.values());
+        // create unique sha
+        String blobFileNames = "";
+        for (String blobFileName : list) {
+            blobFileNames += blobFileName;
+        }
         this.message = msg;
         this.parents[0] = parent;
-        this.sha1 = Utils.sha1("COMMIT" + message);
+        this.sha1 = Utils.sha1("COMMIT" + message + blobFileNames);
         this.timestamp = generateDate(initial);
         this.snapshot = map;
         this.init = initial;
     }
 
-    public Commit(String msg) {
+    /** for init only */
+    public Commit(String msg, Map<String, String> map) {
         this.message = msg;
         this.parents[0] = Repo.INIT_PARENT_SHA1;
+        this.snapshot = map;
         this.sha1 = Utils.sha1("COMMIT" + message);
         this.timestamp = generateDate(false);
     }
