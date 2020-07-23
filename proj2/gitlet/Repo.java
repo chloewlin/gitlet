@@ -120,7 +120,7 @@ public class Repo {
 
         stagingArea = stagingArea.load();
 
-        if (stagingArea.stagedForAdditionIsEmpty()) {
+        if (stagingArea.isEmpty()) {
             Main.exitWithError("No changes added to the commit.");
         }
         if (message.isEmpty() || message.isBlank()) {
