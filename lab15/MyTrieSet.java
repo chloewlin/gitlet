@@ -1,6 +1,18 @@
+import java.util.HashMap;
 import java.util.List;
 
 public class MyTrieSet implements TrieSet61BL{
+    private class Node {
+        private boolean isKey;
+        private HashMap<Character, Node> map;
+        Node (boolean a) {
+            this.isKey = a;
+            map = new HashMap<>();
+        }
+    }
+
+    private Node root;
+
     @Override
     public void clear() {
 
@@ -18,7 +30,7 @@ public class MyTrieSet implements TrieSet61BL{
         for (int i = 0, n = key.length(); i < n; i++) {
             char c = key.charAt(i);
             if (!curr.map.containsKey(c)) {
-                curr.map.put(c, new Node(c, false));
+                curr.map.put(c, new Node(false));
             }
             curr = curr.map.get(c);
         }
