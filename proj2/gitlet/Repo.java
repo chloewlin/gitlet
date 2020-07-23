@@ -237,7 +237,6 @@ public class Repo {
         String[] commits = commitDir.list();
         Boolean found = false;
 
-        // TODO: FIX BUG
         for (String commitId : commits) {
             Commit commit = Commit.load(commitId);
             if (commit.getMessage().equals(commitMessage)) {
@@ -310,16 +309,15 @@ public class Repo {
     }
 
     /** check if a commit id exists in our repo */
-    public boolean containsCommitId(String commitId) {
-        Commit commit = Head.getGlobalHEAD();
+    public boolean containsCommitId(String targetCommitId) {
         Boolean found = false;
+        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
+        String[] commits = commitDir.list();
 
-        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
-            if (findMatchId(commit.getSHA(), commitId)) {
+        for (String commitId : commits) {
+            if (commitId.equals(targetCommitId)) {
                 found = true;
-                break;
             }
-            commit = commit.getParent();
         }
 
         return found;
@@ -348,10 +346,10 @@ public class Repo {
         if (currBranchName.equals(branchName)) {
             Main.exitWithError("No need to checkout the current branch.");
         }
-//        if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
-//            Main.exitWithError("There is an untracked file in the way; " +
-//                    "delete it, or add and commit it first.");
-//        }
+        if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+            Main.exitWithError("There is an untracked file in the way; " +
+                    "delete it, or add and commit it first.");
+        }
 
         Head.setGlobalHEAD(branchName, branchHEAD);
         restoreFilesAtBranch(currHEAD, branchHEAD);
@@ -468,7 +466,7 @@ public class Repo {
         String commitId = args[1];
         Commit targetCommit = null;
 
-        // TODO: TEST THIS FUNCTIONALITY
+        // TODO: FIX BUG
 //        if (hasUntrackedFiles()) {
 //            Main.exitWithError("There is an untracked file in the way; " +
 //                    "delete it, or add and commit it first.");
@@ -501,14 +499,22 @@ public class Repo {
      * and would be overwritten by the checkout.
      * */
     public boolean hasUntrackedFilesForCheckoutBranch(Commit branchHEAD) {
-        // TODO: HAS BUGS
         List<String> untrackedFiles = new ArrayList<String>();
+
         stagingArea = stagingArea.load();
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
 
+        // TODO: DEBUG
+        // check if a file is (1) NOT saved in the current HEAD of branch
+        // and (2) IS saved in the target HEAD of branch
         for (String fileName : fileInCWD) {
-            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
-                    && branchHEAD.getSnapshot().containsKey(fileName)) {
+            String blobFileNameOfFileInTargetBranch =
+                    branchHEAD.getSnapshot().get(fileName);
+            // compare the blob saved in the branch head with current file
+            Blob blobOfCurrFile = new Blob(fileName);
+            String blobFileNameOfCurrFile = blobOfCurrFile.getBlobSHA1();
+
+            if (!blobFileNameOfCurrFile.equals(blobFileNameOfFileInTargetBranch)) {
                 untrackedFiles.add(fileName);
             }
         }
