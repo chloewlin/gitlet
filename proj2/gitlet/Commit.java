@@ -103,7 +103,7 @@ public class Commit implements Serializable {
     /**
      * Return a commit node from a byte array.
      */
-    public Commit load(String sha1) {
+    public static Commit load(String sha1) {
         File commitFile = Utils.join(Main.COMMITS_FOLDER, sha1);
         return Utils.readObject(commitFile, Commit.class);
     }

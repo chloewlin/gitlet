@@ -11,6 +11,7 @@ import java.util.*;
  */
 public class Repo {
 
+    static final String SENTINEL_COMMIT_ID = "6cf73ef132f3f89a94f4c73ec879aa79ba529e86";
     static final String INIT_PARENT_SHA1 = "0000000000000000000000000000000000000000";
     static Staging stagingArea = new Staging();
     Head head = new Head();
@@ -200,6 +201,20 @@ public class Repo {
      */
     public void globalLog() {
         /** To-do: traverse the entire commit tree */
+        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
+        String[] commits = commitDir.list();
+
+        for (String commitId : commits) {
+            if (!commitId.equals(SENTINEL_COMMIT_ID)) {
+                Commit commit = Commit.load(commitId);
+                System.out.print("===" + "\n");
+                System.out.print("commit " + commit.getSHA() + "\n");
+                System.out.print("Date: " + commit.getTimestamp() + "\n");
+                System.out.print(commit.getMessage() + "\n");
+                System.out.println("");
+            }
+        }
+
     }
 
     /**
@@ -207,14 +222,6 @@ public class Repo {
      * @param commitMsg
      */
     public void find(String[] commitMsg) {
-
-//        String commits = Head.getGlobalHEAD().getMessage();
-//        if (commits.length() < 1) {
-//            System.out.println("Found no commit with that message.");
-//        }
-//        if (commits.compareTo(String.valueOf(commitMsg)) == 0) {
-//            System.out.println(commits);
-//        }
 
     }
 
