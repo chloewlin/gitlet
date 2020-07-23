@@ -215,15 +215,28 @@ public class Repo {
                 System.out.println("");
             }
         }
-
     }
 
     /**
      * Search for commits that have the given commit message.
-     * @param commitMsg
      */
-    public void find(String[] commitMsg) {
+    public void find(String[] args) {
+        String commitMessage = args[1];
+        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
+        String[] commits = commitDir.list();
+        Boolean found = false;
 
+        for (String commitId : commits) {
+            Commit commit = Commit.load(commitId);
+            if (commit.getMessage().equals(commitMessage)) {
+                found = true;
+                System.out.println(commit.getSHA());
+            }
+        }
+
+        if (!found) {
+            Main.exitWithError("Found no commit with that message.");
+        }
     }
 
     /**
