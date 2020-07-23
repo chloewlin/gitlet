@@ -197,10 +197,9 @@ public class Repo {
     }
 
     /**
-     * Print print all of the commit metadata.
+     * Print all of the commits in this repo.
      */
     public void globalLog() {
-        /** To-do: traverse the entire commit tree */
         File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
         String[] commits = commitDir.list();
 
