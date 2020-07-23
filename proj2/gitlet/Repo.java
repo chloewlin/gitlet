@@ -504,6 +504,7 @@ public class Repo {
      * and would be overwritten by the checkout.
      * */
     public boolean hasUntrackedFilesForCheckoutBranch(Commit branchHEAD) {
+        // TODO: HAS BUGS
         List<String> untrackedFiles = new ArrayList<String>();
         stagingArea = stagingArea.load();
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
@@ -523,7 +524,7 @@ public class Repo {
      * */
     public boolean hasUntrackedFiles() {
 
-        //may have bugs
+        // TODO: HAS BUGS
 
         stagingArea = stagingArea.load();
         List<String> fileInCWD = Utils.plainFilenamesIn("./");

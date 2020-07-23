@@ -133,9 +133,9 @@ public class Main {
                 exitWithError("Incorrect Operation");
                 return;
             }
-            if (!repo.containsFile(Head.getGlobalHEAD().getSHA(), args[2])) {
-                exitWithError("File does not exist in that commit.");
-            }
+//            if (!repo.containsFile(Head.getGlobalHEAD().getSHA(), args[2])) {
+//                exitWithError("File does not exist in that commit.");
+//            }
             repo.checkoutFile(args[2]);
         }
 
@@ -147,9 +147,9 @@ public class Main {
             if (!repo.containsCommitId(args[1])) {
                 exitWithError("No commit with that id exists.");
             }
-            if (!repo.containsFile(Head.getGlobalHEAD().getSHA(), args[2])) {
-                exitWithError("File does not exist in that commit.");
-            }
+//            if (!repo.containsFile(Head.getGlobalHEAD().getSHA(), args[2])) {
+//                exitWithError("File does not exist in that commit.");
+//            }
             repo.checkoutCommit(args[1], args[3]);
         }
     }
@@ -226,7 +226,7 @@ public class Main {
         boolean found = false;
 
         for (String file : fileInCWD) {
-            if (file.equals(fileName)) {
+            if (file.toLowerCase().equals(fileName.toLowerCase())) {
                 found = true;
             }
         }
