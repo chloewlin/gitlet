@@ -297,26 +297,6 @@ public class Repo {
         restoreFileInCWD(blob);
     }
 
-    /**
-     * Checks if a commit contains a given file
-     * */
-    public boolean containsFile(String commitId, String fileName) {
-        Commit commit = Head.getGlobalHEAD();
-        Boolean hasFile = false;
-
-        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
-            if (findMatchId(commit.getSHA(), commitId)) {
-                if (commit.getSnapshot().containsKey(fileName)) {
-                    hasFile = true;
-                    break;
-                }
-            }
-            commit = commit.getParent();
-        }
-
-        return hasFile;
-    }
-
     /** check if a commit id exists in our repo */
     public boolean containsCommitId(String commitId) {
         Commit commit = Head.getGlobalHEAD();
