@@ -55,7 +55,6 @@ public class Repo {
                 stagingArea.removeFromStagedForRemoval(fileName);
             }
             stagingArea.save();
-            Main.validateFileToBeStaged();
         }
 
         Blob blob = new Blob(fileName);
@@ -122,10 +121,10 @@ public class Repo {
         stagingArea = stagingArea.load();
 
         if (stagingArea.stagedForAdditionIsEmpty()) {
-            Main.validateFileToBeStaged();
+            Main.exitWithError("No changes added to the commit.");
         }
         if (message.isEmpty() || message.isBlank()) {
-            Main.validateCommitMessage();
+            Main.exitWithError("Please enter a commit message.");
         }
 
         String currHeadSHA1 = Head.getGlobalHEAD().getSHA();
