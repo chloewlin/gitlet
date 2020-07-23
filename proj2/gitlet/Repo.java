@@ -508,16 +508,24 @@ public class Repo {
         // check if a file is (1) NOT saved in the current HEAD of branch
         // and (2) IS saved in the target HEAD of branch
         for (String fileName : fileInCWD) {
-            String blobFileNameOfFileInTargetBranch =
-                    branchHEAD.getSnapshot().get(fileName);
-            // compare the blob saved in the branch head with current file
-            Blob blobOfCurrFile = new Blob(fileName);
-            String blobFileNameOfCurrFile = blobOfCurrFile.getBlobSHA1();
 
-            if (!blobFileNameOfCurrFile.equals(blobFileNameOfFileInTargetBranch)) {
-                untrackedFiles.add(fileName);
+            // check if a file is saved in the current HEAD of a branch
+            if (branchHEAD.getSnapshot().containsKey(fileName)) {
+
+                String blobFileNameOfFileInTargetBranch =
+                        branchHEAD.getSnapshot().get(fileName);
+                // compare the blob saved in the branch head with current file
+                Blob blobOfCurrFile = new Blob(fileName);
+                String blobFileNameOfCurrFile = blobOfCurrFile.getBlobSHA1();
+
+                if (!blobFileNameOfCurrFile.equals(blobFileNameOfFileInTargetBranch)) {
+                    untrackedFiles.add(fileName);
+                }
             }
         }
+
+//        System.out.println("Untracked Files....");
+//        untrackedFiles.forEach((s) -> System.out.println(s));
 
         return untrackedFiles.size() > 0;
     }
