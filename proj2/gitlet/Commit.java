@@ -81,8 +81,11 @@ public class Commit implements Serializable {
         Commit commit = new Commit(this.message, this.parents[0],
                 true, this.snapshot);
         File commitFile = Utils.join(Main.COMMITS_FOLDER, this.sha1);
+        File commitLogs = Utils.join(Main.LOGS_FOLDER, this.sha1);
         commitFile.createNewFile();
+        commitLogs.createNewFile();
         Utils.writeObject(commitFile, commit);
+        Utils.writeObject(commitLogs, commit);
     }
 
     /**
@@ -92,8 +95,11 @@ public class Commit implements Serializable {
         Commit commit = new Commit(this.message, this.parents[0],
                 this.init, this.snapshot);
         File commitFile = Utils.join(Main.COMMITS_FOLDER, this.sha1);
+        File commitLogs = Utils.join(Main.LOGS_FOLDER, this.sha1);
         commitFile.createNewFile();
+        commitLogs.createNewFile();
         Utils.writeObject(commitFile, commit);
+        Utils.writeObject(commitLogs, commit);
     }
 
     /**

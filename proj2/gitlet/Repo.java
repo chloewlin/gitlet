@@ -17,6 +17,7 @@ public class Repo {
     Head head = new Head();
     Merge merge = new Merge();
 
+
     /**
      * Create initial commit and set up branch and HEAD pointer.
      */
@@ -305,10 +306,11 @@ public class Repo {
                 blobSHA1 = commit.getSnapshot().get(fileName);
                 found = true;
                 break;
+            } else {
+                Main.exitWithError("No commit with that id exists.");
             }
             commit = commit.getParent();
         }
-
         if (!found) {
             Main.exitWithError("File does not exist in that commit.");
         }
@@ -318,20 +320,19 @@ public class Repo {
         restoreFileInCWD(blob);
     }
 
-    /** check if a commit id exists in our repo */
-    public boolean containsCommitId(String targetCommitId) {
-        Boolean found = false;
-        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
-        String[] commits = commitDir.list();
-
-        for (String commitId : commits) {
-            if (commitId.equals(targetCommitId)) {
-                found = true;
-            }
-        }
-
-        return found;
-    }
+//    /** check if a commit id exists in our repo */
+//    public boolean containsCommitId(String targetCommitId) {
+//        Boolean found = false;
+//        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
+//        String[] commits = commitDir.list();
+//
+//        for (String commitId : commits) {
+//            if (findMatchId(commitId, targetCommitId)) {
+//                found = true;
+//            }
+//        }
+//        return found;
+//    }
 
     /**
      * Checks if a given commit id, full or abbreviated, matches
