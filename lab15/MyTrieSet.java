@@ -28,6 +28,9 @@ public class MyTrieSet implements TrieSet61BL {
 
     @Override
     public boolean contains(String key) {
+        if (key == null || key.length() < 1) {
+            return false;
+        }
         Node curr = root;
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
@@ -92,12 +95,12 @@ public class MyTrieSet implements TrieSet61BL {
         return null;
     }
 
-    public static void main(String[] args) {
-        MyTrieSet t = new MyTrieSet();
+//    public static void main(String[] args) {
+//        MyTrieSet t = new MyTrieSet();
 
-        t.add("hello");
+//        t.add("hello");
 //        t.add("hi");
 //        t.add("help");
 //        t.add("zebra");
-    }
+//    }
 }
