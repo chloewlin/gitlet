@@ -164,8 +164,6 @@ public class Repo {
             }
         });
 
-//        System.out.println("========= parent snapshot ======== ");
-//        parentSnapshot.forEach((k, v) -> System.out.println(k + ": " + v));
         return parentSnapshot;
     }
 
@@ -398,9 +396,7 @@ public class Repo {
         Map<String, String> delete = new HashMap<>();
 
         // TODO: FIX BUGS
-//        System.out.println("===== Curr Snapshot ===== ");
         currSnapshot.forEach((fileName, blobSHA1) -> {
-//            System.out.println(fileName + ": " + blobSHA1);
             if (checkoutSnapshot.containsKey(fileName)) {
                 overwrite.put(fileName, checkoutSnapshot.get(fileName));
             } else {
@@ -408,20 +404,13 @@ public class Repo {
             }
         });
 
-//        System.out.println();
-//        System.out.println("===== Checkout Snapshot ===== ");
         checkoutSnapshot.forEach((fileName, blobSHA1) -> {
-//            System.out.println(fileName + ": " + blobSHA1);
             if (!overwrite.containsKey(fileName)) {
                 overwrite.put(fileName, blobSHA1);
             }
         });
 
-//        System.out.println();
-//        System.out.println("===== Files To Overwrite ===== ");
         overwrite.forEach((file, blobSHA1) -> {
-//            System.out.println(file + ": " + blobSHA1);
-
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
             Blob blob = Blob.load(blobFile);
             try {
@@ -431,10 +420,7 @@ public class Repo {
             }
         });
 
-//        System.out.println();
-//        System.out.println("===== Files To Delete ===== ");
         delete.forEach((file, blobSHA1) -> {
-//            System.out.println(file + ": " + blobSHA1);
             Utils.restrictedDelete(file);
         });
     }
@@ -558,9 +544,6 @@ public class Repo {
                 }
             }
         }
-
-//        System.out.println(" =========== Untracked Files =============");
-//        untrackedFiles.forEach((s) -> System.out.println(s));
 
         return untrackedFiles.size() > 0;
     }
