@@ -237,7 +237,6 @@ public class Repo {
         String[] commits = commitDir.list();
         Boolean found = false;
 
-        // TODO: FIX BUG
         for (String commitId : commits) {
             Commit commit = Commit.load(commitId);
             if (commit.getMessage().equals(commitMessage)) {
@@ -310,16 +309,15 @@ public class Repo {
     }
 
     /** check if a commit id exists in our repo */
-    public boolean containsCommitId(String commitId) {
-        Commit commit = Head.getGlobalHEAD();
+    public boolean containsCommitId(String targetCommitId) {
         Boolean found = false;
+        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
+        String[] commits = commitDir.list();
 
-        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
-            if (findMatchId(commit.getSHA(), commitId)) {
+        for (String commitId : commits) {
+            if (commitId.equals(targetCommitId)) {
                 found = true;
-                break;
             }
-            commit = commit.getParent();
         }
 
         return found;
