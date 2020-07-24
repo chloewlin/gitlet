@@ -21,12 +21,17 @@ public class Merge {
         // 1. If the split point is the same commit as the given branch, then we
         // do nothing; the merge is complete, and the operation ends with the message
         // Given branch is an ancestor of the current branch.
-        branchHeadIsSP(SP, branchHEAD);
+        if (branchHeadIsSP(SP, branchHEAD)) {
+            Main.exitWithError("Given branch is an ancestor of the current branch.");
+        }
 
         // 2. If the split point is the current branch, then the effect is to check
         // out the given branch, and the operation ends after printing the message
         // Current branch fast-forwarded.
-        currHeadIsSP();
+        if (currHeadIsSP(SP)) {
+//            Repo.checkoutBranch(branchName);
+            Main.exitWithError("Current branch fast-forwarded.");
+        }
 
         // Otherwise, we continue with the steps below.
 
@@ -100,14 +105,15 @@ public class Merge {
     // 1. If the split point is the same commit as the given branch, then we
     // do nothing; the merge is complete, and the operation ends with the message
     // Given branch is an ancestor of the current branch.
-    public void branchHeadIsSP(Commit SP, Commit branchHead) {
-        if (SP.getSHA().equals(branchHead.getSHA())) {
-            Main.exitWithError("Given branch is an ancestor of the current branch.");
-        }
+    public boolean branchHeadIsSP(Commit SP, Commit branchHead) {
+        return SP.getSHA().equals(branchHead.getSHA());
     }
 
-    public boolean currHeadIsSP() {
-        return false;
+    // 2. If the split point is the current branch, then the effect is to check
+    // out the given branch, and the operation ends after printing the message
+    // Current branch fast-forwarded.
+    public boolean currHeadIsSP(Commit SP) {
+        return Head.getGlobalHEAD().getSHA().equals(SP.getSHA());
     }
 
     public void compareBranchHeadWithSP() {
