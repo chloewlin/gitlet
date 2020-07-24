@@ -98,8 +98,6 @@ public class Merge {
             branchHead = branchHead.getParent();
         }
 
-        System.out.println("SP: " + SP.getSHA());
-        System.out.println("SP: " + SP.getMessage());
         return SP;
     }
 
