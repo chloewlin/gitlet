@@ -485,6 +485,10 @@ public class Repo {
         Commit targetCommit = null;
 
         // TODO: FIX BUG
+//        if (hasUntrackedFilesForCheckoutBranch(commit)) {
+//            Main.exitWithError("There is an untracked file in the way;" +
+//                    " delete it or add it first.");
+//        }
 //        if (hasUntrackedFiles()) {
 //            Main.exitWithError("There is an untracked file in the way; " +
 //                    "delete it, or add and commit it first.");
@@ -523,6 +527,7 @@ public class Repo {
 
         for (String fileName : fileInCWD) {
             if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
+//                    && stagingArea.getFilesStagedForAddition().containsKey(fileName)
                     && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
                 untrackedFiles.add(fileName);
             }
@@ -605,6 +610,12 @@ public class Repo {
             // use min depth as your split point
             Commit SP = latestCommonAncestor(currHEAD, branchHEAD);
 
+            //failure case
+            //print error msg and error out
+            if (failureCases(branchName)) {
+                return;
+            }
+
             // edge case
             // 1. If the split point is the current branch, then the effect is to check
             // out the given branch, and the operation ends after printing the message
@@ -666,6 +677,7 @@ public class Repo {
             // 2. Save second parent: HEAD of given branch
             // 2. message: Merged [given branch name] into [current branch name].
             commitMerge();
+
         }
 
         public Commit latestCommonAncestor(Commit currHead, Commit branchHead) {
@@ -730,6 +742,36 @@ public class Repo {
             System.out.println(message);
             System.exit(0);
         }
+
+        //failure case
+        //1. stagingArea is present
+        //2. given branch name does not exit
+        //3. attempting to merge the branch it self
+        //4. untracked files in the way
+        public boolean failureCases(String branchName) {
+            stagingArea = stagingArea.load();
+            Commit branchHEAD = Head.getBranchHEAD(branchName);
+
+            if (!stagingArea.isEmpty()) {
+                exitWithMessage("You have uncommitted changes.");
+                return true;
+            }
+            if (!Branch.hasBranch(branchName)) {
+                exitWithMessage("A branch with that name does not exist.");
+                return true;
+            }
+            if(branchHEAD.equals(currentBranchName())) {
+                exitWithMessage("Cannot merge a branch with itself.");
+                return true;
+            }
+            if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+                exitWithMessage("There is an untracked file in the way; delete it, " +
+                        "or add and commit it first.");
+                return true;
+            }
+            return false;
+        }
+
     }
 
 
