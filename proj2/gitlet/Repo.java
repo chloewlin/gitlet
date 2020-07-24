@@ -181,8 +181,7 @@ public class Repo {
 
         if (stagingArea.containsFileForAddition(fileName)) {
             stagingArea.remove(fileName);
-        }
-        if (trackedByCurrCommit(fileName)) {
+        } else if (trackedByCurrCommit(fileName)) {
             stagingArea.unstage(fileName);
             String CWD = System.getProperty("user.dir");
             File file = new File(CWD, fileName);
