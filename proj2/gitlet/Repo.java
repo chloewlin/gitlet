@@ -511,41 +511,17 @@ public class Repo {
      * Checks if a working file is untracked in the HEAD of current branch
      * and would be overwritten by the checkout.
      * */
-    public boolean hasUntrackedFilesForCheckoutBranch(Commit branchHEAD) {
+    public boolean hasUntrackedFilesForCheckoutBranch(Commit givenBranchHEAD) {
         List<String> untrackedFiles = new ArrayList<String>();
-
         stagingArea = stagingArea.load();
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
 
-        // TODO: DEBUG
-        // check if a file is (1) NOT saved in the current HEAD of branch
-        // and (2) IS saved in the target HEAD of branch
         for (String fileName : fileInCWD) {
-
-            // check if a file is saved in the branch HEAD BUT NOT in current HEAD
-            if (branchHEAD.getSnapshot().containsKey(fileName)) {
-
-                String blobFileNameOfFileInTargetBranch =
-                        branchHEAD.getSnapshot().get(fileName);
-                // compare the blob saved in the branch head with current file
-                Blob blobOfCurrFile = new Blob(fileName);
-                String blobFileNameOfCurrFile = blobOfCurrFile.getBlobSHA1();
-
-                if (!blobFileNameOfCurrFile.equals(blobFileNameOfFileInTargetBranch)) {
-                    untrackedFiles.add(fileName);
-                }
-
-                // check if the current file in CWD is tracked in the current branch HEAD
-                // current branch HEAD should have the exact key-value (filename: blobSHA1)
-                // match
-                if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
-                        && !Head.getGlobalHEAD()
-                                .getSnapshot().containsValue(blobFileNameOfCurrFile)) {
-                    untrackedFiles.add(fileName);
-                }
+            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
+                    && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
+                untrackedFiles.add(fileName);
             }
         }
-
         return untrackedFiles.size() > 0;
     }
 
