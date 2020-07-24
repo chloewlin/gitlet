@@ -351,13 +351,14 @@ public class Repo {
      */
     public void checkoutBranch(String branchName) {
 
+        // TODO: FIND BUG
         String currBranchName = currentBranchName();
         Commit branchHEAD = Head.getBranchHEAD(branchName);
         Commit currHEAD = Head.getGlobalHEAD();
 
-        if (!stagingArea.getFilesStagedForRemoval().isEmpty()) {
-
-        }
+//        if (!stagingArea.getFilesStagedForRemoval().isEmpty()) {
+//
+//        }
 
         if (currBranchName.equals(branchName)) {
             Main.exitWithError("No need to checkout the current branch.");
