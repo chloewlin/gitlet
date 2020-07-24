@@ -212,12 +212,21 @@ public class Repo {
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             System.out.print("===" + "\n");
             System.out.print("commit " + commit.getSHA() + "\n");
+            if (isMergeCommit(commit)) {
+                String firstParentSHA = commit.getFirstParentSHA1().substring(0, 7);
+                String secondParentSHA = commit.getSecondParentSHA1().substring(0, 7);
+                System.out.println("Merge: " + firstParentSHA + " " + secondParentSHA);
+            }
             System.out.print("Date: " + commit.getTimestamp() + "\n");
             System.out.print(commit.getMessage() + "\n");
             System.out.println("");
 
             commit = commit.getParent();
         }
+    }
+
+    public boolean isMergeCommit(Commit commit) {
+        return commit.getMessage().startsWith("Merge");
     }
 
     /**
@@ -585,17 +594,19 @@ public class Repo {
     /**
      * Merge given branch into current branch.
      */
-    public void merge(String[] args) {
+    public void merge(String[] args) throws IOException {
         String givenBranch = args[1];
         merge.merge(givenBranch);
     }
 
     private class Merge {
 
-        public void merge(String branchName) {
+        public void merge(String branchName) throws IOException {
             Commit currHEAD = Head.getGlobalHEAD();
             Commit branchHEAD = Head.getBranchHEAD(branchName);
-
+            String originalBranchName = Utils.readObject(
+                    (Utils.join(Main.GITLET_FOLDER, "HEAD")), Branch.class)
+                    .getName();
             // find split point/latest common ancestor
 
             // handle criss-cross merge: when you have TWO SP/latest common ancestor
@@ -611,7 +622,7 @@ public class Repo {
             // Current branch fast-forwarded.
             if (currHeadIsSP(SP)) {
                 checkoutBranch(branchName);
-                exitWithMessage("Current branch fast-forwarded.");
+                System.out.println("Current branch fast-forwarded.");
             }
 
             // edge case:
@@ -619,8 +630,25 @@ public class Repo {
             // do nothing; the merge is complete, and the operation ends with the message
             // Given branch is an ancestor of the current branch.
             if (branchHeadIsSP(SP, branchHEAD)) {
-                exitWithMessage("Given branch is an ancestor of the current branch.");
+                System.out.println("Given branch is an ancestor of the current branch.");
             }
+
+            Map<String, String> currMap = Head.getGlobalHEAD().getSnapshot();
+            Map<String, String> branchMap = Head.getBranchHEAD(branchName).getSnapshot();
+            Map<String, String> SPMap = SP.getSnapshot();
+            Set<String> allFiles = new HashSet<String>(branchMap.keySet());
+
+
+            allFiles.addAll(SPMap.keySet());
+            allFiles.addAll(currMap.keySet());
+
+            allFiles.forEach(fileName -> {
+                if (!SPMap.containsKey(fileName)) {
+                    if (!currMap.containsKey(fileName) && branchMap.containsKey(fileName)) {
+                        stagingArea.add(fileName, branchMap.get(fileName));
+                    }
+                }
+            });
 
 
             // Otherwise, we continue with the steps below.
@@ -665,8 +693,42 @@ public class Repo {
             // 1. Save first parent: HEAD of curr branch
             // 2. Save second parent: HEAD of given branch
             // 2. message: Merged [given branch name] into [current branch name].
-            commitMerge();
+            commitMerge(branchName, originalBranchName);
         }
+
+        public void commitMerge(String branchName, String originalBranchName) throws IOException {
+            String commitMessage = "Merged " + branchName + " into " + originalBranchName + ". ";
+            String firstParentSHA1 = Head.getBranchHEAD(originalBranchName).getSHA();
+            String secondParentSHA1 = Head.getBranchHEAD(branchName).getSHA();
+
+            // TODO: Do we need to handle stage for removal:
+            Commit mergeCommit = new Commit(commitMessage, firstParentSHA1, secondParentSHA1,
+                    false, stagingArea.getFilesStagedForAddition());
+
+            mergeCommit.save();
+
+            head.setGlobalHEAD(originalBranchName, mergeCommit);
+
+            stagingArea = new Staging();
+            stagingArea.save();
+        }
+
+        public void compareBranchHeadWithSP() {
+
+        }
+
+        public void compareCurrHeadWithBranchHead() {
+
+        }
+
+        public void compareCurrHeadWithSP() {
+
+        }
+
+        public void findMergeConflicts() {
+
+        }
+
 
         public Commit latestCommonAncestor(Commit currHead, Commit branchHead) {
             ArrayList<Commit> currPath = new ArrayList<>();
@@ -704,31 +766,6 @@ public class Repo {
         // Current branch fast-forwarded.
         public boolean currHeadIsSP(Commit SP) {
             return Head.getGlobalHEAD().getSHA().equals(SP.getSHA());
-        }
-
-        public void compareBranchHeadWithSP() {
-
-        }
-
-        public void compareCurrHeadWithBranchHead() {
-
-        }
-
-        public void compareCurrHeadWithSP() {
-
-        }
-
-        public void findMergeConflicts() {
-
-        }
-
-        public void commitMerge() {
-
-        }
-
-        public void exitWithMessage(String message) {
-            System.out.println(message);
-            System.exit(0);
         }
     }
 
