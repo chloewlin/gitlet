@@ -667,25 +667,10 @@ public class Repo {
             condition3(sp, given, curr, mergeMap);
             condition4(sp, given, curr, mergeMap);
             condition5(sp, given, curr, mergeMap, bothDeleted);
+            condition6(sp, curr, mergeMap);
+            condition7(sp, given, mergeMap);
             condition8And9(sp,given, curr, deletedAtOne);
 
-            // 6. File not in SP && File in curr
-            // -> add curr file and blob into mergeMap
-            for (String currFileName : curr.keySet()) {
-                if (!sp.keySet().contains(currFileName)) {
-                    String currBlob = curr.get(currFileName);
-                    mergeMap.put(currFileName, currBlob);
-                }
-            }
-
-            // 7. File not in SP && File in given
-            // -> add given file and given blob into merge map
-            for (String givenFileName : given.keySet()) {
-                if (!sp.containsKey(givenFileName)){
-                    String givenBlob = given.get(givenFileName);
-                    mergeMap.put(givenFileName, givenBlob);
-                }
-            }
 
             System.out.println("=========== merge map =========");
             mergeMap.forEach((k, v) -> {
@@ -723,7 +708,31 @@ public class Repo {
             // 2. Save second parent: HEAD of given branch
             // 2. message: Merged [given branch name] into [current branch name].
             // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
-//            commitMerge(branchName, originalBranchName);
+            commitMerge(branchName, originalBranchName);
+            restoreFilesAtMerge(mergeMap, deletedAtOne);
+        }
+
+        public void restoreFilesAtMerge(Map<String, String> mergeMap,
+                                        Map<String, String> deleteAtOne) {
+
+            mergeMap.forEach((file, blobSHA1) -> {
+                File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+                Blob blob = Blob.load(blobFile);
+
+                String CWD = System.getProperty("user.dir");
+                File newFile = new File(CWD, file);
+                try {
+                    newFile.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Utils.writeContents(newFile, blob.getFileContent());
+            });
+
+            // TODO: delete files
+//            delete.forEach((file, blobSHA1) -> {
+//                Utils.restrictedDelete(file);
+//            });
         }
 
         // case 3:
@@ -733,7 +742,7 @@ public class Repo {
                                                   Map<String, String> given,
                                                   Map<String, String> curr,
                                                   Map<String, String> mergeMap) {
-
+            stagingArea = stagingArea.load();
             HashMap<String, String> sameOnCurrAndSP = new HashMap<>();
             HashMap<String, String> diffOnGivenAndSP = new HashMap<>();
 
@@ -761,9 +770,12 @@ public class Repo {
                 diffOnGivenAndSP.forEach((diffFileName, diffBlob) -> {
                     if (sameFileName.equals(diffFileName)) {
                         mergeMap.put(diffFileName, diffBlob);
+                        stagingArea.add(diffFileName, diffBlob);
                     }
                 });
             });
+
+            stagingArea.save();
         }
 
         // case 4. currBranch: modified && givenBranch: unmodified (=SP)
@@ -772,7 +784,7 @@ public class Repo {
                                Map<String, String> given,
                                Map<String, String> curr,
                                Map<String, String> mergeMap) {
-
+            stagingArea = stagingArea.load();
             HashMap<String, String> sameOnGivenAndSP = new HashMap<>();
             HashMap<String, String> diffOnCurrAndSP = new HashMap<>();
 
@@ -809,9 +821,12 @@ public class Repo {
                 diffOnCurrAndSP.forEach((diffFileName, diffBlob) -> {
                     if (sameFileName.equals(diffFileName)) {
                         mergeMap.put(diffFileName, diffBlob);
+                        stagingArea.add(diffFileName, diffBlob);
                     }
                 });
             });
+
+            stagingArea.save();
         }
 
         // 5. Modified: currBranch && givenBranch in the same way
@@ -823,7 +838,7 @@ public class Repo {
                                Map<String, String> curr,
                                Map<String, String> mergeMap,
                                Map<String, String> bothDeleted) {
-
+            stagingArea = stagingArea.load();
             for (String SPFileName : SP.keySet()) {
                 boolean insideCurr = curr.containsKey(SPFileName);
                 boolean insideGiven = given.containsKey(SPFileName);
@@ -840,14 +855,49 @@ public class Repo {
                             && !currBlob.equals(SPBlob)
                             && givenBlob.equals(currBlob)) {
                         mergeMap.put(SPFileName, currBlob);
+                        stagingArea.add(SPFileName,currBlob);
                     }
                 }
 
                 // both are deleted
                 if (!insideCurr && !insideGiven) {
                     bothDeleted.put(SPFileName, SPBlob);
+                    stagingArea.unstage(SPFileName); // TODO: do we need to save SPBlob?
                 }
             }
+            stagingArea.save();
+        }
+
+        // 6. File not in SP && File in curr
+        // -> add curr file and blob into mergeMap
+        public void condition6(Map<String, String> SP,
+                               Map<String, String> curr,
+                               Map<String, String> mergeMap) {
+            stagingArea = stagingArea.load();
+            for (String currFileName : curr.keySet()) {
+                if (!SP.keySet().contains(currFileName)) {
+                    String currBlob = curr.get(currFileName);
+                    mergeMap.put(currFileName, currBlob);
+                    stagingArea.add(currFileName, currBlob);
+                }
+            }
+            stagingArea.save();
+        }
+
+        // 7. File not in SP && File in given
+        // -> add given file and given blob into merge map
+        public void condition7(Map<String, String> SP,
+                               Map<String, String> given,
+                               Map<String, String> mergeMap) {
+            stagingArea = stagingArea.load();
+            for (String givenFileName : given.keySet()) {
+                if (!SP.containsKey(givenFileName)){
+                    String givenBlob = given.get(givenFileName);
+                    mergeMap.put(givenFileName, givenBlob);
+                    stagingArea.add(givenFileName, givenBlob);
+                }
+            }
+            stagingArea.save();
         }
 
         // File in SP && current: unmodified && given: absent (treat like modified)
@@ -858,7 +908,7 @@ public class Repo {
                                    Map<String, String> given,
                                    Map<String, String> curr,
                                    Map<String, String> deletedAtOne) {
-
+            stagingArea = stagingArea.load();
             for (String SPFileName : SP.keySet()) {
                 boolean insideCurr = curr.containsKey(SPFileName);
                 boolean insideGiven = given.containsKey(SPFileName);
@@ -871,6 +921,7 @@ public class Repo {
                     if (currBlob.equals(SPBlob)) {
 //                        deletedAtOne.put(SPFileName, givenBlob); // TODO: BECOMES NULL
                         deletedAtOne.put(SPFileName, SPBlob);
+                        stagingArea.unstage(SPFileName);
                     }
                 }
 
@@ -878,9 +929,11 @@ public class Repo {
                 if (!insideCurr && insideGiven) {
                     if (givenBlob.equals(SPBlob)) {
                         deletedAtOne.put(SPFileName, currBlob);
+                        stagingArea.unstage(SPFileName);
                     }
                 }
             }
+            stagingArea.save();
         }
 
         public void commitMerge(String branchName, String originalBranchName) throws IOException {
@@ -888,9 +941,10 @@ public class Repo {
             String firstParentSHA1 = Head.getBranchHEAD(originalBranchName).getSHA();
             String secondParentSHA1 = Head.getBranchHEAD(branchName).getSHA();
 
-            // TODO: Do we need to handle stage for removal:
+            // TODO: Do we need to handle deleted files
             Commit mergeCommit = new Commit(commitMessage, firstParentSHA1, secondParentSHA1,
-                    false, stagingArea.getFilesStagedForAddition());
+                    false, stagingArea.getFilesStagedForAddition(),
+                    stagingArea.getFilesStagedForRemoval());
 
             mergeCommit.save();
 
