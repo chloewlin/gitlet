@@ -373,10 +373,10 @@ public class Repo {
             Main.exitWithError("No need to checkout the current branch.");
         }
         // TODO: FIX BUG
-//        if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
-//            Main.exitWithError("There is an untracked file in the way; " +
-//                    "delete it, or add and commit it first.");
-//        }
+        if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+            Main.exitWithError("There is an untracked file in the way; " +
+                    "delete it, or add and commit it first.");
+        }
 
         Head.setGlobalHEAD(branchName, branchHEAD);
         restoreFilesAtBranch(currHEAD, branchHEAD);
@@ -549,11 +549,17 @@ public class Repo {
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
 
         for (String fileName : fileInCWD) {
-            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
-                    // TODO: CHECK WHICH, OR BOTH, CONDITION IS CORRECT **
-                    && !stagingArea.getFilesStagedForAddition().containsKey(fileName)
+            if (!fileName.equals(".DS_Store") && !fileName.equals(".gitignore") && !fileName.equals(
+                    "proj2.iml")) {
+
+//            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
+//                    // TODO: CHECK WHICH, OR BOTH, CONDITION IS CORRECT **
+//                    && !stagingArea.getFilesStagedForAddition().containsKey(fileName)
+//                    && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
+                if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
                     && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
-                untrackedFiles.add(fileName);
+                      untrackedFiles.add(fileName);
+                }
             }
         }
         return untrackedFiles.size() > 0;
@@ -677,22 +683,21 @@ public class Repo {
             condition8And9(sp,given, curr, deletedAtOne);
 
 
-            System.out.println("=========== merge map =========");
-            mergeMap.forEach((k, v) -> {
-                System.out.println(k + " : " + v);
-            });
-            System.out.println();
-
-            System.out.println("=========== both deleted =========");
-            bothDeleted.forEach((k, v) -> {
-                System.out.println(k + " : " + v);
-            });
-
-            System.out.println("=========== deleted at one =========");
-            deletedAtOne.forEach((k, v) -> {
-                System.out.println(k + " : " + v);
-            });
-
+//            System.out.println("=========== merge map =========");
+//            mergeMap.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
+//            System.out.println();
+//
+//            System.out.println("=========== both deleted =========");
+//            bothDeleted.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
+//
+//            System.out.println("=========== deleted at one =========");
+//            deletedAtOne.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
 
             // compare HEAD of curr branch with HEAD of given branch:
             // find "conflicts": files modified in different ways in currHEAD and branchHEAD
@@ -802,10 +807,10 @@ public class Repo {
                 });
             });
 
-            System.out.println("====== sameOnGivenAndSP ===== ");
-            sameOnGivenAndSP.forEach((k, v) -> {
-                System.out.println(k + " : " + v);
-            });
+//            System.out.println("====== sameOnGivenAndSP ===== ");
+//            sameOnGivenAndSP.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
 
             // compare SP and Curr, find same file name with different content
             SP.forEach((spFileName, spBlob) -> {
@@ -816,10 +821,10 @@ public class Repo {
                 });
             });
 
-            System.out.println("====== diffOnCurrAndSP ===== ");
-            diffOnCurrAndSP.forEach((k, v) -> {
-                System.out.println(k + " : " + v);
-            });
+//            System.out.println("====== diffOnCurrAndSP ===== ");
+//            diffOnCurrAndSP.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
 
             // find files modified on Curr but not on Given since SP
             sameOnGivenAndSP.forEach((sameFileName, sameBlob) -> {
@@ -1036,11 +1041,11 @@ public class Repo {
                 return true;
             }
             // TODO: FIX hasUntrackedFilesForCheckoutBranch
-//            if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
-//                exitWithMessage("There is an untracked file in the way; delete it, " +
-//                        "or add and commit it first.");
-//                return true;
-//            }
+            if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+                exitWithMessage("There is an untracked file in the way; delete it, " +
+                        "or add and commit it first.");
+                return true;
+            }
             return false;
         }
     }
