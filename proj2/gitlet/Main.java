@@ -64,53 +64,63 @@ public class Main {
      * Usage: java gitlet.Main ARGS, where ARGS contains <COMMAND> <OPERAND>.
      */
     public static void main(String... args) throws IOException {
-        switch (args[0]) {
-        case "init":
+        validateNumCommand(args);
+        String command = args[0];
+        if (command.equals("init")) {
             validateGitlet();
             setupPersistence();
             repo.initialize();
-            break;
-        case "add":
-            validateFileToBeAdded(args);
-            repo.add(args);
-            break;
-        case "commit":
-            repo.commit(args);
-            break;
-        case "rm":
-            repo.remove(args);
-            break;
-        case "log":
-            repo.log();
-            break;
-        case "global-log":
-            repo.globalLog();
-            break;
-        case "find":
-            repo.find(args);
-            break;
-        case "status":
-            repo.status();
-            break;
-        case "checkout":
-            validateCheckout(args);
-            break;
-        case "branch":
-            repo.branch(args);
-            break;
-        case "rm-branch":
-            repo.rmBranch(args);
-            break;
-        case "reset":
-             repo.reset(args);
-             break;
-        case "merge":
-             repo.merge(args);
-             break;
-        default:
+        } else {
             validateInitialization();
-            validateCommand();
-            validateNumCommand(args);
+
+            switch (command) {
+    //        case "init":
+    //            validateGitlet();
+    //            setupPersistence();
+    //            repo.initialize();
+    //            break;
+                case "add":
+    //            validateInitialization();
+                    validateFileToBeAdded(args);
+                    repo.add(args);
+                    break;
+                case "commit":
+                    repo.commit(args);
+                    break;
+                case "rm":
+                    repo.remove(args);
+                    break;
+                case "log":
+                    repo.log();
+                    break;
+                case "global-log":
+                    repo.globalLog();
+                    break;
+                case "find":
+                    repo.find(args);
+                    break;
+                case "status":
+                    repo.status();
+                    break;
+                case "checkout":
+                    validateCheckout(args);
+                    break;
+                case "branch":
+                    repo.branch(args);
+                    break;
+                case "rm-branch":
+                    repo.rmBranch(args);
+                    break;
+                case "reset":
+                    repo.reset(args);
+                    break;
+                case "merge":
+                    repo.merge(args);
+                    break;
+                default:
+                    validateInitialization();
+                    validateCommand();
+            }
         }
         return;
     }
@@ -204,6 +214,9 @@ public class Main {
             exitWithError("A Gitlet version-control system "
                     + "already exists in the current directory.");
         }
+//        else {
+//            exitWithError("Not in an initialized Gitlet directory.");
+//        }
     }
 
     /**
