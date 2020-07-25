@@ -648,9 +648,9 @@ public class Repo {
 
             //failure case
             //print error msg and error out
-            if (failureCases(branchName)) {
-                return;
-            }
+//            if (failureCases(branchName)) {
+//                return;
+//            }
 
             // saved to commit (add)
             Map<String, String> mergeMap = new HashMap<>();
