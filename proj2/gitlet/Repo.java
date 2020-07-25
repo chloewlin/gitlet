@@ -633,6 +633,9 @@ public class Repo {
             String originalBranchName = Utils.readObject(
                     (Utils.join(Main.GITLET_FOLDER, "HEAD")), Branch.class)
                     .getName();
+
+            stagingArea = stagingArea.load();
+
             // find split point/latest common ancestor
 
             // handle criss-cross merge: when you have TWO SP/latest common ancestor
@@ -718,6 +721,7 @@ public class Repo {
             // 2. Save second parent: HEAD of given branch
             // 2. message: Merged [given branch name] into [current branch name].
             // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
+            stagingArea.save();
             commitMerge(branchName, originalBranchName);
             restoreFilesAtMerge(mergeMap, deletedAtOne);
         }
@@ -752,7 +756,6 @@ public class Repo {
                                                   Map<String, String> given,
                                                   Map<String, String> curr,
                                                   Map<String, String> mergeMap) {
-            stagingArea = stagingArea.load();
             HashMap<String, String> sameOnCurrAndSP = new HashMap<>();
             HashMap<String, String> diffOnGivenAndSP = new HashMap<>();
 
@@ -784,8 +787,6 @@ public class Repo {
                     }
                 });
             });
-
-            stagingArea.save();
         }
 
         // case 4. currBranch: modified && givenBranch: unmodified (=SP)
@@ -794,7 +795,7 @@ public class Repo {
                                Map<String, String> given,
                                Map<String, String> curr,
                                Map<String, String> mergeMap) {
-            stagingArea = stagingArea.load();
+
             HashMap<String, String> sameOnGivenAndSP = new HashMap<>();
             HashMap<String, String> diffOnCurrAndSP = new HashMap<>();
 
@@ -836,7 +837,6 @@ public class Repo {
                 });
             });
 
-            stagingArea.save();
         }
 
         // 5. Modified: currBranch && givenBranch in the same way
@@ -848,7 +848,7 @@ public class Repo {
                                Map<String, String> curr,
                                Map<String, String> mergeMap,
                                Map<String, String> bothDeleted) {
-            stagingArea = stagingArea.load();
+
             for (String SPFileName : SP.keySet()) {
                 boolean insideCurr = curr.containsKey(SPFileName);
                 boolean insideGiven = given.containsKey(SPFileName);
@@ -875,7 +875,7 @@ public class Repo {
                     stagingArea.unstage(SPFileName); // TODO: do we need to save SPBlob?
                 }
             }
-            stagingArea.save();
+
         }
 
         // 6. File not in SP && File in curr
@@ -883,7 +883,7 @@ public class Repo {
         public void condition6(Map<String, String> SP,
                                Map<String, String> curr,
                                Map<String, String> mergeMap) {
-            stagingArea = stagingArea.load();
+
             for (String currFileName : curr.keySet()) {
                 if (!SP.keySet().contains(currFileName)) {
                     String currBlob = curr.get(currFileName);
@@ -891,7 +891,7 @@ public class Repo {
                     stagingArea.add(currFileName, currBlob);
                 }
             }
-            stagingArea.save();
+
         }
 
         // 7. File not in SP && File in given
@@ -899,7 +899,7 @@ public class Repo {
         public void condition7(Map<String, String> SP,
                                Map<String, String> given,
                                Map<String, String> mergeMap) {
-            stagingArea = stagingArea.load();
+
             for (String givenFileName : given.keySet()) {
                 if (!SP.containsKey(givenFileName)){
                     String givenBlob = given.get(givenFileName);
@@ -907,7 +907,7 @@ public class Repo {
                     stagingArea.add(givenFileName, givenBlob);
                 }
             }
-            stagingArea.save();
+
         }
 
         // File in SP && current: unmodified && given: absent (treat like modified)
@@ -918,7 +918,7 @@ public class Repo {
                                    Map<String, String> given,
                                    Map<String, String> curr,
                                    Map<String, String> deletedAtOne) {
-            stagingArea = stagingArea.load();
+
             for (String SPFileName : SP.keySet()) {
                 boolean insideCurr = curr.containsKey(SPFileName);
                 boolean insideGiven = given.containsKey(SPFileName);
@@ -943,7 +943,7 @@ public class Repo {
                     }
                 }
             }
-            stagingArea.save();
+
         }
 
         public void commitMerge(String branchName, String originalBranchName) throws IOException {
