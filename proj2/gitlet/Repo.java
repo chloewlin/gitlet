@@ -968,25 +968,32 @@ public class Repo {
 
 
         public Commit latestCommonAncestor(Commit currHead, Commit branchHead) {
-            ArrayList<Commit> currPath = new ArrayList<>();
+//            ArrayList<Commit> currPath = new ArrayList<>();
+            HashSet<String> currPath = new HashSet<>();
             Commit SP = null;
 
             while (!currHead.getFirstParentSHA1().equals(Repo.INIT_PARENT_SHA1)) {
-                currPath.add(currHead);
+//                currPath.add(currHead);
+                currPath.add(currHead.getSHA());
                 currHead = currHead.getParent();
             }
 
-            loop:
             while (!branchHead.getFirstParentSHA1().equals(Repo.INIT_PARENT_SHA1)) {
-                for (int i = 0; i < currPath.size(); i++) {
-                    if (branchHead.getSHA().equals(currPath.get(i).getSHA())) {
-                        SP = currPath.get(i);
-                        break loop;
-                    }
+//                for (int i = 0; i < currPath.size(); i++) {
+//                    if (branchHead.getSHA().equals(currPath.get(i).getSHA())) {
+//                        SP = currPath.get(i);
+//                        break loop;
+//                    }
+//                 }
+                if (currPath.contains(branchHead.getSHA())) {
+                    SP = branchHead;
+                    break;
                 }
+
                 branchHead = branchHead.getParent();
             }
 
+//            System.out.println("Split point: " + SP.getSHA());
             return SP;
         }
 
