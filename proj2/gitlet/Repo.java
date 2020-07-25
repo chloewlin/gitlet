@@ -548,8 +548,9 @@ public class Repo {
 
         for (String fileName : fileInCWD) {
             if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
-//                    && stagingArea.getFilesStagedForAddition().containsKey(fileName)
-                    && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
+                    // TODO: CHECK WHICH CONDITION IS CORRECT **
+                    && !stagingArea.getFilesStagedForAddition().containsKey(fileName)) {
+//                    && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
                 untrackedFiles.add(fileName);
             }
         }
@@ -643,6 +644,12 @@ public class Repo {
                 return;
             }
 
+            // saved to commit (add)
+            Map<String, String> mergeMap = new HashMap<>();
+            Map<String, String> bothDeleted = new HashMap<>();
+            Map<String, String> deletedAtOne = new HashMap<>();
+            boolean withConflict = false;
+
             // 1. If the split point is the same commit as the given branch, then we
             // do nothing; the merge is complete, and the operation ends with the message
             // Given branch is an ancestor of the current branch.
@@ -660,10 +667,10 @@ public class Repo {
                 return;
             }
 
-            // saved to commit (add)
-            Map<String, String> mergeMap = new HashMap<>();
-            Map<String, String> bothDeleted = new HashMap<>();
-            boolean withConflict = false;
+            condition3(sp, given, curr, mergeMap);
+            condition4(sp, given, curr, mergeMap);
+            condition5(sp, given, curr, mergeMap, bothDeleted);
+            condition8And9(sp,given, curr, deletedAtOne);
 
             // 6. File not in SP && File in curr
             // -> add curr file and blob into mergeMap
@@ -683,10 +690,6 @@ public class Repo {
                 }
             }
 
-            condition1(sp, given, curr, mergeMap);
-            condition2(sp, given, curr, mergeMap);
-            condition3(sp, given, curr, mergeMap, bothDeleted);
-
             System.out.println("=========== merge map =========");
             mergeMap.forEach((k, v) -> {
                 System.out.println(k + " : " + v);
@@ -695,6 +698,11 @@ public class Repo {
 
             System.out.println("=========== both deleted =========");
             bothDeleted.forEach((k, v) -> {
+                System.out.println(k + " : " + v);
+            });
+
+            System.out.println("=========== deleted at one =========");
+            deletedAtOne.forEach((k, v) -> {
                 System.out.println(k + " : " + v);
             });
 
@@ -723,7 +731,7 @@ public class Repo {
         // case 3:
         // givenBranch: modified && currBranch: unmodified (=SP)
         // -> copy givenBranch key-value pair, add into hashmap (stageToBeAdded), and auto staged
-        public void condition1(Map<String, String> SP,
+        public void condition3(Map<String, String> SP,
                                                   Map<String, String> given,
                                                   Map<String, String> curr,
                                                   Map<String, String> mergeMap) {
@@ -762,7 +770,7 @@ public class Repo {
 
         // case 4. currBranch: modified && givenBranch: unmodified (=SP)
         // -> stay the same (continue?)
-        public void condition2(Map<String, String> SP,
+        public void condition4(Map<String, String> SP,
                                Map<String, String> given,
                                Map<String, String> curr,
                                Map<String, String> mergeMap) {
@@ -812,7 +820,7 @@ public class Repo {
         // both are different from SP, but Curr and given are the same
         // OR, both are deleted on Curr and given branch
         // -> pick currentBranch key-value pair, add into map
-        public void condition3(Map<String, String> SP,
+        public void condition5(Map<String, String> SP,
                                Map<String, String> given,
                                Map<String, String> curr,
                                Map<String, String> mergeMap,
@@ -840,6 +848,38 @@ public class Repo {
                 // both are deleted
                 if (!insideCurr && !insideGiven) {
                     bothDeleted.put(SPFileName, SPBlob);
+                }
+            }
+        }
+
+        // File in SP && current: unmodified && given: absent (treat like modified)
+        // -> removed (untracked)
+        // File in SP && given: unmodified && curr: absent (treat like modified)
+        // -> remain absent (unchanged?)
+        public void condition8And9(Map<String, String> SP,
+                                   Map<String, String> given,
+                                   Map<String, String> curr,
+                                   Map<String, String> deletedAtOne) {
+
+            for (String SPFileName : SP.keySet()) {
+                boolean insideCurr = curr.containsKey(SPFileName);
+                boolean insideGiven = given.containsKey(SPFileName);
+                String SPBlob = SP.get(SPFileName);
+                String givenBlob = given.get(SPFileName);
+                String currBlob = curr.get(SPFileName);
+
+                // absent at given, curr blob is the same version as SP blob
+                if (insideCurr && !insideGiven) {
+                    if (currBlob.equals(SPBlob)) {
+                        deletedAtOne.put(SPFileName, givenBlob);
+                    }
+                }
+
+                // absent at curr, present at given
+                if (!insideCurr && insideGiven) {
+                    if (givenBlob.equals(SPBlob)) {
+                        deletedAtOne.put(SPFileName, currBlob);
+                    }
                 }
             }
         }
@@ -936,11 +976,12 @@ public class Repo {
                 exitWithMessage("Cannot merge a branch with itself.");
                 return true;
             }
-            if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
-                exitWithMessage("There is an untracked file in the way; delete it, " +
-                        "or add and commit it first.");
-                return true;
-            }
+            // TODO: FIX hasUntrackedFilesForCheckoutBranch
+//            if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+//                exitWithMessage("There is an untracked file in the way; delete it, " +
+//                        "or add and commit it first.");
+//                return true;
+//            }
             return false;
         }
     }
