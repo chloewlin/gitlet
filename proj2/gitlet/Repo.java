@@ -550,9 +550,9 @@ public class Repo {
 
         for (String fileName : fileInCWD) {
             if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
-                    // TODO: CHECK WHICH CONDITION IS CORRECT **
-                    && !stagingArea.getFilesStagedForAddition().containsKey(fileName)) {
-//                    && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
+                    // TODO: CHECK WHICH, OR BOTH, CONDITION IS CORRECT **
+                    && !stagingArea.getFilesStagedForAddition().containsKey(fileName)
+                    && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
                 untrackedFiles.add(fileName);
             }
         }
