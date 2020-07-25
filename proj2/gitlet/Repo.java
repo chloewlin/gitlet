@@ -978,7 +978,6 @@ public class Repo {
                 currHead = currHead.getParent();
             }
 
-            loop:
             while (!branchHead.getFirstParentSHA1().equals(Repo.INIT_PARENT_SHA1)) {
 //                for (int i = 0; i < currPath.size(); i++) {
 //                    if (branchHead.getSHA().equals(currPath.get(i).getSHA())) {
