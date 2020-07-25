@@ -88,6 +88,24 @@ public class Commit implements Serializable {
         Utils.writeObject(commitLogs, commit);
     }
 
+    /** for merge commits only */
+    public Commit(String msg, String firstParent, String secondParent, boolean initial,
+                  Map<String, String> map) {
+        List<String> list = new ArrayList<String>(map.values());
+        // create unique sha
+        String blobFileNames = "";
+        for (String blobFileName : list) {
+            blobFileNames += blobFileName;
+        }
+        this.message = msg;
+        this.parents[0] = firstParent;
+        this.parents[1] = secondParent;
+        this.sha1 = Utils.sha1("MERGE" + message + blobFileNames);
+        this.timestamp = generateDate(initial);
+        this.snapshot = map;
+        this.init = initial;
+    }
+
     /**
      * Save a commit node into a byte array.
      */
@@ -124,6 +142,13 @@ public class Commit implements Serializable {
      */
     public String getFirstParentSHA1() {
         return this.parents[0];
+    }
+
+    /**
+     * Return the SHA1 of the second parent commit node.
+     */
+    public String getSecondParentSHA1() {
+        return this.parents[1];
     }
 
     /**

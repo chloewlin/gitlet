@@ -19,7 +19,7 @@
 > add g.txt
 <<<
 
-> commit "add g and g"
+> commit "add f and g"
 <<<
 
 > checkout other
@@ -43,3 +43,4 @@
 <<<
 
 = f.txt hey.txt
+* g.txt
