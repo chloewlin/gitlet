@@ -1032,21 +1032,23 @@ public class Repo {
         //3. attempting to merge the branch it self
         //4. untracked files in the way
         public boolean failureCases(String branchName) {
-            stagingArea = stagingArea.load();
             Commit branchHEAD = Head.getBranchHEAD(branchName);
 
             if (!stagingArea.isEmpty()) {
                 exitWithMessage("You have uncommitted changes.");
                 return true;
             }
-            if (!Branch.hasBranch(branchName)) {
+
+            if (Branch.hasBranch(branchName)) {
                 exitWithMessage("A branch with that name does not exist.");
                 return true;
             }
-            if (branchHEAD.equals(currentBranchName())) {
+
+            if (branchName.equals(currentBranchName())) {
                 exitWithMessage("Cannot merge a branch with itself.");
                 return true;
             }
+
             // TODO: FIX hasUntrackedFilesForCheckoutBranch
             if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
                 exitWithMessage("There is an untracked file in the way; delete it, " +
