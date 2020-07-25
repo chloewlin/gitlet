@@ -506,6 +506,10 @@ public class Repo {
         Commit targetCommit = null;
 
         // TODO: FIX BUG
+//        if (hasUntrackedFilesForCheckoutBranch(commit)) {
+//            Main.exitWithError("There is an untracked file in the way;" +
+//                    " delete it or add it first.");
+//        }
 //        if (hasUntrackedFiles()) {
 //            Main.exitWithError("There is an untracked file in the way; " +
 //                    "delete it, or add and commit it first.");
@@ -544,6 +548,7 @@ public class Repo {
 
         for (String fileName : fileInCWD) {
             if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
+//                    && stagingArea.getFilesStagedForAddition().containsKey(fileName)
                     && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
                 untrackedFiles.add(fileName);
             }
@@ -628,6 +633,16 @@ public class Repo {
             // use min depth as your split point
             Commit SP = latestCommonAncestor(currHEAD, branchHEAD);
 
+            Map<String, String> curr = currHEAD.getSnapshot();
+            Map<String, String> branch = branchHEAD.getSnapshot();
+            Map<String, String> sp = SP.getSnapshot();
+
+            //failure case
+            //print error msg and error out
+            if (failureCases(branchName)) {
+                return;
+            }
+
             // edge case
             // 1. If the split point is the current branch, then the effect is to check
             // out the given branch, and the operation ends after printing the message
@@ -645,22 +660,25 @@ public class Repo {
                 System.out.println("Given branch is an ancestor of the current branch.");
             }
 
-            Map<String, String> currMap = Head.getGlobalHEAD().getSnapshot();
-            Map<String, String> branchMap = Head.getBranchHEAD(branchName).getSnapshot();
-            Map<String, String> SPMap = SP.getSnapshot();
-            Set<String> allFiles = new HashSet<String>(branchMap.keySet());
 
+            boolean withConflict = false;
 
-            allFiles.addAll(SPMap.keySet());
-            allFiles.addAll(currMap.keySet());
+            for (String fileName : branch.keySet()) {
+                boolean insideCurr = curr.containsKey(fileName);
+                boolean insideBranch = branch.containsKey(fileName);
+                boolean insideSP = sp.containsKey(fileName);
 
-            allFiles.forEach(fileName -> {
-                if (!SPMap.containsKey(fileName)) {
-                    if (!currMap.containsKey(fileName) && branchMap.containsKey(fileName)) {
-                        stagingArea.add(fileName, branchMap.get(fileName));
-                    }
+                //6. File not in SP && File in curr -> remain
+                if (!insideSP && insideCurr) {
+                    continue;
                 }
-            });
+                //7. File not in SP && File in given -> checkout and staged
+                if (!insideSP && insideBranch){
+                    checkoutBranch(branchName);
+                    //add to stage
+                }
+
+            }
 
 
             // Otherwise, we continue with the steps below.
@@ -729,18 +747,6 @@ public class Repo {
 
         }
 
-        public void compareCurrHeadWithBranchHead() {
-
-        }
-
-        public void compareCurrHeadWithSP() {
-
-        }
-
-        public void findMergeConflicts() {
-
-        }
-
 
         public Commit latestCommonAncestor(Commit currHead, Commit branchHead) {
             ArrayList<Commit> currPath = new ArrayList<>();
@@ -778,6 +784,80 @@ public class Repo {
         // Current branch fast-forwarded.
         public boolean currHeadIsSP(Commit SP) {
             return Head.getGlobalHEAD().getSHA().equals(SP.getSHA());
+        }
+
+        public void compareBranchHeadWithSP(Commit sp, Commit branchHead) {
+
+
+        }
+
+        public void compareCurrHeadWithBranchHead() {
+
+        }
+
+        public void compareCurrHeadWithSP() {
+
+        }
+
+        public void findMergeConflicts() {
+
+        }
+
+        public void commitMerge() {
+
+        }
+
+        public void exitWithMessage(String message) {
+            System.out.println(message);
+            System.exit(0);
+        }
+
+        //failure case
+        //1. stagingArea is present
+        //2. given branch name does not exit
+        //3. attempting to merge the branch it self
+        //4. untracked files in the way
+        public boolean failureCases(String branchName) {
+            stagingArea = stagingArea.load();
+            Commit branchHEAD = Head.getBranchHEAD(branchName);
+
+            if (!stagingArea.isEmpty()) {
+                exitWithMessage("You have uncommitted changes.");
+                return true;
+            }
+            if (!Branch.hasBranch(branchName)) {
+                exitWithMessage("A branch with that name does not exist.");
+                return true;
+            }
+            if(branchHEAD.equals(currentBranchName())) {
+                exitWithMessage("Cannot merge a branch with itself.");
+                return true;
+            }
+            if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+                exitWithMessage("There is an untracked file in the way; delete it, " +
+                        "or add and commit it first.");
+                return true;
+            }
+            return false;
+        }
+
+
+        //3. givenBranch: modified && currBranch: unmodified (=SP)
+        // -> currBranch = givenBranch, and auto staged
+        public boolean condition1(String sp, String branch, String curr) {
+            return !branch.equals(sp) && curr.equals(sp);
+        }
+
+        //4. currBranch: modified && givenBranch: unmodified (=SP)
+        // -> stay the same (continue?)
+        public boolean condition2(String sp, String branch, String curr) {
+            return !curr.equals(sp) && branch.equals(sp);
+        }
+
+        //5. Modified: currBranch && givenBranch  (the same)
+        // -> left unchanged by merge
+        public boolean condition3(String sp, String branch, String curr) {
+            return !curr.equals(sp) && !branch.equals(sp) && curr.equals(branch);
         }
     }
 
