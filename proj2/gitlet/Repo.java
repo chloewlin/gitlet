@@ -620,7 +620,7 @@ public class Repo {
 
         public void merge(String branchName) throws IOException {
             Commit currHEAD = Head.getGlobalHEAD();
-            Commit branchHEAD = Head.getBranchHEAD(branchName);
+            Commit givenHEAD = Head.getBranchHEAD(branchName);
             String originalBranchName = Utils.readObject(
                     (Utils.join(Main.GITLET_FOLDER, "HEAD")), Branch.class)
                     .getName();
@@ -631,10 +631,10 @@ public class Repo {
             // go up branch
             // find depth of first parent and second parent
             // use min depth as your split point
-            Commit SP = latestCommonAncestor(currHEAD, branchHEAD);
+            Commit SP = latestCommonAncestor(currHEAD, givenHEAD);
 
             Map<String, String> curr = currHEAD.getSnapshot();
-            Map<String, String> branch = branchHEAD.getSnapshot();
+            Map<String, String> given = givenHEAD.getSnapshot();
             Map<String, String> sp = SP.getSnapshot();
 
             //failure case
@@ -643,67 +643,52 @@ public class Repo {
                 return;
             }
 
-            // edge case
-            // 1. If the split point is the current branch, then the effect is to check
+            // 1. If the split point is the same commit as the given branch, then we
+            // do nothing; the merge is complete, and the operation ends with the message
+            // Given branch is an ancestor of the current branch.
+            if (branchHeadIsSP(SP, givenHEAD)) {
+                System.out.println("Given branch is an ancestor of the current branch.");
+                return;
+            }
+
+            // 2. If the split point is the current branch, then the effect is to check
             // out the given branch, and the operation ends after printing the message
             // Current branch fast-forwarded.
             if (currHeadIsSP(SP)) {
                 checkoutBranch(branchName);
                 System.out.println("Current branch fast-forwarded.");
-            }
-
-            // edge case:
-            // 2. If the split point is the same commit as the given branch, then we
-            // do nothing; the merge is complete, and the operation ends with the message
-            // Given branch is an ancestor of the current branch.
-            if (branchHeadIsSP(SP, branchHEAD)) {
-                System.out.println("Given branch is an ancestor of the current branch.");
+                return;
             }
 
 
+            Map<String, String> mergeMap = new HashMap<>();
             boolean withConflict = false;
 
-            for (String fileName : branch.keySet()) {
-                boolean insideCurr = curr.containsKey(fileName);
-                boolean insideBranch = branch.containsKey(fileName);
-                boolean insideSP = sp.containsKey(fileName);
-
-                //6. File not in SP && File in curr -> remain
-                if (!insideSP && insideCurr) {
-                    continue;
+            // 6. File not in SP && File in curr
+            // -> add curr file and blob into mergeMap
+            for (String currFileName : curr.keySet()) {
+                if (!sp.keySet().contains(currFileName)) {
+                    String currBlob = curr.get(currFileName);
+                    mergeMap.put(currFileName, currBlob);
                 }
-                //7. File not in SP && File in given -> checkout and staged
-                if (!insideSP && insideBranch){
-                    checkoutBranch(branchName);
-                    //add to stage
-                }
-
             }
 
+            // 7. File not in SP && File in given
+            // -> add given file and given blob into merge map
+            for (String givenFileName : given.keySet()) {
+                if (!sp.containsKey(givenFileName)){
+                    String givenBlob = given.get(givenFileName);
+                    mergeMap.put(givenFileName, givenBlob);
+                }
+            }
 
-            // Otherwise, we continue with the steps below.
+            condition1(sp, given, curr, mergeMap);
 
-            // 1. We need to compare three commit nodes
-            // 1. SP (split point)
-            // 2. HEAD of current branch
-            // 3. HEAD of given branch
+            System.out.println("=========== merge map =========");
+            mergeMap.forEach((k, v) -> {
+                System.out.println(k + " : " + v);
+            });
 
-            // compare HEAD of given branch with SP, find modified files
-            compareBranchHeadWithSP();
-            // compare HEAD of given branch with HEAD of curr branch
-            // 1. find modified files, stage these files
-            // 2. find files in curr HEAD but not in given HEAD, they should stay the way they are
-            // 3. find files modified in the same way (both changed to same content, or both removed),
-            // merge doesn't change these files
-            // (if a file is removed in both, but that file is in CWD, don't remove it)
-            compareCurrHeadWithBranchHead();
-
-            // compare HEAD of current branch with SP:
-            // 1. file not in SP but in curr branch HEAD should stay the way they are
-            // 2. file in SP but not in curr branch HEAD: checked out and staged
-            // 3. file in SP, unmodified in given branch HEAD, not in curr branch HEAD, stay the way
-            // they are
-            compareCurrHeadWithSP();
 
             // compare HEAD of curr branch with HEAD of given branch:
             // find "conflicts": files modified in different ways in currHEAD and branchHEAD
@@ -713,7 +698,7 @@ public class Repo {
             // =======
             // contents of file in given branch
             // >>>>>>>
-            findMergeConflicts();
+//            findMergeConflicts();
 
             // After user updated the files, and SP is neither curr branch HEAD or given branch HEAD
             // if we still have conflict:
@@ -723,7 +708,59 @@ public class Repo {
             // 1. Save first parent: HEAD of curr branch
             // 2. Save second parent: HEAD of given branch
             // 2. message: Merged [given branch name] into [current branch name].
-            commitMerge(branchName, originalBranchName);
+//            commitMerge(branchName, originalBranchName);
+        }
+
+        // case 3:
+        // givenBranch: modified && currBranch: unmodified (=SP)
+        // -> copy givenBranch key-value pair, add into hashmap (stageToBeAdded), and auto staged
+        public void condition1(Map<String, String> SP,
+                                                  Map<String, String> given,
+                                                  Map<String, String> curr,
+                                                  Map<String, String> mergeMap) {
+
+            HashMap<String, String> sameOnCurrAndSP = new HashMap<>();
+            HashMap<String, String> diffOnGivenAndSP = new HashMap<>();
+
+            // compare SP and Curr, find same file name with same content
+            SP.forEach((spFileName, spBlob) -> {
+                curr.forEach((currFileName, currBlob) -> {
+                    if (spFileName.equals(currFileName) && spBlob.equals(currBlob)) {
+                        sameOnCurrAndSP.put(currFileName, currBlob);
+                    }
+                });
+            });
+
+            // compare SP and Given, find same file name with different content
+            SP.forEach((spFileName, spBlob) -> {
+                given.forEach((givenFileName, givenBlob) -> {
+                    if (spFileName.equals(givenFileName) && !spBlob.equals(givenBlob)) {
+                        diffOnGivenAndSP.put(givenFileName, givenBlob);
+                    }
+                });
+            });
+
+            // find files modified on Given but not on Curr since SP
+            //            {hi.txt: sdijs[dok[wq} hey **
+            sameOnCurrAndSP.forEach((sameFileName, sameBlob) -> {
+                diffOnGivenAndSP.forEach((diffFileName, diffBlob) -> {
+                    if (sameFileName.equals(diffFileName)) {
+                        mergeMap.put(diffFileName, diffBlob);
+                    }
+                });
+            });
+        }
+
+        //4. currBranch: modified && givenBranch: unmodified (=SP)
+        // -> stay the same (continue?)
+        public boolean condition2(String sp, String branch, String curr) {
+            return !curr.equals(sp) && branch.equals(sp);
+        }
+
+        //5. Modified: currBranch && givenBranch  (the same)
+        // -> left unchanged by merge
+        public boolean condition3(String sp, String branch, String curr) {
+            return !curr.equals(sp) && !branch.equals(sp) && curr.equals(branch);
         }
 
         public void commitMerge(String branchName, String originalBranchName) throws IOException {
@@ -743,9 +780,6 @@ public class Repo {
             stagingArea.save();
         }
 
-        public void compareBranchHeadWithSP() {
-
-        }
 
 
         public Commit latestCommonAncestor(Commit currHead, Commit branchHead) {
@@ -786,18 +820,6 @@ public class Repo {
             return Head.getGlobalHEAD().getSHA().equals(SP.getSHA());
         }
 
-        public void compareBranchHeadWithSP(Commit sp, Commit branchHead) {
-
-
-        }
-
-        public void compareCurrHeadWithBranchHead() {
-
-        }
-
-        public void compareCurrHeadWithSP() {
-
-        }
 
         public void findMergeConflicts() {
 
@@ -829,7 +851,7 @@ public class Repo {
                 exitWithMessage("A branch with that name does not exist.");
                 return true;
             }
-            if(branchHEAD.equals(currentBranchName())) {
+            if (branchHEAD.equals(currentBranchName())) {
                 exitWithMessage("Cannot merge a branch with itself.");
                 return true;
             }
@@ -839,25 +861,6 @@ public class Repo {
                 return true;
             }
             return false;
-        }
-
-
-        //3. givenBranch: modified && currBranch: unmodified (=SP)
-        // -> currBranch = givenBranch, and auto staged
-        public boolean condition1(String sp, String branch, String curr) {
-            return !branch.equals(sp) && curr.equals(sp);
-        }
-
-        //4. currBranch: modified && givenBranch: unmodified (=SP)
-        // -> stay the same (continue?)
-        public boolean condition2(String sp, String branch, String curr) {
-            return !curr.equals(sp) && branch.equals(sp);
-        }
-
-        //5. Modified: currBranch && givenBranch  (the same)
-        // -> left unchanged by merge
-        public boolean condition3(String sp, String branch, String curr) {
-            return !curr.equals(sp) && !branch.equals(sp) && curr.equals(branch);
         }
     }
 
