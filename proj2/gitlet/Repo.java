@@ -364,17 +364,14 @@ public class Repo {
         Commit branchHEAD = Head.getBranchHEAD(branchName);
         Commit currHEAD = Head.getGlobalHEAD();
 
-//        if (!stagingArea.getFilesStagedForRemoval().isEmpty()) {
-//
-//        }
-
         if (currBranchName.equals(branchName)) {
             Main.exitWithError("No need to checkout the current branch.");
         }
-        if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
-            Main.exitWithError("There is an untracked file in the way; " +
-                    "delete it, or add and commit it first.");
-        }
+        // TODO: FIX BUG
+//        if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+//            Main.exitWithError("There is an untracked file in the way; " +
+//                    "delete it, or add and commit it first.");
+//        }
 
         Head.setGlobalHEAD(branchName, branchHEAD);
         restoreFilesAtBranch(currHEAD, branchHEAD);
@@ -725,6 +722,7 @@ public class Repo {
             // 1. Save first parent: HEAD of curr branch
             // 2. Save second parent: HEAD of given branch
             // 2. message: Merged [given branch name] into [current branch name].
+            // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
 //            commitMerge(branchName, originalBranchName);
         }
 
@@ -871,7 +869,8 @@ public class Repo {
                 // absent at given, curr blob is the same version as SP blob
                 if (insideCurr && !insideGiven) {
                     if (currBlob.equals(SPBlob)) {
-                        deletedAtOne.put(SPFileName, givenBlob);
+//                        deletedAtOne.put(SPFileName, givenBlob); // TODO: BECOMES NULL
+                        deletedAtOne.put(SPFileName, SPBlob);
                     }
                 }
 
