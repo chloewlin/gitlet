@@ -226,7 +226,7 @@ public class Repo {
     }
 
     public boolean isMergeCommit(Commit commit) {
-        return commit.getMessage().startsWith("Merge");
+        return commit.getMessage().startsWith("Merged");
     }
 
     /**
@@ -241,6 +241,11 @@ public class Repo {
             if (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
                 System.out.print("===" + "\n");
                 System.out.print("commit " + commit.getSHA() + "\n");
+                if (isMergeCommit(commit) && commit.getSecondParentSHA1() != null) {
+                    String firstParentSHA = commit.getFirstParentSHA1().substring(0, 7);
+                    String secondParentSHA = commit.getSecondParentSHA1().substring(0, 7);
+                    System.out.println("Merge: " + firstParentSHA + " " + secondParentSHA);
+                }
                 System.out.print("Date: " + commit.getTimestamp() + "\n");
                 System.out.print(commit.getMessage() + "\n");
                 System.out.println("");
@@ -943,10 +948,10 @@ public class Repo {
 
             // TODO: Do we need to handle deleted files
             Commit mergeCommit = new Commit(commitMessage, firstParentSHA1, secondParentSHA1,
-                    false, stagingArea.getFilesStagedForAddition(),
+                            false, stagingArea.getFilesStagedForAddition(),
                     stagingArea.getFilesStagedForRemoval());
 
-            mergeCommit.save();
+            mergeCommit.saveMergeCommit();
 
             head.setGlobalHEAD(originalBranchName, mergeCommit);
 

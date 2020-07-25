@@ -39,6 +39,11 @@ public class Commit implements Serializable {
      */
     private Map<String, String> snapshot;
     /**
+     * the snapshot of deleted files
+     */
+    private HashSet<String> deletedSnapshot = new HashSet<>();
+
+    /**
      * a flag for the first commit node.
      */
     private boolean init = false;
@@ -89,8 +94,13 @@ public class Commit implements Serializable {
     }
 
     /** for merge commits only */
-    public Commit(String msg, String firstParent, String secondParent, boolean initial,
-                  Map<String, String> map) {
+    public Commit(String msg,
+                  String firstParent,
+                  String secondParent,
+                  boolean initial,
+                  Map<String, String> map,
+                  HashSet<String> deletedSnapshot) {
+
         List<String> list = new ArrayList<String>(map.values());
         // create unique sha
         String blobFileNames = "";
@@ -102,8 +112,9 @@ public class Commit implements Serializable {
         this.parents[1] = secondParent;
         this.sha1 = Utils.sha1("MERGE" + message + blobFileNames);
         this.timestamp = generateDate(initial);
-        this.snapshot = map;
         this.init = initial;
+        this.snapshot = map; // TODO: files added
+        this.deletedSnapshot = deletedSnapshot; // TODO: files deleted at merge
     }
 
     /**
@@ -113,11 +124,24 @@ public class Commit implements Serializable {
         Commit commit = new Commit(this.message, this.parents[0],
                 this.init, this.snapshot);
         File commitFile = Utils.join(Main.COMMITS_FOLDER, this.sha1);
-        File commitLogs = Utils.join(Main.LOGS_FOLDER, this.sha1);
         commitFile.createNewFile();
-        commitLogs.createNewFile();
         Utils.writeObject(commitFile, commit);
-        Utils.writeObject(commitLogs, commit);
+    }
+
+    /**
+     * Save a MERGE commit node into a byte array.
+     */
+    public void saveMergeCommit() throws IOException {
+        Commit commit =
+                new Commit(this.message,
+                        this.parents[0],
+                        this.parents[1],
+                        this.init,
+                        this.snapshot,
+                        this.deletedSnapshot);
+        File commitFile = Utils.join(Main.COMMITS_FOLDER, this.sha1);
+        commitFile.createNewFile();
+        Utils.writeObject(commitFile, commit);
     }
 
     /**
