@@ -226,7 +226,7 @@ public class Repo {
     }
 
     public boolean isMergeCommit(Commit commit) {
-        return commit.getMessage().startsWith("Merge");
+        return commit.getMessage().startsWith("Merged");
     }
 
     /**
@@ -241,6 +241,11 @@ public class Repo {
             if (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
                 System.out.print("===" + "\n");
                 System.out.print("commit " + commit.getSHA() + "\n");
+                if (isMergeCommit(commit) && commit.getSecondParentSHA1() != null) {
+                    String firstParentSHA = commit.getFirstParentSHA1().substring(0, 7);
+                    String secondParentSHA = commit.getSecondParentSHA1().substring(0, 7);
+                    System.out.println("Merge: " + firstParentSHA + " " + secondParentSHA);
+                }
                 System.out.print("Date: " + commit.getTimestamp() + "\n");
                 System.out.print(commit.getMessage() + "\n");
                 System.out.println("");
@@ -364,13 +369,10 @@ public class Repo {
         Commit branchHEAD = Head.getBranchHEAD(branchName);
         Commit currHEAD = Head.getGlobalHEAD();
 
-//        if (!stagingArea.getFilesStagedForRemoval().isEmpty()) {
-//
-//        }
-
         if (currBranchName.equals(branchName)) {
             Main.exitWithError("No need to checkout the current branch.");
         }
+        // TODO: FIX BUG
         if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
             Main.exitWithError("There is an untracked file in the way; " +
                     "delete it, or add and commit it first.");
@@ -506,6 +508,10 @@ public class Repo {
         Commit targetCommit = null;
 
         // TODO: FIX BUG
+//        if (hasUntrackedFilesForCheckoutBranch(commit)) {
+//            Main.exitWithError("There is an untracked file in the way;" +
+//                    " delete it or add it first.");
+//        }
 //        if (hasUntrackedFiles()) {
 //            Main.exitWithError("There is an untracked file in the way; " +
 //                    "delete it, or add and commit it first.");
@@ -543,9 +549,17 @@ public class Repo {
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
 
         for (String fileName : fileInCWD) {
-            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
+            if (!fileName.equals(".DS_Store") && !fileName.equals(".gitignore") && !fileName.equals(
+                    "proj2.iml")) {
+
+//            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
+//                    // TODO: CHECK WHICH, OR BOTH, CONDITION IS CORRECT **
+//                    && !stagingArea.getFilesStagedForAddition().containsKey(fileName)
+//                    && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
+                if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
                     && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
-                untrackedFiles.add(fileName);
+                      untrackedFiles.add(fileName);
+                }
             }
         }
         return untrackedFiles.size() > 0;
@@ -615,7 +629,7 @@ public class Repo {
 
         public void merge(String branchName) throws IOException {
             Commit currHEAD = Head.getGlobalHEAD();
-            Commit branchHEAD = Head.getBranchHEAD(branchName);
+            Commit givenHEAD = Head.getBranchHEAD(branchName);
             String originalBranchName = Utils.readObject(
                     (Utils.join(Main.GITLET_FOLDER, "HEAD")), Branch.class)
                     .getName();
@@ -626,66 +640,64 @@ public class Repo {
             // go up branch
             // find depth of first parent and second parent
             // use min depth as your split point
-            Commit SP = latestCommonAncestor(currHEAD, branchHEAD);
+            Commit SP = latestCommonAncestor(currHEAD, givenHEAD);
 
-            // edge case
-            // 1. If the split point is the current branch, then the effect is to check
+            Map<String, String> curr = currHEAD.getSnapshot();
+            Map<String, String> given = givenHEAD.getSnapshot();
+            Map<String, String> sp = SP.getSnapshot();
+
+            //failure case
+            //print error msg and error out
+            if (failureCases(branchName)) {
+                return;
+            }
+
+            // saved to commit (add)
+            Map<String, String> mergeMap = new HashMap<>();
+            Map<String, String> bothDeleted = new HashMap<>();
+            Map<String, String> deletedAtOne = new HashMap<>();
+            boolean withConflict = false;
+
+            // 1. If the split point is the same commit as the given branch, then we
+            // do nothing; the merge is complete, and the operation ends with the message
+            // Given branch is an ancestor of the current branch.
+            if (branchHeadIsSP(SP, givenHEAD)) {
+                System.out.println("Given branch is an ancestor of the current branch.");
+                return;
+            }
+
+            // 2. If the split point is the current branch, then the effect is to check
             // out the given branch, and the operation ends after printing the message
             // Current branch fast-forwarded.
             if (currHeadIsSP(SP)) {
                 checkoutBranch(branchName);
                 System.out.println("Current branch fast-forwarded.");
+                return;
             }
 
-            // edge case:
-            // 2. If the split point is the same commit as the given branch, then we
-            // do nothing; the merge is complete, and the operation ends with the message
-            // Given branch is an ancestor of the current branch.
-            if (branchHeadIsSP(SP, branchHEAD)) {
-                System.out.println("Given branch is an ancestor of the current branch.");
-            }
-
-            Map<String, String> currMap = Head.getGlobalHEAD().getSnapshot();
-            Map<String, String> branchMap = Head.getBranchHEAD(branchName).getSnapshot();
-            Map<String, String> SPMap = SP.getSnapshot();
-            Set<String> allFiles = new HashSet<String>(branchMap.keySet());
+            condition3(sp, given, curr, mergeMap);
+            condition4(sp, given, curr, mergeMap);
+            condition5(sp, given, curr, mergeMap, bothDeleted);
+            condition6(sp, curr, mergeMap);
+            condition7(sp, given, mergeMap);
+            condition8And9(sp,given, curr, deletedAtOne);
 
 
-            allFiles.addAll(SPMap.keySet());
-            allFiles.addAll(currMap.keySet());
-
-            allFiles.forEach(fileName -> {
-                if (!SPMap.containsKey(fileName)) {
-                    if (!currMap.containsKey(fileName) && branchMap.containsKey(fileName)) {
-                        stagingArea.add(fileName, branchMap.get(fileName));
-                    }
-                }
-            });
-
-
-            // Otherwise, we continue with the steps below.
-
-            // 1. We need to compare three commit nodes
-            // 1. SP (split point)
-            // 2. HEAD of current branch
-            // 3. HEAD of given branch
-
-            // compare HEAD of given branch with SP, find modified files
-            compareBranchHeadWithSP();
-            // compare HEAD of given branch with HEAD of curr branch
-            // 1. find modified files, stage these files
-            // 2. find files in curr HEAD but not in given HEAD, they should stay the way they are
-            // 3. find files modified in the same way (both changed to same content, or both removed),
-            // merge doesn't change these files
-            // (if a file is removed in both, but that file is in CWD, don't remove it)
-            compareCurrHeadWithBranchHead();
-
-            // compare HEAD of current branch with SP:
-            // 1. file not in SP but in curr branch HEAD should stay the way they are
-            // 2. file in SP but not in curr branch HEAD: checked out and staged
-            // 3. file in SP, unmodified in given branch HEAD, not in curr branch HEAD, stay the way
-            // they are
-            compareCurrHeadWithSP();
+//            System.out.println("=========== merge map =========");
+//            mergeMap.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
+//            System.out.println();
+//
+//            System.out.println("=========== both deleted =========");
+//            bothDeleted.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
+//
+//            System.out.println("=========== deleted at one =========");
+//            deletedAtOne.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
 
             // compare HEAD of curr branch with HEAD of given branch:
             // find "conflicts": files modified in different ways in currHEAD and branchHEAD
@@ -695,7 +707,7 @@ public class Repo {
             // =======
             // contents of file in given branch
             // >>>>>>>
-            findMergeConflicts();
+//            findMergeConflicts();
 
             // After user updated the files, and SP is neither curr branch HEAD or given branch HEAD
             // if we still have conflict:
@@ -705,7 +717,233 @@ public class Repo {
             // 1. Save first parent: HEAD of curr branch
             // 2. Save second parent: HEAD of given branch
             // 2. message: Merged [given branch name] into [current branch name].
+            // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
             commitMerge(branchName, originalBranchName);
+            restoreFilesAtMerge(mergeMap, deletedAtOne);
+        }
+
+        public void restoreFilesAtMerge(Map<String, String> mergeMap,
+                                        Map<String, String> deleteAtOne) {
+
+            mergeMap.forEach((file, blobSHA1) -> {
+                File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+                Blob blob = Blob.load(blobFile);
+
+                String CWD = System.getProperty("user.dir");
+                File newFile = new File(CWD, file);
+                try {
+                    newFile.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Utils.writeContents(newFile, blob.getFileContent());
+            });
+
+            // TODO: delete files
+//            delete.forEach((file, blobSHA1) -> {
+//                Utils.restrictedDelete(file);
+//            });
+        }
+
+        // case 3:
+        // givenBranch: modified && currBranch: unmodified (=SP)
+        // -> copy givenBranch key-value pair, add into hashmap (stageToBeAdded), and auto staged
+        public void condition3(Map<String, String> SP,
+                                                  Map<String, String> given,
+                                                  Map<String, String> curr,
+                                                  Map<String, String> mergeMap) {
+            stagingArea = stagingArea.load();
+            HashMap<String, String> sameOnCurrAndSP = new HashMap<>();
+            HashMap<String, String> diffOnGivenAndSP = new HashMap<>();
+
+            // compare SP and Curr, find same file name with same content
+            SP.forEach((spFileName, spBlob) -> {
+                curr.forEach((currFileName, currBlob) -> {
+                    if (spFileName.equals(currFileName) && spBlob.equals(currBlob)) {
+                        sameOnCurrAndSP.put(currFileName, currBlob);
+                    }
+                });
+            });
+
+            // compare SP and Given, find same file name with different content
+            SP.forEach((spFileName, spBlob) -> {
+                given.forEach((givenFileName, givenBlob) -> {
+                    if (spFileName.equals(givenFileName) && !spBlob.equals(givenBlob)) {
+                        diffOnGivenAndSP.put(givenFileName, givenBlob);
+                    }
+                });
+            });
+
+            // find files modified on Given but not on Curr since SP
+            //            {hi.txt: sdijs[dok[wq} hey **
+            sameOnCurrAndSP.forEach((sameFileName, sameBlob) -> {
+                diffOnGivenAndSP.forEach((diffFileName, diffBlob) -> {
+                    if (sameFileName.equals(diffFileName)) {
+                        mergeMap.put(diffFileName, diffBlob);
+                        stagingArea.add(diffFileName, diffBlob);
+                    }
+                });
+            });
+
+            stagingArea.save();
+        }
+
+        // case 4. currBranch: modified && givenBranch: unmodified (=SP)
+        // -> stay the same (continue?)
+        public void condition4(Map<String, String> SP,
+                               Map<String, String> given,
+                               Map<String, String> curr,
+                               Map<String, String> mergeMap) {
+            stagingArea = stagingArea.load();
+            HashMap<String, String> sameOnGivenAndSP = new HashMap<>();
+            HashMap<String, String> diffOnCurrAndSP = new HashMap<>();
+
+            // compare SP and Given, find same file name with same content
+            SP.forEach((spFileName, spBlob) -> {
+                given.forEach((givenFileName, givenBlob) -> {
+                    if (spFileName.equals(givenFileName) && spBlob.equals(givenBlob)) {
+                        sameOnGivenAndSP.put(givenFileName, givenBlob);
+                    }
+                });
+            });
+
+//            System.out.println("====== sameOnGivenAndSP ===== ");
+//            sameOnGivenAndSP.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
+
+            // compare SP and Curr, find same file name with different content
+            SP.forEach((spFileName, spBlob) -> {
+                curr.forEach((currFileName, currBlob) -> {
+                    if (spFileName.equals(currFileName) && !spBlob.equals(currBlob)) {
+                        diffOnCurrAndSP.put(currFileName, currBlob);
+                    }
+                });
+            });
+
+//            System.out.println("====== diffOnCurrAndSP ===== ");
+//            diffOnCurrAndSP.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
+
+            // find files modified on Curr but not on Given since SP
+            sameOnGivenAndSP.forEach((sameFileName, sameBlob) -> {
+                diffOnCurrAndSP.forEach((diffFileName, diffBlob) -> {
+                    if (sameFileName.equals(diffFileName)) {
+                        mergeMap.put(diffFileName, diffBlob);
+                        stagingArea.add(diffFileName, diffBlob);
+                    }
+                });
+            });
+
+            stagingArea.save();
+        }
+
+        // 5. Modified: currBranch && givenBranch in the same way
+        // both are different from SP, but Curr and given are the same
+        // OR, both are deleted on Curr and given branch
+        // -> pick currentBranch key-value pair, add into map
+        public void condition5(Map<String, String> SP,
+                               Map<String, String> given,
+                               Map<String, String> curr,
+                               Map<String, String> mergeMap,
+                               Map<String, String> bothDeleted) {
+            stagingArea = stagingArea.load();
+            for (String SPFileName : SP.keySet()) {
+                boolean insideCurr = curr.containsKey(SPFileName);
+                boolean insideGiven = given.containsKey(SPFileName);
+                String SPBlob = SP.get(SPFileName);
+                String givenBlob = given.get(SPFileName);
+                String currBlob = curr.get(SPFileName);
+
+                // both are modified in the same way
+                if (insideCurr && insideGiven) {
+                    // check if give blob is different from SP blob
+                    // check if curr blob is different from SP blob
+                    // check if given blob and curr blob are the same version
+                    if (!givenBlob.equals(SPBlob)
+                            && !currBlob.equals(SPBlob)
+                            && givenBlob.equals(currBlob)) {
+                        mergeMap.put(SPFileName, currBlob);
+                        stagingArea.add(SPFileName,currBlob);
+                    }
+                }
+
+                // both are deleted
+                if (!insideCurr && !insideGiven) {
+                    bothDeleted.put(SPFileName, SPBlob);
+                    stagingArea.unstage(SPFileName); // TODO: do we need to save SPBlob?
+                }
+            }
+            stagingArea.save();
+        }
+
+        // 6. File not in SP && File in curr
+        // -> add curr file and blob into mergeMap
+        public void condition6(Map<String, String> SP,
+                               Map<String, String> curr,
+                               Map<String, String> mergeMap) {
+            stagingArea = stagingArea.load();
+            for (String currFileName : curr.keySet()) {
+                if (!SP.keySet().contains(currFileName)) {
+                    String currBlob = curr.get(currFileName);
+                    mergeMap.put(currFileName, currBlob);
+                    stagingArea.add(currFileName, currBlob);
+                }
+            }
+            stagingArea.save();
+        }
+
+        // 7. File not in SP && File in given
+        // -> add given file and given blob into merge map
+        public void condition7(Map<String, String> SP,
+                               Map<String, String> given,
+                               Map<String, String> mergeMap) {
+            stagingArea = stagingArea.load();
+            for (String givenFileName : given.keySet()) {
+                if (!SP.containsKey(givenFileName)){
+                    String givenBlob = given.get(givenFileName);
+                    mergeMap.put(givenFileName, givenBlob);
+                    stagingArea.add(givenFileName, givenBlob);
+                }
+            }
+            stagingArea.save();
+        }
+
+        // File in SP && current: unmodified && given: absent (treat like modified)
+        // -> removed (untracked)
+        // File in SP && given: unmodified && curr: absent (treat like modified)
+        // -> remain absent (unchanged?)
+        public void condition8And9(Map<String, String> SP,
+                                   Map<String, String> given,
+                                   Map<String, String> curr,
+                                   Map<String, String> deletedAtOne) {
+            stagingArea = stagingArea.load();
+            for (String SPFileName : SP.keySet()) {
+                boolean insideCurr = curr.containsKey(SPFileName);
+                boolean insideGiven = given.containsKey(SPFileName);
+                String SPBlob = SP.get(SPFileName);
+                String givenBlob = given.get(SPFileName);
+                String currBlob = curr.get(SPFileName);
+
+                // absent at given, curr blob is the same version as SP blob
+                if (insideCurr && !insideGiven) {
+                    if (currBlob.equals(SPBlob)) {
+//                        deletedAtOne.put(SPFileName, givenBlob); // TODO: BECOMES NULL
+                        deletedAtOne.put(SPFileName, SPBlob);
+                        stagingArea.unstage(SPFileName);
+                    }
+                }
+
+                // absent at curr, present at given
+                if (!insideCurr && insideGiven) {
+                    if (givenBlob.equals(SPBlob)) {
+                        deletedAtOne.put(SPFileName, currBlob);
+                        stagingArea.unstage(SPFileName);
+                    }
+                }
+            }
+            stagingArea.save();
         }
 
         public void commitMerge(String branchName, String originalBranchName) throws IOException {
@@ -713,33 +951,20 @@ public class Repo {
             String firstParentSHA1 = Head.getBranchHEAD(originalBranchName).getSHA();
             String secondParentSHA1 = Head.getBranchHEAD(branchName).getSHA();
 
-            // TODO: Do we need to handle stage for removal:
+            // TODO: Do we need to handle deleted files
             Commit mergeCommit = new Commit(commitMessage, firstParentSHA1, secondParentSHA1,
-                    false, stagingArea.getFilesStagedForAddition());
+                            false, stagingArea.getFilesStagedForAddition(),
+                    stagingArea.getFilesStagedForRemoval());
 
-            mergeCommit.save();
+            mergeCommit.saveMergeCommit();
 
+            head.setBranchHEAD(originalBranchName,mergeCommit);
             head.setGlobalHEAD(originalBranchName, mergeCommit);
 
             stagingArea = new Staging();
             stagingArea.save();
         }
 
-        public void compareBranchHeadWithSP() {
-
-        }
-
-        public void compareCurrHeadWithBranchHead() {
-
-        }
-
-        public void compareCurrHeadWithSP() {
-
-        }
-
-        public void findMergeConflicts() {
-
-        }
 
 
         public Commit latestCommonAncestor(Commit currHead, Commit branchHead) {
@@ -778,6 +1003,50 @@ public class Repo {
         // Current branch fast-forwarded.
         public boolean currHeadIsSP(Commit SP) {
             return Head.getGlobalHEAD().getSHA().equals(SP.getSHA());
+        }
+
+
+        public void findMergeConflicts() {
+
+        }
+
+        public void commitMerge() {
+
+        }
+
+        public void exitWithMessage(String message) {
+            System.out.println(message);
+            System.exit(0);
+        }
+
+        //failure case
+        //1. stagingArea is present
+        //2. given branch name does not exit
+        //3. attempting to merge the branch it self
+        //4. untracked files in the way
+        public boolean failureCases(String branchName) {
+            stagingArea = stagingArea.load();
+            Commit branchHEAD = Head.getBranchHEAD(branchName);
+
+            if (!stagingArea.isEmpty()) {
+                exitWithMessage("You have uncommitted changes.");
+                return true;
+            }
+            if (!Branch.hasBranch(branchName)) {
+                exitWithMessage("A branch with that name does not exist.");
+                return true;
+            }
+            if (branchHEAD.equals(currentBranchName())) {
+                exitWithMessage("Cannot merge a branch with itself.");
+                return true;
+            }
+            // TODO: FIX hasUntrackedFilesForCheckoutBranch
+            if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+                exitWithMessage("There is an untracked file in the way; delete it, " +
+                        "or add and commit it first.");
+                return true;
+            }
+            return false;
         }
     }
 

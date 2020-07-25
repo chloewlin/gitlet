@@ -201,7 +201,7 @@ public class Main {
      */
     private static void validateGitlet() {
         if (GITLET_FOLDER.exists()) {
-            exitWithError("A Gitlet version-control system"
+            exitWithError("A Gitlet version-control system "
                     + "already exists in the current directory.");
         }
     }
