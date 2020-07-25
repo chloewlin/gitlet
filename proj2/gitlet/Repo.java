@@ -610,6 +610,10 @@ public class Repo {
             // use min depth as your split point
             Commit SP = latestCommonAncestor(currHEAD, branchHEAD);
 
+            Map<String, String> curr = currHEAD.getSnapshot();
+            Map<String, String> branch = branchHEAD.getSnapshot();
+            Map<String, String> sp = SP.getSnapshot();
+
             //failure case
             //print error msg and error out
             if (failureCases(branchName)) {
@@ -631,6 +635,25 @@ public class Repo {
             // Given branch is an ancestor of the current branch.
             if (branchHeadIsSP(SP, branchHEAD)) {
                 exitWithMessage("Given branch is an ancestor of the current branch.");
+            }
+
+            boolean withConflict = false;
+
+            for (String fileName : branch.keySet()) {
+                boolean insideCurr = curr.containsKey(fileName);
+                boolean insideBranch = branch.containsKey(fileName);
+                boolean insideSP = sp.containsKey(fileName);
+
+                //6. File not in SP && File in curr -> remain
+                if (!insideSP && insideCurr) {
+                    continue;
+                }
+                //7. File not in SP && File in given -> checkout and staged
+                if (!insideSP && insideBranch){
+                    checkoutBranch(branchName);
+                    //add to stage
+                }
+
             }
 
 
@@ -718,7 +741,8 @@ public class Repo {
             return Head.getGlobalHEAD().getSHA().equals(SP.getSHA());
         }
 
-        public void compareBranchHeadWithSP() {
+        public void compareBranchHeadWithSP(Commit sp, Commit branchHead) {
+
 
         }
 
@@ -770,6 +794,25 @@ public class Repo {
                 return true;
             }
             return false;
+        }
+
+
+        //3. givenBranch: modified && currBranch: unmodified (=SP)
+        // -> currBranch = givenBranch, and auto staged
+        public boolean condition1(String sp, String branch, String curr) {
+            return !branch.equals(sp) && curr.equals(sp);
+        }
+
+        //4. currBranch: modified && givenBranch: unmodified (=SP)
+        // -> stay the same (continue?)
+        public boolean condition2(String sp, String branch, String curr) {
+            return !curr.equals(sp) && branch.equals(sp);
+        }
+
+        //5. Modified: currBranch && givenBranch  (the same)
+        // -> left unchanged by merge
+        public boolean condition3(String sp, String branch, String curr) {
+            return !curr.equals(sp) && !branch.equals(sp) && curr.equals(branch);
         }
 
     }
