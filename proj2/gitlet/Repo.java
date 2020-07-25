@@ -651,9 +651,9 @@ public class Repo {
 
             //failure case
             //print error msg and error out
-            if (failureCases(branchName)) {
-                return;
-            }
+//            if (failureCases(branchName)) {
+//                return;
+//            }
 
             // saved to commit (add)
             Map<String, String> mergeMap = new HashMap<>();
@@ -723,11 +723,12 @@ public class Repo {
             // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
             stagingArea.save();
             commitMerge(branchName, originalBranchName);
-            restoreFilesAtMerge(mergeMap, deletedAtOne);
+            restoreFilesAtMerge(mergeMap, deletedAtOne, bothDeleted);
         }
 
         public void restoreFilesAtMerge(Map<String, String> mergeMap,
-                                        Map<String, String> deleteAtOne) {
+                                        Map<String, String> deleteAtOne,
+                                        Map<String, String> bothDeleted) {
 
             mergeMap.forEach((file, blobSHA1) -> {
                 File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
@@ -744,9 +745,13 @@ public class Repo {
             });
 
             // TODO: delete files
-//            delete.forEach((file, blobSHA1) -> {
-//                Utils.restrictedDelete(file);
-//            });
+            deleteAtOne.forEach((file, blobSHA1) -> {
+                Utils.restrictedDelete(file);
+            });
+
+            bothDeleted.forEach((file, blobSHA1) -> {
+                Utils.restrictedDelete(file);
+            });
         }
 
         // case 3:
@@ -926,16 +931,16 @@ public class Repo {
                 String givenBlob = given.get(SPFileName);
                 String currBlob = curr.get(SPFileName);
 
-                // absent at given, curr blob is the same version as SP blob
+                // 8. absent at given, curr blob is the same version as SP blob
                 if (insideCurr && !insideGiven) {
                     if (currBlob.equals(SPBlob)) {
-//                        deletedAtOne.put(SPFileName, givenBlob); // TODO: BECOMES NULL
-                        deletedAtOne.put(SPFileName, SPBlob);
+                        deletedAtOne.put(SPFileName, givenBlob); // TODO: BECOMES NULL
+//                        deletedAtOne.put(SPFileName, SPBlob);
                         stagingArea.unstage(SPFileName);
                     }
                 }
 
-                // absent at curr, present at given
+                // 9. absent at curr, present at given
                 if (!insideCurr && insideGiven) {
                     if (givenBlob.equals(SPBlob)) {
                         deletedAtOne.put(SPFileName, currBlob);
