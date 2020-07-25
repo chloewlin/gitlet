@@ -410,7 +410,12 @@ public class Repo {
         Map<String, String> overwrite = new HashMap<>();
         Map<String, String> delete = new HashMap<>();
 
+
         // TODO: FIX BUGS
+        // Takes all files in the commit at the head of the
+        // given branch, and puts them in the working directory,
+        // overwriting the versions of the files that are already
+        // there if they exist.
         currSnapshot.forEach((fileName, blobSHA1) -> {
             if (checkoutSnapshot.containsKey(fileName)) {
                 overwrite.put(fileName, checkoutSnapshot.get(fileName));
@@ -419,20 +424,27 @@ public class Repo {
             }
         });
 
+        // Any files that are tracked in the current branch but
+        // are not present in the checked-out branch are deleted.
         checkoutSnapshot.forEach((fileName, blobSHA1) -> {
             if (!overwrite.containsKey(fileName)) {
                 overwrite.put(fileName, blobSHA1);
             }
         });
 
+
         overwrite.forEach((file, blobSHA1) -> {
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
             Blob blob = Blob.load(blobFile);
+
+            String CWD = System.getProperty("user.dir");
+            File newFile = new File(CWD, file);
             try {
-                restoreFileInCWD(blob);
+                newFile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            Utils.writeContents(newFile, blob.getFileContent());
         });
 
         delete.forEach((file, blobSHA1) -> {
