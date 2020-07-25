@@ -683,6 +683,7 @@ public class Repo {
             }
 
             condition1(sp, given, curr, mergeMap);
+            condition2(sp, given, curr, mergeMap);
 
             System.out.println("=========== merge map =========");
             mergeMap.forEach((k, v) -> {
@@ -751,10 +752,52 @@ public class Repo {
             });
         }
 
-        //4. currBranch: modified && givenBranch: unmodified (=SP)
+        // case 4. currBranch: modified && givenBranch: unmodified (=SP)
         // -> stay the same (continue?)
-        public boolean condition2(String sp, String branch, String curr) {
-            return !curr.equals(sp) && branch.equals(sp);
+        public void condition2(Map<String, String> SP,
+                               Map<String, String> given,
+                               Map<String, String> curr,
+                               Map<String, String> mergeMap) {
+
+            HashMap<String, String> sameOnGivenAndSP = new HashMap<>();
+            HashMap<String, String> diffOnCurrAndSP = new HashMap<>();
+
+            // compare SP and Given, find same file name with same content
+            SP.forEach((spFileName, spBlob) -> {
+                given.forEach((givenFileName, givenBlob) -> {
+                    if (spFileName.equals(givenFileName) && spBlob.equals(givenBlob)) {
+                        sameOnGivenAndSP.put(givenFileName, givenBlob);
+                    }
+                });
+            });
+
+            System.out.println("====== sameOnGivenAndSP ===== ");
+            sameOnGivenAndSP.forEach((k, v) -> {
+                System.out.println(k + " : " + v);
+            });
+
+            // compare SP and Curr, find same file name with different content
+            SP.forEach((spFileName, spBlob) -> {
+                curr.forEach((currFileName, currBlob) -> {
+                    if (spFileName.equals(currFileName) && !spBlob.equals(currBlob)) {
+                        diffOnCurrAndSP.put(currFileName, currBlob);
+                    }
+                });
+            });
+
+            System.out.println("====== diffOnCurrAndSP ===== ");
+            diffOnCurrAndSP.forEach((k, v) -> {
+                System.out.println(k + " : " + v);
+            });
+
+            // find files modified on Curr but not on Given since SP
+            sameOnGivenAndSP.forEach((sameFileName, sameBlob) -> {
+                diffOnCurrAndSP.forEach((diffFileName, diffBlob) -> {
+                    if (sameFileName.equals(diffFileName)) {
+                        mergeMap.put(diffFileName, diffBlob);
+                    }
+                });
+            });
         }
 
         //5. Modified: currBranch && givenBranch  (the same)
