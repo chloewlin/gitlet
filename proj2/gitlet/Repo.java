@@ -660,8 +660,9 @@ public class Repo {
                 return;
             }
 
-
+            // saved to commit (add)
             Map<String, String> mergeMap = new HashMap<>();
+            Map<String, String> bothDeleted = new HashMap<>();
             boolean withConflict = false;
 
             // 6. File not in SP && File in curr
@@ -684,9 +685,16 @@ public class Repo {
 
             condition1(sp, given, curr, mergeMap);
             condition2(sp, given, curr, mergeMap);
+            condition3(sp, given, curr, mergeMap, bothDeleted);
 
             System.out.println("=========== merge map =========");
             mergeMap.forEach((k, v) -> {
+                System.out.println(k + " : " + v);
+            });
+            System.out.println();
+
+            System.out.println("=========== both deleted =========");
+            bothDeleted.forEach((k, v) -> {
                 System.out.println(k + " : " + v);
             });
 
@@ -800,10 +808,40 @@ public class Repo {
             });
         }
 
-        //5. Modified: currBranch && givenBranch  (the same)
-        // -> left unchanged by merge
-        public boolean condition3(String sp, String branch, String curr) {
-            return !curr.equals(sp) && !branch.equals(sp) && curr.equals(branch);
+        // 5. Modified: currBranch && givenBranch in the same way
+        // both are different from SP, but Curr and given are the same
+        // OR, both are deleted on Curr and given branch
+        // -> pick currentBranch key-value pair, add into map
+        public void condition3(Map<String, String> SP,
+                               Map<String, String> given,
+                               Map<String, String> curr,
+                               Map<String, String> mergeMap,
+                               Map<String, String> bothDeleted) {
+
+            for (String SPFileName : SP.keySet()) {
+                boolean insideCurr = curr.containsKey(SPFileName);
+                boolean insideGiven = given.containsKey(SPFileName);
+                String SPBlob = SP.get(SPFileName);
+                String givenBlob = given.get(SPFileName);
+                String currBlob = curr.get(SPFileName);
+
+                // both are modified in the same way
+                if (insideCurr && insideGiven) {
+                    // check if give blob is different from SP blob
+                    // check if curr blob is different from SP blob
+                    // check if given blob and curr blob are the same version
+                    if (!givenBlob.equals(SPBlob)
+                            && !currBlob.equals(SPBlob)
+                            && givenBlob.equals(currBlob)) {
+                        mergeMap.put(SPFileName, currBlob);
+                    }
+                }
+
+                // both are deleted
+                if (!insideCurr && !insideGiven) {
+                    bothDeleted.put(SPFileName, SPBlob);
+                }
+            }
         }
 
         public void commitMerge(String branchName, String originalBranchName) throws IOException {
