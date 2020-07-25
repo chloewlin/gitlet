@@ -953,6 +953,7 @@ public class Repo {
 
             mergeCommit.saveMergeCommit();
 
+            head.setBranchHEAD(originalBranchName,mergeCommit);
             head.setGlobalHEAD(originalBranchName, mergeCommit);
 
             stagingArea = new Staging();
