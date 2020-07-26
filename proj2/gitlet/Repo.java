@@ -729,74 +729,74 @@ public class Repo {
 
             condition3(sp, given, curr, mergeMap);
 
-            System.out.println();
-            System.out.println("************* condition 3 ******************");
-            System.out.println("===== merge map ======");
-            mergeMap.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
-            System.out.println("===== deleted at one map ======");
-            deletedAtOne.forEach((k, v) -> System.out.println(k + ": " + v  + " ==> " + printBlob(v)));
-            System.out.println("===== both deleted ======");
-            bothDeleted.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
+//            System.out.println();
+//            System.out.println("************* condition 3 ******************");
+//            System.out.println("===== merge map ======");
+//            mergeMap.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
+//            System.out.println("===== deleted at one map ======");
+//            deletedAtOne.forEach((k, v) -> System.out.println(k + ": " + v  + " ==> " + printBlob(v)));
+//            System.out.println("===== both deleted ======");
+//            bothDeleted.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
 
             condition4(sp, given, curr, mergeMap);
 
-            System.out.println();
-            System.out.println("************* condition 4 ******************");
-            System.out.println("===== merge map ======");
-            mergeMap.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
-            System.out.println("===== deleted at one map ======");
-            deletedAtOne.forEach((k, v) -> System.out.println(k + ": " + v  + " ==> " + printBlob(v)));
-            System.out.println("===== both deleted ======");
-            bothDeleted.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
+//            System.out.println();
+//            System.out.println("************* condition 4 ******************");
+//            System.out.println("===== merge map ======");
+//            mergeMap.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
+//            System.out.println("===== deleted at one map ======");
+//            deletedAtOne.forEach((k, v) -> System.out.println(k + ": " + v  + " ==> " + printBlob(v)));
+//            System.out.println("===== both deleted ======");
+//            bothDeleted.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
 
             condition5(sp, given, curr, mergeMap, bothDeleted);
 
 
-            System.out.println();
-            System.out.println("************* condition 5 ******************");
-            System.out.println("===== merge map ======");
-            mergeMap.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
-            System.out.println("===== deleted at one map ======");
-            deletedAtOne.forEach((k, v) -> System.out.println(k + ": " + v  + " ==> " + printBlob(v)));
-            System.out.println("===== both deleted ======");
-            bothDeleted.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
+//            System.out.println();
+//            System.out.println("************* condition 5 ******************");
+//            System.out.println("===== merge map ======");
+//            mergeMap.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
+//            System.out.println("===== deleted at one map ======");
+//            deletedAtOne.forEach((k, v) -> System.out.println(k + ": " + v  + " ==> " + printBlob(v)));
+//            System.out.println("===== both deleted ======");
+//            bothDeleted.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
 
 
             condition6(sp, curr, mergeMap);
 
-            System.out.println();
-            System.out.println("************* condition 6 ******************");
-            System.out.println("===== merge map ======");
-            mergeMap.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
-            System.out.println("===== deleted at one map ======");
-            deletedAtOne.forEach((k, v) -> System.out.println(k + ": " + v  + " ==> " + printBlob(v)));
-            System.out.println("===== both deleted ======");
-            bothDeleted.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
+//            System.out.println();
+//            System.out.println("************* condition 6 ******************");
+//            System.out.println("===== merge map ======");
+//            mergeMap.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
+//            System.out.println("===== deleted at one map ======");
+//            deletedAtOne.forEach((k, v) -> System.out.println(k + ": " + v  + " ==> " + printBlob(v)));
+//            System.out.println("===== both deleted ======");
+//            bothDeleted.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
 
             condition7(sp, given, mergeMap);
 
-            System.out.println();
-            System.out.println("************* condition 7 ******************");
-            System.out.println("===== merge map ======");
-            mergeMap.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
-            System.out.println("===== deleted at one map ======");
-            deletedAtOne.forEach((k, v) -> System.out.println(k + ": " + v  + " ==> " + printBlob(v)));
-            System.out.println("===== both deleted ======");
-            bothDeleted.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
+//            System.out.println();
+//            System.out.println("************* condition 7 ******************");
+//            System.out.println("===== merge map ======");
+//            mergeMap.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
+//            System.out.println("===== deleted at one map ======");
+//            deletedAtOne.forEach((k, v) -> System.out.println(k + ": " + v  + " ==> " + printBlob(v)));
+//            System.out.println("===== both deleted ======");
+//            bothDeleted.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
 
             boolean hasConflict = false;
             condition8And9(sp, given, curr, deletedAtOne, hasConflict);
 
-            System.out.println();
-            System.out.println("************* condition 8 & 9 ******************");
-            System.out.println("===== merge map ======");
-            mergeMap.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
-            System.out.println("===== deleted at one map ======");
-            deletedAtOne.forEach((k, v) -> System.out.println(k));
-            System.out.println("===== both deleted ======");
-            bothDeleted.forEach((k, v) -> System.out.println(k));
+//            System.out.println();
+//            System.out.println("************* condition 8 & 9 ******************");
+//            System.out.println("===== merge map ======");
+//            mergeMap.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
+//            System.out.println("===== deleted at one map ======");
+//            deletedAtOne.forEach((k, v) -> System.out.println(k));
+//            System.out.println("===== both deleted ======");
+//            bothDeleted.forEach((k, v) -> System.out.println(k));
 
-//            condition10(sp, given, curr, mergeMap);
+              condition10(sp, given, curr, mergeMap);
 
 //            System.out.println("=========== merge map =========");
 //            mergeMap.forEach((k, v) -> {
@@ -920,10 +920,6 @@ public class Repo {
                 });
             });
 
-//            System.out.println("====== sameOnGivenAndSP ===== ");
-//            sameOnGivenAndSP.forEach((k, v) -> {
-//                System.out.println(k + " : " + v);
-//            });
 
             // compare SP and Curr, find same file name with different content
             SP.forEach((spFileName, spBlob) -> {
@@ -933,11 +929,6 @@ public class Repo {
                     }
                 });
             });
-
-//            System.out.println("====== diffOnCurrAndSP ===== ");
-//            diffOnCurrAndSP.forEach((k, v) -> {
-//                System.out.println(k + " : " + v);
-//            });
 
             // find files modified on Curr but not on Given since SP
             sameOnGivenAndSP.forEach((sameFileName, sameBlob) -> {
