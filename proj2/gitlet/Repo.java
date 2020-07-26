@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -722,7 +723,7 @@ public class Repo {
             condition6(sp, curr, mergeMap);
             condition7(sp, given, mergeMap);
             condition8And9(sp,given, curr, deletedAtOne);
-
+            condition10(sp, given, curr, mergeMap);
 
 //            System.out.println("=========== merge map =========");
 //            mergeMap.forEach((k, v) -> {
@@ -739,16 +740,6 @@ public class Repo {
 //            deletedAtOne.forEach((k, v) -> {
 //                System.out.println(k + " : " + v);
 //            });
-
-            // compare HEAD of curr branch with HEAD of given branch:
-            // find "conflicts": files modified in different ways in currHEAD and branchHEAD
-            // format conflict, stage them!
-            // <<<<<<< HEAD
-            // contents of file in current branch
-            // =======
-            // contents of file in given branch
-            // >>>>>>>
-//            findMergeConflicts();
 
             // After user updated the files, and SP is neither curr branch HEAD or given branch HEAD
             // if we still have conflict:
@@ -961,7 +952,7 @@ public class Repo {
         public void condition8And9(Map<String, String> SP,
                                    Map<String, String> given,
                                    Map<String, String> curr,
-                                   Map<String, String> deletedAtOne) {
+                                   Map<String, String> deletedAtOne) throws IOException {
 
             for (String SPFileName : SP.keySet()) {
                 boolean insideCurr = curr.containsKey(SPFileName);
@@ -977,7 +968,15 @@ public class Repo {
                         deletedAtOne.put(SPFileName, givenBlob); // TODO
 //                        deletedAtOne.put(SPFileName, SPBlob);
                         stagingArea.unstage(SPFileName);
+
+                    } else {
+                 //10.3 Conflict: File in SP && absent: given  && modified: current
+
+                        // replace & staged (using line separator)
+                        // TODO: CONFIRM
+                        createConflictFile(currBlob, givenBlob);
                     }
+
                 }
 
                 // 9. absent at curr, present at given
@@ -985,10 +984,119 @@ public class Repo {
                     if (givenBlob.equals(SPBlob)) {
                         deletedAtOne.put(SPFileName, currBlob);
                         stagingArea.unstage(SPFileName);
+
+                    } else {
+                        //10.2 Conflict File in SP && absent: current  && modified: given
+                        // replace & staged (using line separator)
+                        // TODO: CONFIRM
+                        createConflictFile(currBlob, givenBlob);
+                    }
+                }
+                //10.1 Conflict: SP != curr != given
+                if (insideCurr && insideGiven) {
+                    if (!givenBlob.equals(SPBlob)
+                            && !given.equals(currBlob)
+                            && !currBlob.equals(SPBlob)) {
+
+                        // replace & staged (using line separator)
+                        createConflictFile(currBlob, givenBlob);
                     }
                 }
             }
 
+        }
+
+        // 10.4 Conflict: File not in SP && Curr != given
+        public void condition10(Map<String, String> SP,
+                               Map<String, String> given,
+                               Map<String, String> curr,
+                               Map<String, String> mergeMap) {
+
+            for (String givenFileName : given.keySet()) {
+                String givenBlob = given.get(givenFileName);
+                String currBlob = curr.get(givenFileName);
+                if (!SP.containsKey(givenFileName) && !currBlob.equals(givenBlob)){
+                  // replace & staged (using line separator)
+                    // TODO: CONFIRM
+                    createConflictFile(currBlob, givenBlob);
+                }
+            }
+
+        }
+
+        public void createConflictFile(String currBlob, String givenBlob) {
+            File blobDir = Utils.join(Main.OBJECTS_FOLDER, "blobs");
+            String[] blobsFileNames = blobDir.list();
+
+            File currBlobFile = null;
+            File givenBlobFile = null;
+
+            for (String blobFileName : blobsFileNames) {
+                if (blobFileName.equals(currBlob)) {
+                    currBlobFile = Utils.join(blobDir, blobFileName);
+                }
+                if (blobFileName.equals(givenBlob)) {
+                    givenBlobFile = Utils.join(blobDir, blobFileName);
+                }
+            }
+
+            if (currBlobFile != null && givenBlobFile != null) {
+                Blob currBlobObj = Utils.readObject(currBlobFile, Blob.class);
+                Blob givenBlobObj = Utils.readObject(givenBlobFile, Blob.class);
+
+                String CWD = System.getProperty("user.dir");
+                File conflictFile = new File(CWD, currBlobObj.getFileName());
+
+                String currContent = new String(currBlobObj.getFileContent(),
+                        StandardCharsets.UTF_8);
+                String givenContent = new String(givenBlobObj.getFileContent(),
+                        StandardCharsets.UTF_8);
+
+                Utils.writeContents(conflictFile,
+                        "<<<<<<< HEAD" + System.lineSeparator() +
+                                currContent +
+                                System.lineSeparator() +
+                                "=======" + System.lineSeparator() +
+                                givenContent +
+                                System.lineSeparator() +
+                                ">>>>>>>");
+
+                Blob conflictFileBlob = new Blob(currBlobObj.getFileName());
+                stagingArea.add(currBlobObj.getFileName(), conflictFileBlob.getBlobSHA1());
+            } else if (currBlobFile == null && givenBlob != null) {
+                condition10_2And10_3(givenBlobFile, "curr");
+            } else if (currBlobFile != null) {
+                condition10_2And10_3(currBlobFile, "given");
+            }
+
+            stagingArea.save();
+            Main.exitWithError("Encountered a merge conflict.");
+        }
+
+        public void condition10_2And10_3(File presentBlobFile, String absentBranch) {
+            Blob presentBlobObj = Utils.readObject(presentBlobFile, Blob.class);
+
+            String CWD = System.getProperty("user.dir");
+            File conflictFile = new File(CWD, presentBlobObj.getFileName());
+
+            String presentContent = new String(presentBlobObj.getFileContent(),
+                    StandardCharsets.UTF_8);
+
+            if (absentBranch.equals("curr")) {
+                Utils.writeContents(conflictFile,
+                        "<<<<<<< HEAD" + System.lineSeparator() +
+                                "=======" + System.lineSeparator() +
+                                presentContent +
+                                System.lineSeparator() +
+                                ">>>>>>>");
+            } else {
+                Utils.writeContents(conflictFile,
+                        "<<<<<<< HEAD" + System.lineSeparator() +
+                                presentContent +
+                                System.lineSeparator() +
+                                "=======" + System.lineSeparator() +
+                                ">>>>>>>");
+            }
         }
 
         public void commitMerge(String branchName, String originalBranchName) throws IOException {
