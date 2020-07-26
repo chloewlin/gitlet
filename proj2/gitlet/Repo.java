@@ -814,14 +814,6 @@ public class Repo {
 //                System.out.println(k + " : " + v);
 //            });
 
-            // After user updated the files, and SP is neither curr branch HEAD or given branch HEAD
-            // if we still have conflict:
-            // Encountered a merge conflict.
-            // if no conflict:
-            // save the commit:
-            // 1. Save first parent: HEAD of curr branch
-            // 2. Save second parent: HEAD of given branch
-            // 2. message: Merged [given branch name] into [current branch name].
             // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
             stagingArea.save();
             commitMerge(branchName, originalBranchName);
