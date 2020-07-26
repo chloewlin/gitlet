@@ -130,7 +130,7 @@ public class Main {
 
         if (args.length == 3) {
             if (!args[1].equals("--")) {
-                exitWithError("Incorrect Operation");
+                exitWithError("Incorrect operands.");
                 return;
             }
             repo.checkoutFile(args[2]);
@@ -138,7 +138,7 @@ public class Main {
 
         if (args.length == 4) {
             if (!args[2].equals("--")) {
-                exitWithError("Incorrect Operation");
+                exitWithError("Incorrect operands.");
                 return;
             }
             if (!repo.containsCommitId(args[1])) {
