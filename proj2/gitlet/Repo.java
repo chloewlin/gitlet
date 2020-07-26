@@ -531,7 +531,6 @@ public class Repo {
 //        System.out.println("==== currSnapshot ===== ");
 //        currSnapshot.forEach((k, v) -> System.out.println(k + " : " + v));
 
-        // TODO: FIX BUGS
         checkoutSnapshot.forEach((fileName, blobSHA1) -> {
             restore.put(fileName, blobSHA1);
         });
@@ -558,9 +557,13 @@ public class Repo {
             }
             Utils.writeContents(newFile, blob.getFileContent());
         });
-
-//        Head.setGlobalHEAD(currentBranchName(), targetCommit);
+//
+//        System.out.println("curr branch is " + currentBranchName());
+//        System.out.println("reset curr head " + currentBranchName() + " to.... ");
+        Head.setGlobalHEAD(currentBranchName(), targetCommit);
         Head.setBranchHEAD(currentBranchName(), targetCommit);
+//
+//        System.out.println("after reset, curr branch head is at " + targetCommit.getMessage());
 
         stagingArea = new Staging();
         stagingArea.save();
