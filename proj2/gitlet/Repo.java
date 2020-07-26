@@ -1097,7 +1097,7 @@ public class Repo {
                     }
                 }
             }
-            return true;
+            return hasConflict;
         }
 
         public void createConflictFile(String currBlob, String givenBlob) {
