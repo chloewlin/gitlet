@@ -351,8 +351,8 @@ public class Repo {
      * @param commitId a given commitId we want to search
      * */
     public boolean findMatchId(String commitSHA1, String commitId) {
-        return commitSHA1.equals(commitId) ||
-                commitSHA1.substring(0, commitId.length()).equals(commitId);
+//        return commitSHA1.equals(commitId) ||
+         return commitSHA1.substring(0, commitId.length()).equals(commitId);
     }
 
     /**
@@ -502,19 +502,27 @@ public class Repo {
         String commitId = args[1];
 
         Commit commit = Head.getGlobalHEAD();
-        if (hasUntrackedFilesForCheckoutBranch(commit)) {
-            Main.exitWithError("There is an untracked file in the way;" +
-                    " delete it or add it first.");
+//        if (hasUntrackedFilesForCheckoutBranch(commit)) {
+//            Main.exitWithError("There is an untracked file in the way;" +
+//                    " delete it or add it first.");
+//        }
+
+        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
+        String[] commits = commitDir.list();
+
+        boolean found = false;
+
+        for (String commit_id : commits) {
+            if (commitId.substring(0, commitId.length()).equals(commit_id)) {
+                found = true;
+            }
         }
 
-        if (!containsCommitId(commitId)) {
+        if (!found) {
             Main.exitWithError("No commit with that id exists.");
         }
 
         Commit targetCommit = null;
-
-        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
-        String[] commits = commitDir.list();
 
         for (String commitFileNames : commits) {
             if (commitId.equals(commitFileNames)) {
