@@ -782,6 +782,7 @@ public class Repo {
                 Utils.writeContents(newFile, blob.getFileContent());
             });
 
+
             // TODO: delete files
             deleteAtOne.forEach((file, blobSHA1) -> {
                 Utils.restrictedDelete(file);
@@ -969,10 +970,11 @@ public class Repo {
                 String givenBlob = given.get(SPFileName);
                 String currBlob = curr.get(SPFileName);
 
+
                 // 8. absent at given, curr blob is the same version as SP blob
                 if (insideCurr && !insideGiven) {
                     if (currBlob.equals(SPBlob)) {
-                        deletedAtOne.put(SPFileName, givenBlob); // TODO: BECOMES NULL
+                        deletedAtOne.put(SPFileName, givenBlob); // TODO
 //                        deletedAtOne.put(SPFileName, SPBlob);
                         stagingArea.unstage(SPFileName);
                     }
@@ -1011,34 +1013,68 @@ public class Repo {
 
 
         public Commit latestCommonAncestor(Commit currHead, Commit branchHead) {
-//            ArrayList<Commit> currPath = new ArrayList<>();
-            HashSet<String> currPath = new HashSet<>();
-            Commit SP = null;
+            HashSet<String> branchPath = new HashSet<>();
+            buildBranchHashSet(branchPath, branchHead);
+//            System.out.println("***** branch map *********");
+//            branchPath.forEach(b -> System.out.println(b));
 
-            while (!currHead.getFirstParentSHA1().equals(Repo.INIT_PARENT_SHA1)) {
-//                currPath.add(currHead);
-                currPath.add(currHead.getSHA());
-                currHead = currHead.getParent();
-            }
+            HashMap<Commit, Integer> ancestors = new HashMap<>();
 
-            while (!branchHead.getFirstParentSHA1().equals(Repo.INIT_PARENT_SHA1)) {
-//                for (int i = 0; i < currPath.size(); i++) {
-//                    if (branchHead.getSHA().equals(currPath.get(i).getSHA())) {
-//                        SP = currPath.get(i);
-//                        break loop;
-//                    }
-//                 }
-                if (currPath.contains(branchHead.getSHA())) {
-                    SP = branchHead;
-                    break;
+            getAncestors(ancestors, branchPath, currHead, 0);
+            Commit LCA = null;
+            Integer minDepth = -1;
+
+//            System.out.println("***** ancestors *********");
+            for (Map.Entry<Commit, Integer> entry : ancestors.entrySet()) {
+                Commit node = entry.getKey();
+                Integer depth = entry.getValue();
+//                System.out.println("=>" + node.getSHA() + " : " + depth);
+                if (minDepth < 0) {
+                    minDepth = depth;
+                    LCA = node;
+                } else if (depth < minDepth) {
+                    LCA = node;
+                    minDepth = depth;
                 }
-
-                branchHead = branchHead.getParent();
             }
 
-//            System.out.println("Split point: " + SP.getSHA());
-            return SP;
+            return LCA;
         }
+
+        public void getAncestors(HashMap<Commit, Integer> ancestors,
+                           HashSet<String> branchPath,
+                           Commit currHead,
+                           Integer depth) {
+            if (currHead.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+                return;
+            }
+            if (branchPath.contains(currHead.getSHA())) {
+                ancestors.put(currHead, depth);
+            } else {
+                if (currHead.getFirstParentSHA1() != null) {
+                    getAncestors(ancestors, branchPath, currHead.getParent(), depth + 1);
+                }
+                if (currHead.getSecondParentSHA1() != null) {
+                    getAncestors(ancestors, branchPath, currHead.getParent2(), depth + 1);
+                }
+            }
+
+        }
+
+        public void buildBranchHashSet(HashSet<String> branchSet, Commit branchHead) {
+            if (branchHead.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
+                return;
+            }
+            branchSet.add(branchHead.getSHA());
+
+            if (branchHead.getFirstParentSHA1() != null) {
+                buildBranchHashSet(branchSet, branchHead.getParent());
+            }
+            if (branchHead.getSecondParentSHA1() != null) {
+                buildBranchHashSet(branchSet, branchHead.getParent2());
+            }
+        }
+
 
         // edge cases:
         // 1. If the split point is the same commit as the given branch, then we
