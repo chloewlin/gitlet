@@ -1107,13 +1107,12 @@ public class Repo {
 
 //                System.out.println("creating conflict file.....");
                 Utils.writeContents(conflictFile,
-                        "<<<<<<< HEAD" + System.lineSeparator() +
-                                currContent +
-                                System.lineSeparator() +
-                                "=======" + System.lineSeparator() +
-                                givenContent +
-                                System.lineSeparator() +
-                                ">>>>>>>");
+                        "<<<<<<< HEAD\n",
+                                currContent,
+                                "=======\n",
+                                givenContent,
+                                ">>>>>>>",
+                                System.lineSeparator());
 //                System.out.println("currContent: " + currContent);
 //                System.out.println("givenContent " + givenContent);
 
@@ -1137,18 +1136,18 @@ public class Repo {
 
             if (absentBranch.equals("curr")) {
                 Utils.writeContents(conflictFile,
-                        "<<<<<<< HEAD" + System.lineSeparator() +
-                                "=======" + System.lineSeparator() +
-                                presentContent +
-                                System.lineSeparator() +
-                                ">>>>>>>");
+                        "<<<<<<< HEAD\n",
+                                "=======\n",
+                                presentContent,
+                                ">>>>>>>",
+                                System.lineSeparator());
             } else {
                 Utils.writeContents(conflictFile,
-                        "<<<<<<< HEAD" + System.lineSeparator() +
+                        "<<<<<<< HEAD\n" +
                                 presentContent +
-                                System.lineSeparator() +
-                                "=======" + System.lineSeparator() +
-                                ">>>>>>>");
+                                "=======\n" +
+                                ">>>>>>>" +
+                                System.lineSeparator());
             }
         }
 
