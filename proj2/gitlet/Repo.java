@@ -86,13 +86,13 @@ public class Repo {
         String CWD = System.getProperty("user.dir");
         File currentFile = new File(CWD, currFileName);
 
-        Commit currCommit = Head.getGlobalHEAD();
-        String blobInLastCommit = currCommit.getParent().getSnapshot().get(currFileName);
+        Commit lastCommit = Head.getGlobalHEAD();
+        String blobSHA1 = lastCommit.getSnapshot().get(currFileName);
 
-        if (blobInLastCommit == null) {
+        if (blobSHA1 == null) {
             return false;
         }
-        File blobOfPrevVersion = Utils.join(Main.BLOBS_FOLDER, blobInLastCommit);
+        File blobOfPrevVersion = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
 
         return hasSameContent(currentFile, blobOfPrevVersion);
     }
