@@ -1069,7 +1069,6 @@ public class Repo {
                 condition10_2And10_3(currBlobFile, "given");
             }
 
-
             stagingArea.save();
             Main.exitWithError("Encountered a merge conflict.");
         }
@@ -1086,8 +1085,6 @@ public class Repo {
             if (absentBranch.equals("curr")) {
                 Utils.writeContents(conflictFile,
                         "<<<<<<< HEAD" + System.lineSeparator() +
-                                "" +
-                                System.lineSeparator() +
                                 "=======" + System.lineSeparator() +
                                 presentContent +
                                 System.lineSeparator() +
@@ -1098,13 +1095,8 @@ public class Repo {
                                 presentContent +
                                 System.lineSeparator() +
                                 "=======" + System.lineSeparator() +
-                                "" +
-                                System.lineSeparator() +
                                 ">>>>>>>");
             }
-
-            Blob conflictFileBlob = new Blob(presentBlobObj.getFileName());
-            stagingArea.add(presentBlobObj.getFileName(), conflictFileBlob.getBlobSHA1());
         }
 
         public void commitMerge(String branchName, String originalBranchName) throws IOException {
