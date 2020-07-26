@@ -317,7 +317,8 @@ public class Repo {
 
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             if (findMatchId(commit.getSHA(), commitId)) {
-                blobSHA1 = commit.getSnapshot().get(fileName);
+                blobSHA1 = commit.getSnapshot().get(fileName); // This returns null if file does
+                // not exist in that commit
                 found = true;
                 break;
 //            } else {
@@ -325,10 +326,15 @@ public class Repo {
             }
             commit = commit.getParent();
         }
+
         if (!found) {
+            Main.exitWithError("No commit with that id exists.");
+        }
+        if (blobSHA1.equals("") || blobSHA1 == null) {
             Main.exitWithError("File does not exist in that commit.");
         }
 
+        // TODO: BUG
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
         Blob blob = Blob.load(blobFile);
         restoreFileInCWD(blob);
@@ -505,6 +511,7 @@ public class Repo {
     public void reset(String[] args) {
         Commit commit = Head.getGlobalHEAD();
         String commitId = args[1];
+
         Commit targetCommit = null;
 
         // TODO: FIX BUG
@@ -517,7 +524,6 @@ public class Repo {
 //                    "delete it, or add and commit it first.");
 //        }
 
-        // find commit
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             if (findMatchId(commit.getSHA(), commitId)) {
                 targetCommit = commit;
@@ -531,8 +537,10 @@ public class Repo {
 
         // checkout to that commit
         Commit currCommit = Head.getGlobalHEAD();
+
+        //
         restoreFilesAtCommit(currCommit, targetCommit);
-        // reset global HEAD
+
         Head.setGlobalHEAD(currentBranchName(), targetCommit);
 
         stagingArea = new Staging();
@@ -613,7 +621,6 @@ public class Repo {
             }
         });
 
-        delete.forEach((file, blobSHA1) -> Utils.restrictedDelete(file));
         delete.forEach((file, blobSHA1) -> Utils.restrictedDelete(file));
     }
 
