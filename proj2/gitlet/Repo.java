@@ -977,7 +977,13 @@ public class Repo {
                         deletedAtOne.put(SPFileName, givenBlob); // TODO
 //                        deletedAtOne.put(SPFileName, SPBlob);
                         stagingArea.unstage(SPFileName);
+
+                    } else {
+                 //10.3 Conflict: File in SP && absent: given  && modified: current
+
+                        // replace & staged (using line separator)
                     }
+
                 }
 
                 // 9. absent at curr, present at given
@@ -985,7 +991,38 @@ public class Repo {
                     if (givenBlob.equals(SPBlob)) {
                         deletedAtOne.put(SPFileName, currBlob);
                         stagingArea.unstage(SPFileName);
+
+                    } else {
+
+                //10.2 Conflict File in SP && absent: current  && modified: given
+                // replace & staged (using line separator)
                     }
+                }
+                //10.1 Conflict: SP != curr != given
+                if (insideCurr && insideGiven) {
+                    if (!givenBlob.equals(SPBlob)
+                            && !given.equals(currBlob)
+                            && !currBlob.equals(SPBlob)) {
+
+                        // replace & staged (using line separator)
+
+                    }
+                }
+            }
+
+        }
+
+        // 10.4 Conflict: File not in SP && Curr != given
+        public void condition10(Map<String, String> SP,
+                               Map<String, String> given,
+                               Map<String, String> curr,
+                               Map<String, String> mergeMap) {
+
+            for (String givenFileName : given.keySet()) {
+                String givenBlob = given.get(givenFileName);
+                String currBlob = curr.get(givenFileName);
+                if (!SP.containsKey(givenFileName) && !currBlob.equals(givenBlob)){
+                  // replace & staged (using line separator)
                 }
             }
 
