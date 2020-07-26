@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -1010,23 +1011,30 @@ public class Repo {
                             }
                         }
 
-
                         Blob currBlobObj = Utils.readObject(currBlobFile, Blob.class);
                         Blob givenBlobObj = Utils.readObject(givenBlobFile, Blob.class);
 
                         String CWD = System.getProperty("user.dir");
-                        File currentFile = new File(CWD, currBlobObj.getFileName());
+                        File conflictFile = new File(CWD, currBlobObj.getFileName());
 
-                        Utils.writeContents(currentFile,
-                                            "<<<<<<< HEAD" + System.lineSeparator() +
-                                            currBlobObj.getFileContent() +
+                        String currContent =
+                                new String(currBlobObj.getFileContent(), StandardCharsets.UTF_8);
+                        String givenContent =
+                                new String(givenBlobObj.getFileContent(), StandardCharsets.UTF_8);
+
+                        Utils.writeContents(conflictFile,
+                                    "<<<<<<< HEAD" + System.lineSeparator() +
+                                            currContent +
                                             System.lineSeparator() +
                                             "=======" + System.lineSeparator() +
-                                            givenBlobObj.getFileContent() +
+                                                    givenContent +
                                             System.lineSeparator() +
                                             ">>>>>>>");
-                        // TODO: for debugging only, delete later
-                        System.out.println("Encountered a merge conflict.");
+
+                        Blob conflictFileBlob = new Blob(currBlobObj.getFileName());
+                        stagingArea.add(currBlobObj.getFileName(), conflictFileBlob.getBlobSHA1());
+                        stagingArea.save();
+                        Main.exitWithError("Encountered a merge conflict.");
                     }
                 }
             }
