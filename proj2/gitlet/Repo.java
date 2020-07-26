@@ -313,20 +313,16 @@ public class Repo {
     public void checkoutCommit(String commitId, String fileName) throws IOException {
         Commit commit = Head.getGlobalHEAD();
         String blobSHA1 = "";
-        boolean found = false;
 
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             if (findMatchId(commit.getSHA(), commitId)) {
+                if (commit.getSnapshot().get(fileName) == null) {
+                    Main.exitWithError("File does not exist in that commit.");
+                }
                 blobSHA1 = commit.getSnapshot().get(fileName);
-                found = true;
                 break;
-//            } else {
-//                Main.exitWithError("No commit with that id exists.");
             }
             commit = commit.getParent();
-        }
-        if (!found) {
-            Main.exitWithError("File does not exist in that commit.");
         }
 
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
@@ -373,10 +369,10 @@ public class Repo {
             Main.exitWithError("No need to checkout the current branch.");
         }
         // TODO: FIX BUG
-//        if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
-//            Main.exitWithError("There is an untracked file in the way; " +
-//                    "delete it, or add and commit it first.");
-//        }
+        if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+            Main.exitWithError("There is an untracked file in the way; " +
+                    "delete it, or add and commit it first.");
+        }
 
         Head.setGlobalHEAD(branchName, branchHEAD);
         restoreFilesAtBranch(currHEAD, branchHEAD);
@@ -505,6 +501,7 @@ public class Repo {
     public void reset(String[] args) {
         Commit commit = Head.getGlobalHEAD();
         String commitId = args[1];
+
         Commit targetCommit = null;
 
         // TODO: FIX BUG
@@ -517,7 +514,6 @@ public class Repo {
 //                    "delete it, or add and commit it first.");
 //        }
 
-        // find commit
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             if (findMatchId(commit.getSHA(), commitId)) {
                 targetCommit = commit;
@@ -531,8 +527,10 @@ public class Repo {
 
         // checkout to that commit
         Commit currCommit = Head.getGlobalHEAD();
+
+        //
         restoreFilesAtCommit(currCommit, targetCommit);
-        // reset global HEAD
+
         Head.setGlobalHEAD(currentBranchName(), targetCommit);
 
         stagingArea = new Staging();
@@ -549,11 +547,17 @@ public class Repo {
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
 
         for (String fileName : fileInCWD) {
-            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
-                    // TODO: CHECK WHICH, OR BOTH, CONDITION IS CORRECT **
-                    && !stagingArea.getFilesStagedForAddition().containsKey(fileName)
+            if (!fileName.equals(".DS_Store") && !fileName.equals(".gitignore") && !fileName.equals(
+                    "proj2.iml")) {
+
+//            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
+//                    // TODO: CHECK WHICH, OR BOTH, CONDITION IS CORRECT **
+//                    && !stagingArea.getFilesStagedForAddition().containsKey(fileName)
+//                    && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
+                if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
                     && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
-                untrackedFiles.add(fileName);
+                      untrackedFiles.add(fileName);
+                }
             }
         }
         return untrackedFiles.size() > 0;
@@ -608,7 +612,6 @@ public class Repo {
         });
 
         delete.forEach((file, blobSHA1) -> Utils.restrictedDelete(file));
-        delete.forEach((file, blobSHA1) -> Utils.restrictedDelete(file));
     }
 
     /**
@@ -627,6 +630,9 @@ public class Repo {
             String originalBranchName = Utils.readObject(
                     (Utils.join(Main.GITLET_FOLDER, "HEAD")), Branch.class)
                     .getName();
+
+            stagingArea = stagingArea.load();
+
             // find split point/latest common ancestor
 
             // handle criss-cross merge: when you have TWO SP/latest common ancestor
@@ -642,9 +648,9 @@ public class Repo {
 
             //failure case
             //print error msg and error out
-            if (failureCases(branchName)) {
-                return;
-            }
+//            if (failureCases(branchName)) {
+//                return;
+//            }
 
             // saved to commit (add)
             Map<String, String> mergeMap = new HashMap<>();
@@ -677,22 +683,21 @@ public class Repo {
             condition8And9(sp,given, curr, deletedAtOne);
 
 
-            System.out.println("=========== merge map =========");
-            mergeMap.forEach((k, v) -> {
-                System.out.println(k + " : " + v);
-            });
-            System.out.println();
-
-            System.out.println("=========== both deleted =========");
-            bothDeleted.forEach((k, v) -> {
-                System.out.println(k + " : " + v);
-            });
-
-            System.out.println("=========== deleted at one =========");
-            deletedAtOne.forEach((k, v) -> {
-                System.out.println(k + " : " + v);
-            });
-
+//            System.out.println("=========== merge map =========");
+//            mergeMap.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
+//            System.out.println();
+//
+//            System.out.println("=========== both deleted =========");
+//            bothDeleted.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
+//
+//            System.out.println("=========== deleted at one =========");
+//            deletedAtOne.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
 
             // compare HEAD of curr branch with HEAD of given branch:
             // find "conflicts": files modified in different ways in currHEAD and branchHEAD
@@ -713,12 +718,14 @@ public class Repo {
             // 2. Save second parent: HEAD of given branch
             // 2. message: Merged [given branch name] into [current branch name].
             // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
+            stagingArea.save();
             commitMerge(branchName, originalBranchName);
-            restoreFilesAtMerge(mergeMap, deletedAtOne);
+            restoreFilesAtMerge(mergeMap, deletedAtOne, bothDeleted);
         }
 
         public void restoreFilesAtMerge(Map<String, String> mergeMap,
-                                        Map<String, String> deleteAtOne) {
+                                        Map<String, String> deleteAtOne,
+                                        Map<String, String> bothDeleted) {
 
             mergeMap.forEach((file, blobSHA1) -> {
                 File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
@@ -735,9 +742,13 @@ public class Repo {
             });
 
             // TODO: delete files
-//            delete.forEach((file, blobSHA1) -> {
-//                Utils.restrictedDelete(file);
-//            });
+            deleteAtOne.forEach((file, blobSHA1) -> {
+                Utils.restrictedDelete(file);
+            });
+
+            bothDeleted.forEach((file, blobSHA1) -> {
+                Utils.restrictedDelete(file);
+            });
         }
 
         // case 3:
@@ -747,7 +758,6 @@ public class Repo {
                                                   Map<String, String> given,
                                                   Map<String, String> curr,
                                                   Map<String, String> mergeMap) {
-            stagingArea = stagingArea.load();
             HashMap<String, String> sameOnCurrAndSP = new HashMap<>();
             HashMap<String, String> diffOnGivenAndSP = new HashMap<>();
 
@@ -779,8 +789,6 @@ public class Repo {
                     }
                 });
             });
-
-            stagingArea.save();
         }
 
         // case 4. currBranch: modified && givenBranch: unmodified (=SP)
@@ -789,7 +797,7 @@ public class Repo {
                                Map<String, String> given,
                                Map<String, String> curr,
                                Map<String, String> mergeMap) {
-            stagingArea = stagingArea.load();
+
             HashMap<String, String> sameOnGivenAndSP = new HashMap<>();
             HashMap<String, String> diffOnCurrAndSP = new HashMap<>();
 
@@ -802,10 +810,10 @@ public class Repo {
                 });
             });
 
-            System.out.println("====== sameOnGivenAndSP ===== ");
-            sameOnGivenAndSP.forEach((k, v) -> {
-                System.out.println(k + " : " + v);
-            });
+//            System.out.println("====== sameOnGivenAndSP ===== ");
+//            sameOnGivenAndSP.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
 
             // compare SP and Curr, find same file name with different content
             SP.forEach((spFileName, spBlob) -> {
@@ -816,10 +824,10 @@ public class Repo {
                 });
             });
 
-            System.out.println("====== diffOnCurrAndSP ===== ");
-            diffOnCurrAndSP.forEach((k, v) -> {
-                System.out.println(k + " : " + v);
-            });
+//            System.out.println("====== diffOnCurrAndSP ===== ");
+//            diffOnCurrAndSP.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
 
             // find files modified on Curr but not on Given since SP
             sameOnGivenAndSP.forEach((sameFileName, sameBlob) -> {
@@ -831,7 +839,6 @@ public class Repo {
                 });
             });
 
-            stagingArea.save();
         }
 
         // 5. Modified: currBranch && givenBranch in the same way
@@ -843,7 +850,7 @@ public class Repo {
                                Map<String, String> curr,
                                Map<String, String> mergeMap,
                                Map<String, String> bothDeleted) {
-            stagingArea = stagingArea.load();
+
             for (String SPFileName : SP.keySet()) {
                 boolean insideCurr = curr.containsKey(SPFileName);
                 boolean insideGiven = given.containsKey(SPFileName);
@@ -870,7 +877,7 @@ public class Repo {
                     stagingArea.unstage(SPFileName); // TODO: do we need to save SPBlob?
                 }
             }
-            stagingArea.save();
+
         }
 
         // 6. File not in SP && File in curr
@@ -878,7 +885,7 @@ public class Repo {
         public void condition6(Map<String, String> SP,
                                Map<String, String> curr,
                                Map<String, String> mergeMap) {
-            stagingArea = stagingArea.load();
+
             for (String currFileName : curr.keySet()) {
                 if (!SP.keySet().contains(currFileName)) {
                     String currBlob = curr.get(currFileName);
@@ -886,7 +893,7 @@ public class Repo {
                     stagingArea.add(currFileName, currBlob);
                 }
             }
-            stagingArea.save();
+
         }
 
         // 7. File not in SP && File in given
@@ -894,7 +901,7 @@ public class Repo {
         public void condition7(Map<String, String> SP,
                                Map<String, String> given,
                                Map<String, String> mergeMap) {
-            stagingArea = stagingArea.load();
+
             for (String givenFileName : given.keySet()) {
                 if (!SP.containsKey(givenFileName)){
                     String givenBlob = given.get(givenFileName);
@@ -902,7 +909,7 @@ public class Repo {
                     stagingArea.add(givenFileName, givenBlob);
                 }
             }
-            stagingArea.save();
+
         }
 
         // File in SP && current: unmodified && given: absent (treat like modified)
@@ -913,7 +920,7 @@ public class Repo {
                                    Map<String, String> given,
                                    Map<String, String> curr,
                                    Map<String, String> deletedAtOne) {
-            stagingArea = stagingArea.load();
+
             for (String SPFileName : SP.keySet()) {
                 boolean insideCurr = curr.containsKey(SPFileName);
                 boolean insideGiven = given.containsKey(SPFileName);
@@ -921,16 +928,16 @@ public class Repo {
                 String givenBlob = given.get(SPFileName);
                 String currBlob = curr.get(SPFileName);
 
-                // absent at given, curr blob is the same version as SP blob
+                // 8. absent at given, curr blob is the same version as SP blob
                 if (insideCurr && !insideGiven) {
                     if (currBlob.equals(SPBlob)) {
-//                        deletedAtOne.put(SPFileName, givenBlob); // TODO: BECOMES NULL
-                        deletedAtOne.put(SPFileName, SPBlob);
+                        deletedAtOne.put(SPFileName, givenBlob); // TODO: BECOMES NULL
+//                        deletedAtOne.put(SPFileName, SPBlob);
                         stagingArea.unstage(SPFileName);
                     }
                 }
 
-                // absent at curr, present at given
+                // 9. absent at curr, present at given
                 if (!insideCurr && insideGiven) {
                     if (givenBlob.equals(SPBlob)) {
                         deletedAtOne.put(SPFileName, currBlob);
@@ -938,7 +945,7 @@ public class Repo {
                     }
                 }
             }
-            stagingArea.save();
+
         }
 
         public void commitMerge(String branchName, String originalBranchName) throws IOException {
@@ -963,25 +970,32 @@ public class Repo {
 
 
         public Commit latestCommonAncestor(Commit currHead, Commit branchHead) {
-            ArrayList<Commit> currPath = new ArrayList<>();
+//            ArrayList<Commit> currPath = new ArrayList<>();
+            HashSet<String> currPath = new HashSet<>();
             Commit SP = null;
 
             while (!currHead.getFirstParentSHA1().equals(Repo.INIT_PARENT_SHA1)) {
-                currPath.add(currHead);
+//                currPath.add(currHead);
+                currPath.add(currHead.getSHA());
                 currHead = currHead.getParent();
             }
 
-            loop:
             while (!branchHead.getFirstParentSHA1().equals(Repo.INIT_PARENT_SHA1)) {
-                for (int i = 0; i < currPath.size(); i++) {
-                    if (branchHead.getSHA().equals(currPath.get(i).getSHA())) {
-                        SP = currPath.get(i);
-                        break loop;
-                    }
+//                for (int i = 0; i < currPath.size(); i++) {
+//                    if (branchHead.getSHA().equals(currPath.get(i).getSHA())) {
+//                        SP = currPath.get(i);
+//                        break loop;
+//                    }
+//                 }
+                if (currPath.contains(branchHead.getSHA())) {
+                    SP = branchHead;
+                    break;
                 }
+
                 branchHead = branchHead.getParent();
             }
 
+//            System.out.println("Split point: " + SP.getSHA());
             return SP;
         }
 
@@ -1020,27 +1034,29 @@ public class Repo {
         //3. attempting to merge the branch it self
         //4. untracked files in the way
         public boolean failureCases(String branchName) {
-            stagingArea = stagingArea.load();
             Commit branchHEAD = Head.getBranchHEAD(branchName);
 
             if (!stagingArea.isEmpty()) {
                 exitWithMessage("You have uncommitted changes.");
                 return true;
             }
-            if (!Branch.hasBranch(branchName)) {
+
+            if (Branch.hasBranch(branchName)) {
                 exitWithMessage("A branch with that name does not exist.");
                 return true;
             }
-            if (branchHEAD.equals(currentBranchName())) {
+
+            if (branchName.equals(currentBranchName())) {
                 exitWithMessage("Cannot merge a branch with itself.");
                 return true;
             }
+
             // TODO: FIX hasUntrackedFilesForCheckoutBranch
-//            if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
-//                exitWithMessage("There is an untracked file in the way; delete it, " +
-//                        "or add and commit it first.");
-//                return true;
-//            }
+            if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+                exitWithMessage("There is an untracked file in the way; delete it, " +
+                        "or add and commit it first.");
+                return true;
+            }
             return false;
         }
     }
