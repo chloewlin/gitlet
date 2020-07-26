@@ -633,6 +633,9 @@ public class Repo {
             String originalBranchName = Utils.readObject(
                     (Utils.join(Main.GITLET_FOLDER, "HEAD")), Branch.class)
                     .getName();
+
+            stagingArea = stagingArea.load();
+
             // find split point/latest common ancestor
 
             // handle criss-cross merge: when you have TWO SP/latest common ancestor
@@ -718,12 +721,14 @@ public class Repo {
             // 2. Save second parent: HEAD of given branch
             // 2. message: Merged [given branch name] into [current branch name].
             // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
+            stagingArea.save();
             commitMerge(branchName, originalBranchName);
-            restoreFilesAtMerge(mergeMap, deletedAtOne);
+            restoreFilesAtMerge(mergeMap, deletedAtOne, bothDeleted);
         }
 
         public void restoreFilesAtMerge(Map<String, String> mergeMap,
-                                        Map<String, String> deleteAtOne) {
+                                        Map<String, String> deleteAtOne,
+                                        Map<String, String> bothDeleted) {
 
             mergeMap.forEach((file, blobSHA1) -> {
                 File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
@@ -740,9 +745,13 @@ public class Repo {
             });
 
             // TODO: delete files
-//            delete.forEach((file, blobSHA1) -> {
-//                Utils.restrictedDelete(file);
-//            });
+            deleteAtOne.forEach((file, blobSHA1) -> {
+                Utils.restrictedDelete(file);
+            });
+
+            bothDeleted.forEach((file, blobSHA1) -> {
+                Utils.restrictedDelete(file);
+            });
         }
 
         // case 3:
@@ -752,7 +761,6 @@ public class Repo {
                                                   Map<String, String> given,
                                                   Map<String, String> curr,
                                                   Map<String, String> mergeMap) {
-            stagingArea = stagingArea.load();
             HashMap<String, String> sameOnCurrAndSP = new HashMap<>();
             HashMap<String, String> diffOnGivenAndSP = new HashMap<>();
 
@@ -784,8 +792,6 @@ public class Repo {
                     }
                 });
             });
-
-            stagingArea.save();
         }
 
         // case 4. currBranch: modified && givenBranch: unmodified (=SP)
@@ -794,7 +800,7 @@ public class Repo {
                                Map<String, String> given,
                                Map<String, String> curr,
                                Map<String, String> mergeMap) {
-            stagingArea = stagingArea.load();
+
             HashMap<String, String> sameOnGivenAndSP = new HashMap<>();
             HashMap<String, String> diffOnCurrAndSP = new HashMap<>();
 
@@ -836,7 +842,6 @@ public class Repo {
                 });
             });
 
-            stagingArea.save();
         }
 
         // 5. Modified: currBranch && givenBranch in the same way
@@ -848,7 +853,7 @@ public class Repo {
                                Map<String, String> curr,
                                Map<String, String> mergeMap,
                                Map<String, String> bothDeleted) {
-            stagingArea = stagingArea.load();
+
             for (String SPFileName : SP.keySet()) {
                 boolean insideCurr = curr.containsKey(SPFileName);
                 boolean insideGiven = given.containsKey(SPFileName);
@@ -875,7 +880,7 @@ public class Repo {
                     stagingArea.unstage(SPFileName); // TODO: do we need to save SPBlob?
                 }
             }
-            stagingArea.save();
+
         }
 
         // 6. File not in SP && File in curr
@@ -883,7 +888,7 @@ public class Repo {
         public void condition6(Map<String, String> SP,
                                Map<String, String> curr,
                                Map<String, String> mergeMap) {
-            stagingArea = stagingArea.load();
+
             for (String currFileName : curr.keySet()) {
                 if (!SP.keySet().contains(currFileName)) {
                     String currBlob = curr.get(currFileName);
@@ -891,7 +896,7 @@ public class Repo {
                     stagingArea.add(currFileName, currBlob);
                 }
             }
-            stagingArea.save();
+
         }
 
         // 7. File not in SP && File in given
@@ -899,7 +904,7 @@ public class Repo {
         public void condition7(Map<String, String> SP,
                                Map<String, String> given,
                                Map<String, String> mergeMap) {
-            stagingArea = stagingArea.load();
+
             for (String givenFileName : given.keySet()) {
                 if (!SP.containsKey(givenFileName)){
                     String givenBlob = given.get(givenFileName);
@@ -907,7 +912,7 @@ public class Repo {
                     stagingArea.add(givenFileName, givenBlob);
                 }
             }
-            stagingArea.save();
+
         }
 
         // File in SP && current: unmodified && given: absent (treat like modified)
@@ -918,7 +923,7 @@ public class Repo {
                                    Map<String, String> given,
                                    Map<String, String> curr,
                                    Map<String, String> deletedAtOne) {
-            stagingArea = stagingArea.load();
+
             for (String SPFileName : SP.keySet()) {
                 boolean insideCurr = curr.containsKey(SPFileName);
                 boolean insideGiven = given.containsKey(SPFileName);
@@ -926,16 +931,16 @@ public class Repo {
                 String givenBlob = given.get(SPFileName);
                 String currBlob = curr.get(SPFileName);
 
-                // absent at given, curr blob is the same version as SP blob
+                // 8. absent at given, curr blob is the same version as SP blob
                 if (insideCurr && !insideGiven) {
                     if (currBlob.equals(SPBlob)) {
-//                        deletedAtOne.put(SPFileName, givenBlob); // TODO: BECOMES NULL
-                        deletedAtOne.put(SPFileName, SPBlob);
+                        deletedAtOne.put(SPFileName, givenBlob); // TODO: BECOMES NULL
+//                        deletedAtOne.put(SPFileName, SPBlob);
                         stagingArea.unstage(SPFileName);
                     }
                 }
 
-                // absent at curr, present at given
+                // 9. absent at curr, present at given
                 if (!insideCurr && insideGiven) {
                     if (givenBlob.equals(SPBlob)) {
                         deletedAtOne.put(SPFileName, currBlob);
@@ -943,7 +948,7 @@ public class Repo {
                     }
                 }
             }
-            stagingArea.save();
+
         }
 
         public void commitMerge(String branchName, String originalBranchName) throws IOException {
@@ -1032,21 +1037,23 @@ public class Repo {
         //3. attempting to merge the branch it self
         //4. untracked files in the way
         public boolean failureCases(String branchName) {
-            stagingArea = stagingArea.load();
             Commit branchHEAD = Head.getBranchHEAD(branchName);
 
             if (!stagingArea.isEmpty()) {
                 exitWithMessage("You have uncommitted changes.");
                 return true;
             }
-            if (!Branch.hasBranch(branchName)) {
+
+            if (Branch.hasBranch(branchName)) {
                 exitWithMessage("A branch with that name does not exist.");
                 return true;
             }
-            if (branchHEAD.equals(currentBranchName())) {
+
+            if (branchName.equals(currentBranchName())) {
                 exitWithMessage("Cannot merge a branch with itself.");
                 return true;
             }
+
             // TODO: FIX hasUntrackedFilesForCheckoutBranch
             if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
                 exitWithMessage("There is an untracked file in the way; delete it, " +
