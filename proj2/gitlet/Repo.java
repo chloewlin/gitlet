@@ -313,28 +313,18 @@ public class Repo {
     public void checkoutCommit(String commitId, String fileName) throws IOException {
         Commit commit = Head.getGlobalHEAD();
         String blobSHA1 = "";
-        boolean found = false;
 
         while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
             if (findMatchId(commit.getSHA(), commitId)) {
-                blobSHA1 = commit.getSnapshot().get(fileName); // This returns null if file does
-                // not exist in that commit
-                found = true;
+                if (commit.getSnapshot().get(fileName) == null) {
+                    Main.exitWithError("File does not exist in that commit.");
+                }
+                blobSHA1 = commit.getSnapshot().get(fileName);
                 break;
-//            } else {
-//                Main.exitWithError("No commit with that id exists.");
             }
             commit = commit.getParent();
         }
 
-        if (!found) {
-            Main.exitWithError("No commit with that id exists.");
-        }
-        if (blobSHA1.equals("") || blobSHA1 == null) {
-            Main.exitWithError("File does not exist in that commit.");
-        }
-
-        // TODO: BUG
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
         Blob blob = Blob.load(blobFile);
         restoreFileInCWD(blob);
