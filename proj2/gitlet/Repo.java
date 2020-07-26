@@ -723,7 +723,7 @@ public class Repo {
             condition6(sp, curr, mergeMap);
             condition7(sp, given, mergeMap);
             condition8And9(sp,given, curr, deletedAtOne);
-            condition10(sp, given, curr, mergeMap);
+//            condition10(sp, given, curr, mergeMap);
 
 //            System.out.println("=========== merge map =========");
 //            mergeMap.forEach((k, v) -> {
@@ -1015,9 +1015,10 @@ public class Repo {
             for (String givenFileName : given.keySet()) {
                 String givenBlob = given.get(givenFileName);
                 String currBlob = curr.get(givenFileName);
-                if (!SP.containsKey(givenFileName) && !currBlob.equals(givenBlob)){
+                if (!SP.containsKey(givenFileName) && !currBlob.equals(givenBlob)) { //TODO: NUll
+                    // POINTER EXCEPTION
                   // replace & staged (using line separator)
-                    // TODO: CONFIRM
+                    // TODO: HAS BUG
                     createConflictFile(currBlob, givenBlob);
                 }
             }
