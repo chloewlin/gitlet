@@ -780,6 +780,7 @@ public class Repo {
 
             condition7(sp, given, mergeMap);
 //
+<<<<<<< HEAD
 //            System.out.println();
 //            System.out.println("************* condition 7 ******************");
 //            System.out.println("===== merge map ======");
@@ -807,6 +808,17 @@ public class Repo {
 //            bothDeleted.forEach((k, v) -> System.out.println(k));
 
 
+=======
+//            System.out.println("=========== both deleted =========");
+//            bothDeleted.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
+//
+//            System.out.println("=========== deleted at one =========");
+//            deletedAtOne.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
+>>>>>>> b57921d7829864914385db85cd2855e1f3bd21a7
 
             // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
             stagingArea.save();
