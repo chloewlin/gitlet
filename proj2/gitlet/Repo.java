@@ -499,37 +499,72 @@ public class Repo {
      *
      */
     public void reset(String[] args) {
-        Commit commit = Head.getGlobalHEAD();
         String commitId = args[1];
+        if (!containsCommitId(commitId)) {
+            Main.exitWithError("No commit with that id exists.");
+        }
+        Commit commit = Head.getGlobalHEAD();
+        if (hasUntrackedFilesForCheckoutBranch(commit)) {
+            Main.exitWithError("There is an untracked file in the way;" +
+                    " delete it or add it first.");
+        }
 
         Commit targetCommit = null;
 
-        // TODO: FIX BUG
-//        if (hasUntrackedFilesForCheckoutBranch(commit)) {
-//            Main.exitWithError("There is an untracked file in the way;" +
-//                    " delete it or add it first.");
-//        }
-//        if (hasUntrackedFiles()) {
-//            Main.exitWithError("There is an untracked file in the way; " +
-//                    "delete it, or add and commit it first.");
-//        }
+        File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
+        String[] commits = commitDir.list();
 
-        while (!commit.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
-            if (findMatchId(commit.getSHA(), commitId)) {
-                targetCommit = commit;
+        for (String commitFileNames : commits) {
+            if (commitId.equals(commitFileNames)) {
+                targetCommit = Commit.load(commitFileNames);
             }
-            commit = commit.getParent();
         }
 
-        if (targetCommit == null) {
-            Main.exitWithError("No commit with that id exists.");
-        }
+        Map<String, String> checkoutSnapshot = targetCommit.getSnapshot();
+        Map<String, String> currSnapshot = Head.getGlobalHEAD().getSnapshot();
+        Map<String, String> restore = new HashMap<>();
+        Map<String, String> delete = new HashMap<>();
 
-        // checkout to that commit
-        Commit currCommit = Head.getGlobalHEAD();
+//        System.out.println("==== checkoutSnapshot ===== ");
+//        checkoutSnapshot.forEach((k, v) -> System.out.println(k + " : " + v));
+//
+//        System.out.println("==== currSnapshot ===== ");
+//        currSnapshot.forEach((k, v) -> System.out.println(k + " : " + v));
 
-        //
-        restoreFilesAtCommit(currCommit, targetCommit);
+        // TODO: FIX BUGS
+        checkoutSnapshot.forEach((fileName, blobSHA1) -> {
+            restore.put(fileName, blobSHA1);
+        });
+
+        currSnapshot.forEach((fileName, blobSHA1) -> {
+           if (!checkoutSnapshot.containsKey(fileName)) {
+               delete.put(fileName, blobSHA1);
+           }
+        });
+
+//        System.out.println("==== restore ===== ");
+//        restore.forEach((k, v) -> System.out.println(k + " : " + v));
+//
+//        System.out.println("==== delete ===== ");
+//        delete.forEach((k, v) -> System.out.println(k + " : " + v));
+
+        restore.forEach((file, blobSHA1) -> {
+            File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
+            Blob blob = Blob.load(blobFile);
+
+            String CWD = System.getProperty("user.dir");
+            File newFile = new File(CWD, file);
+            try {
+                newFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Utils.writeContents(newFile, blob.getFileContent());
+        });
+
+        delete.forEach((file, blobSHA1) -> {
+            Utils.restrictedDelete(file);
+        });
 
         Head.setGlobalHEAD(currentBranchName(), targetCommit);
 
