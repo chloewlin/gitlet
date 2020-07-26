@@ -500,6 +500,7 @@ public class Repo {
      */
     public void reset(String[] args) {
         String commitId = args[1];
+
         if (!containsCommitId(commitId)) {
             Main.exitWithError("No commit with that id exists.");
         }
@@ -523,7 +524,6 @@ public class Repo {
         Map<String, String> checkoutSnapshot = targetCommit.getSnapshot();
         Map<String, String> currSnapshot = Head.getGlobalHEAD().getSnapshot();
         Map<String, String> restore = new HashMap<>();
-        Map<String, String> delete = new HashMap<>();
 
 //        System.out.println("==== checkoutSnapshot ===== ");
 //        checkoutSnapshot.forEach((k, v) -> System.out.println(k + " : " + v));
@@ -538,15 +538,12 @@ public class Repo {
 
         currSnapshot.forEach((fileName, blobSHA1) -> {
            if (!checkoutSnapshot.containsKey(fileName)) {
-               delete.put(fileName, blobSHA1);
+               Utils.restrictedDelete(fileName);
            }
         });
 
 //        System.out.println("==== restore ===== ");
 //        restore.forEach((k, v) -> System.out.println(k + " : " + v));
-//
-//        System.out.println("==== delete ===== ");
-//        delete.forEach((k, v) -> System.out.println(k + " : " + v));
 
         restore.forEach((file, blobSHA1) -> {
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
@@ -562,11 +559,8 @@ public class Repo {
             Utils.writeContents(newFile, blob.getFileContent());
         });
 
-        delete.forEach((file, blobSHA1) -> {
-            Utils.restrictedDelete(file);
-        });
-
-        Head.setGlobalHEAD(currentBranchName(), targetCommit);
+//        Head.setGlobalHEAD(currentBranchName(), targetCommit);
+        Head.setBranchHEAD(currentBranchName(), targetCommit);
 
         stagingArea = new Staging();
         stagingArea.save();
