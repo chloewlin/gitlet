@@ -741,14 +741,6 @@ public class Repo {
 //                System.out.println(k + " : " + v);
 //            });
 
-            // After user updated the files, and SP is neither curr branch HEAD or given branch HEAD
-            // if we still have conflict:
-            // Encountered a merge conflict.
-            // if no conflict:
-            // save the commit:
-            // 1. Save first parent: HEAD of curr branch
-            // 2. Save second parent: HEAD of given branch
-            // 2. message: Merged [given branch name] into [current branch name].
             // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
             stagingArea.save();
             commitMerge(branchName, originalBranchName);
@@ -1007,23 +999,22 @@ public class Repo {
         }
 
         // 10.4 Conflict: File not in SP && Curr != given
-        public void condition10(Map<String, String> SP,
-                               Map<String, String> given,
-                               Map<String, String> curr,
-                               Map<String, String> mergeMap) {
-
-            for (String givenFileName : given.keySet()) {
-                String givenBlob = given.get(givenFileName);
-                String currBlob = curr.get(givenFileName);
-                if (!SP.containsKey(givenFileName) && !currBlob.equals(givenBlob)) { //TODO: NUll
-                    // POINTER EXCEPTION
-                  // replace & staged (using line separator)
-                    // TODO: HAS BUG
-                    createConflictFile(currBlob, givenBlob);
-                }
-            }
-
-        }
+//        public void condition10(Map<String, String> SP,
+//                               Map<String, String> given,
+//                               Map<String, String> curr,
+//                               Map<String, String> mergeMap) {
+//
+//            for (String givenFileName : given.keySet()) {
+//                String givenBlob = given.get(givenFileName);
+//                String currBlob = curr.get(givenFileName);
+//                if (!SP.containsKey(givenFileName) && !currBlob.equals(givenBlob)) { //TODO: NUll
+//                    // POINTER EXCEPTION
+//                  // replace & staged (using line separator)
+//                    // TODO: HAS BUG
+//                    createConflictFile(currBlob, givenBlob);
+//                }
+//            }
+//        }
 
         public void createConflictFile(String currBlob, String givenBlob) {
             File blobDir = Utils.join(Main.OBJECTS_FOLDER, "blobs");
