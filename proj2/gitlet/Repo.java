@@ -810,6 +810,7 @@ public class Repo {
             // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
             stagingArea.save();
             commitMerge(branchName, originalBranchName);
+
             restoreFilesAtMerge(mergeMap, deletedAtOne, bothDeleted);
 
             boolean hasConflict = false;
@@ -1080,23 +1081,13 @@ public class Repo {
             for (String givenFileName : given.keySet()) {
                 String givenBlob = given.get(givenFileName);
                 String currBlob = curr.get(givenFileName);
-//                System.out.println("Inside 10.... SP " + SP);
-//                System.out.println("Inside 10.... CURR " + curr);
-//                System.out.println("Inside 10.... given " + given);
-//                System.out.println("currBlob...." + currBlob);
-//                System.out.println("givenBlob...." + givenBlob);
 
-                if (curr.containsKey(givenFileName) && !SP.containsKey(givenFileName)) {
-                    if (!givenBlob.equals(currBlob)) {
+                // TODO: HAS BUG
+                if (currBlob.contains(givenFileName) && SP.get(givenFileName) != null) {
+                    if (SP.get(givenFileName) == null && !currBlob.equals(givenBlob)) {
                         hasConflict = true;
                         createConflictFile(currBlob, givenBlob);
-//                        System.out.println("Inside condition 10, found conflict!");
                     }
-//                if (SP.get(givenFileName) == null && !currBlob.equals(givenBlob)) { //TODO:
-//                    // NUll
-//                    hasConflict = true;
-//                    createConflictFile(currBlob, givenBlob);
-//                    System.out.println("Inside condition 10, found conflict!");
                 }
             }
             return hasConflict;
