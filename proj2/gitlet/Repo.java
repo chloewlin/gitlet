@@ -973,6 +973,8 @@ public class Repo {
                  //10.3 Conflict: File in SP && absent: given  && modified: current
 
                         // replace & staged (using line separator)
+                        // TODO: CONFIRM
+                        createConflictFile(currBlob, givenBlob);
                     }
 
                 }
@@ -984,9 +986,10 @@ public class Repo {
                         stagingArea.unstage(SPFileName);
 
                     } else {
-
-                //10.2 Conflict File in SP && absent: current  && modified: given
-                // replace & staged (using line separator)
+                        //10.2 Conflict File in SP && absent: current  && modified: given
+                        // replace & staged (using line separator)
+                        // TODO: CONFIRM
+                        createConflictFile(currBlob, givenBlob);
                     }
                 }
                 //10.1 Conflict: SP != curr != given
@@ -996,45 +999,7 @@ public class Repo {
                             && !currBlob.equals(SPBlob)) {
 
                         // replace & staged (using line separator)
-                        File blobDir = Utils.join(Main.OBJECTS_FOLDER, "blobs");
-                        String[] blobsFileNames = blobDir.list();
-
-                        File currBlobFile = null;
-                        File givenBlobFile = null;
-
-                        for (String blobFileName : blobsFileNames) {
-                            if (blobFileName.equals(currBlob)) {
-                                currBlobFile = Utils.join(blobDir, blobFileName);
-                            }
-                            if (blobFileName.equals(givenBlob)) {
-                                givenBlobFile = Utils.join(blobDir, blobFileName);
-                            }
-                        }
-
-                        Blob currBlobObj = Utils.readObject(currBlobFile, Blob.class);
-                        Blob givenBlobObj = Utils.readObject(givenBlobFile, Blob.class);
-
-                        String CWD = System.getProperty("user.dir");
-                        File conflictFile = new File(CWD, currBlobObj.getFileName());
-
-                        String currContent =
-                                new String(currBlobObj.getFileContent(), StandardCharsets.UTF_8);
-                        String givenContent =
-                                new String(givenBlobObj.getFileContent(), StandardCharsets.UTF_8);
-
-                        Utils.writeContents(conflictFile,
-                                    "<<<<<<< HEAD" + System.lineSeparator() +
-                                            currContent +
-                                            System.lineSeparator() +
-                                            "=======" + System.lineSeparator() +
-                                                    givenContent +
-                                            System.lineSeparator() +
-                                            ">>>>>>>");
-
-                        Blob conflictFileBlob = new Blob(currBlobObj.getFileName());
-                        stagingArea.add(currBlobObj.getFileName(), conflictFileBlob.getBlobSHA1());
-                        stagingArea.save();
-                        Main.exitWithError("Encountered a merge conflict.");
+                        createConflictFile(currBlob, givenBlob);
                     }
                 }
             }
@@ -1052,9 +1017,94 @@ public class Repo {
                 String currBlob = curr.get(givenFileName);
                 if (!SP.containsKey(givenFileName) && !currBlob.equals(givenBlob)){
                   // replace & staged (using line separator)
+                    // TODO: CONFIRM
+                    createConflictFile(currBlob, givenBlob);
                 }
             }
 
+        }
+
+        public void createConflictFile(String currBlob, String givenBlob) {
+            File blobDir = Utils.join(Main.OBJECTS_FOLDER, "blobs");
+            String[] blobsFileNames = blobDir.list();
+
+            File currBlobFile = null;
+            File givenBlobFile = null;
+
+            for (String blobFileName : blobsFileNames) {
+                if (blobFileName.equals(currBlob)) {
+                    currBlobFile = Utils.join(blobDir, blobFileName);
+                }
+                if (blobFileName.equals(givenBlob)) {
+                    givenBlobFile = Utils.join(blobDir, blobFileName);
+                }
+            }
+
+            if (currBlobFile != null && givenBlobFile != null) {
+                Blob currBlobObj = Utils.readObject(currBlobFile, Blob.class);
+                Blob givenBlobObj = Utils.readObject(givenBlobFile, Blob.class);
+
+                String CWD = System.getProperty("user.dir");
+                File conflictFile = new File(CWD, currBlobObj.getFileName());
+
+                String currContent = new String(currBlobObj.getFileContent(),
+                        StandardCharsets.UTF_8);
+                String givenContent = new String(givenBlobObj.getFileContent(),
+                        StandardCharsets.UTF_8);
+
+                Utils.writeContents(conflictFile,
+                        "<<<<<<< HEAD" + System.lineSeparator() +
+                                currContent +
+                                System.lineSeparator() +
+                                "=======" + System.lineSeparator() +
+                                givenContent +
+                                System.lineSeparator() +
+                                ">>>>>>>");
+
+                Blob conflictFileBlob = new Blob(currBlobObj.getFileName());
+                stagingArea.add(currBlobObj.getFileName(), conflictFileBlob.getBlobSHA1());
+            } else if (currBlobFile == null && givenBlob != null) {
+                condition10_2And10_3(givenBlobFile, "curr");
+            } else if (currBlobFile != null) {
+                condition10_2And10_3(currBlobFile, "given");
+            }
+
+
+            stagingArea.save();
+            Main.exitWithError("Encountered a merge conflict.");
+        }
+
+        public void condition10_2And10_3(File presentBlobFile, String absentBranch) {
+            Blob presentBlobObj = Utils.readObject(presentBlobFile, Blob.class);
+
+            String CWD = System.getProperty("user.dir");
+            File conflictFile = new File(CWD, presentBlobObj.getFileName());
+
+            String presentContent = new String(presentBlobObj.getFileContent(),
+                    StandardCharsets.UTF_8);
+
+            if (absentBranch.equals("curr")) {
+                Utils.writeContents(conflictFile,
+                        "<<<<<<< HEAD" + System.lineSeparator() +
+                                "" +
+                                System.lineSeparator() +
+                                "=======" + System.lineSeparator() +
+                                presentContent +
+                                System.lineSeparator() +
+                                ">>>>>>>");
+            } else {
+                Utils.writeContents(conflictFile,
+                        "<<<<<<< HEAD" + System.lineSeparator() +
+                                presentContent +
+                                System.lineSeparator() +
+                                "=======" + System.lineSeparator() +
+                                "" +
+                                System.lineSeparator() +
+                                ">>>>>>>");
+            }
+
+            Blob conflictFileBlob = new Blob(presentBlobObj.getFileName());
+            stagingArea.add(presentBlobObj.getFileName(), conflictFileBlob.getBlobSHA1());
         }
 
         public void commitMerge(String branchName, String originalBranchName) throws IOException {
