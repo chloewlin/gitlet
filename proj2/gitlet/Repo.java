@@ -501,13 +501,14 @@ public class Repo {
     public void reset(String[] args) {
         String commitId = args[1];
 
-        if (!containsCommitId(commitId)) {
-            Main.exitWithError("No commit with that id exists.");
-        }
         Commit commit = Head.getGlobalHEAD();
         if (hasUntrackedFilesForCheckoutBranch(commit)) {
             Main.exitWithError("There is an untracked file in the way;" +
                     " delete it or add it first.");
+        }
+
+        if (!containsCommitId(commitId)) {
+            Main.exitWithError("No commit with that id exists.");
         }
 
         Commit targetCommit = null;
