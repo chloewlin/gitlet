@@ -1200,25 +1200,18 @@ public class Repo {
         public Commit latestCommonAncestor(Commit currHead, Commit branchHead) {
             HashSet<String> branchPath = new HashSet<>();
             buildBranchHashSet(branchPath, branchHead);
-//
-//            System.out.println("========= branch path ==========");
-//            branchPath.forEach((s) -> System.out.println(Commit.load(s).getMessage()));
 
             HashMap<Commit, Integer> ancestors = new HashMap<>();
             getAncestors(ancestors, branchPath, currHead, 0);
 
-//            System.out.println("=========== ancestors ===========");
-//            ancestors.forEach((commit, depth) -> System.out.println(commit.getMessage() + ": " + depth));
 
             Commit LCA = null;
             Integer minDepth = -1;
 
-//            System.out.println("============== looking for LCA ============");
 
             for (Map.Entry<Commit, Integer> entry : ancestors.entrySet()) {
                 Commit node = entry.getKey();
                 Integer depth = entry.getValue();
-//                System.out.println("=>" + node.getSHA() + " : " + depth);
                 if (minDepth < 0) {
                     minDepth = depth;
                     LCA = node;
@@ -1228,8 +1221,6 @@ public class Repo {
                 }
             }
 
-//            System.out.println("=============== LCA ====================");
-//            System.out.println(LCA.getMessage() + ", minDepth: " + minDepth);
             return LCA;
         }
 
@@ -1237,8 +1228,6 @@ public class Repo {
                            HashSet<String> branchPath,
                            Commit currHead,
                            Integer depth) {
-            System.out.println();
-//            System.out.println("=>" + currHead.getMessage() + " : " + depth);
             if (currHead.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
                 return;
             }
