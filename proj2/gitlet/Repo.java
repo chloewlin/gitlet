@@ -722,7 +722,7 @@ public class Repo {
             condition6(sp, curr, mergeMap);
             condition7(sp, given, mergeMap);
             condition8And9(sp,given, curr, deletedAtOne);
-
+            condition10(sp, given, curr, mergeMap);
 
 //            System.out.println("=========== merge map =========");
 //            mergeMap.forEach((k, v) -> {
@@ -739,16 +739,6 @@ public class Repo {
 //            deletedAtOne.forEach((k, v) -> {
 //                System.out.println(k + " : " + v);
 //            });
-
-            // compare HEAD of curr branch with HEAD of given branch:
-            // find "conflicts": files modified in different ways in currHEAD and branchHEAD
-            // format conflict, stage them!
-            // <<<<<<< HEAD
-            // contents of file in current branch
-            // =======
-            // contents of file in given branch
-            // >>>>>>>
-//            findMergeConflicts();
 
             // After user updated the files, and SP is neither curr branch HEAD or given branch HEAD
             // if we still have conflict:
@@ -961,7 +951,7 @@ public class Repo {
         public void condition8And9(Map<String, String> SP,
                                    Map<String, String> given,
                                    Map<String, String> curr,
-                                   Map<String, String> deletedAtOne) {
+                                   Map<String, String> deletedAtOne) throws IOException {
 
             for (String SPFileName : SP.keySet()) {
                 boolean insideCurr = curr.containsKey(SPFileName);
@@ -1005,7 +995,38 @@ public class Repo {
                             && !currBlob.equals(SPBlob)) {
 
                         // replace & staged (using line separator)
+                        File blobDir = Utils.join(Main.OBJECTS_FOLDER, "blobs");
+                        String[] blobsFileNames = blobDir.list();
 
+                        File currBlobFile = null;
+                        File givenBlobFile = null;
+
+                        for (String blobFileName : blobsFileNames) {
+                            if (blobFileName.equals(currBlob)) {
+                                currBlobFile = Utils.join(blobDir, blobFileName);
+                            }
+                            if (blobFileName.equals(givenBlob)) {
+                                givenBlobFile = Utils.join(blobDir, blobFileName);
+                            }
+                        }
+
+
+                        Blob currBlobObj = Utils.readObject(currBlobFile, Blob.class);
+                        Blob givenBlobObj = Utils.readObject(givenBlobFile, Blob.class);
+
+                        String CWD = System.getProperty("user.dir");
+                        File currentFile = new File(CWD, currBlobObj.getFileName());
+
+                        Utils.writeContents(currentFile,
+                                            "<<<<<<< HEAD" + System.lineSeparator() +
+                                            currBlobObj.getFileContent() +
+                                            System.lineSeparator() +
+                                            "=======" + System.lineSeparator() +
+                                            givenBlobObj.getFileContent() +
+                                            System.lineSeparator() +
+                                            ">>>>>>>");
+                        // TODO: for debugging only, delete later
+                        System.out.println("Encountered a merge conflict.");
                     }
                 }
             }
