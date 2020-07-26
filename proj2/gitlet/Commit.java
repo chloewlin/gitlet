@@ -153,6 +153,12 @@ public class Commit implements Serializable {
         return parent;
     }
 
+    public Commit getParent2() {
+        String parent2Sha1 = this.parents[1];
+        Commit parent = load(parent2Sha1);
+        return parent;
+    }
+
     /**
      * Return a commit node from a byte array.
      */
