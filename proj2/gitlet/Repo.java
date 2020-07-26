@@ -1108,12 +1108,10 @@ public class Repo {
 //                System.out.println("creating conflict file.....");
                 Utils.writeContents(conflictFile,
                         "<<<<<<< HEAD" + System.lineSeparator() +
-                                currContent +
-                                System.lineSeparator() +
+                                currContent.trim() +
                                 "=======" + System.lineSeparator() +
-                                givenContent +
-                                System.lineSeparator() +
-                                ">>>>>>>");
+                                givenContent.trim() +
+                                ">>>>>>>" + System.lineSeparator());
 //                System.out.println("currContent: " + currContent);
 //                System.out.println("givenContent " + givenContent);
 
@@ -1139,16 +1137,18 @@ public class Repo {
                 Utils.writeContents(conflictFile,
                         "<<<<<<< HEAD" + System.lineSeparator() +
                                 "=======" + System.lineSeparator() +
-                                presentContent +
+                                presentContent.trim() +
                                 System.lineSeparator() +
-                                ">>>>>>>");
+                                ">>>>>>>" +
+                                System.lineSeparator());
             } else {
                 Utils.writeContents(conflictFile,
                         "<<<<<<< HEAD" + System.lineSeparator() +
-                                presentContent +
+                                presentContent.trim() +
                                 System.lineSeparator() +
                                 "=======" + System.lineSeparator() +
-                                ">>>>>>>");
+                                ">>>>>>>" +
+                                System.lineSeparator());
             }
         }
 
