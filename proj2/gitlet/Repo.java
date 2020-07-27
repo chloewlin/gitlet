@@ -792,14 +792,32 @@ public class Repo {
 
             boolean hasConflict = false;
 
-            if (condition8And9(sp, given, curr, deletedAtOne)
+            if (condition8And9(sp, given, curr, deletedAtOne, mergeMap)
                     || condition10(sp, given, curr, mergeMap)) {
                 hasConflict = true;
             }
 
+//            System.out.println("=========== merge map =========");
+//            mergeMap.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
+//            System.out.println();
+//
+//            System.out.println("=========== both deleted =========");
+//            bothDeleted.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
+//
+//            System.out.println("=========== deleted at one =========");
+//            deletedAtOne.forEach((k, v) -> {
+//                System.out.println(k + " : " + v);
+//            });
+
             // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
             stagingArea.save();
+
             commitMerge(branchName, originalBranchName);
+
             restoreFilesAtMerge(mergeMap, deletedAtOne, bothDeleted);
 
             if (hasConflict) {
@@ -995,7 +1013,8 @@ public class Repo {
         public boolean condition8And9(Map<String, String> SP,
                                       Map<String, String> given,
                                       Map<String, String> curr,
-                                      Map<String, String> deletedAtOne) throws IOException {
+                                      Map<String, String> deletedAtOne,
+                                      Map<String, String> mergeMap) throws IOException {
             boolean hasConflict = false;
             for (String SPFileName : SP.keySet()) {
                 boolean insideCurr = curr.containsKey(SPFileName);
@@ -1018,6 +1037,9 @@ public class Repo {
                         // TODO: CONFIRM
                         hasConflict = true;
                         createConflictFile(currBlob, givenBlob);
+                        if (mergeMap.containsKey(SPFileName)) {
+                            mergeMap.remove(SPFileName);
+                        }
 //                        System.out.println("Inside condition 10.3, found conflict!");
                     }
 
@@ -1035,6 +1057,9 @@ public class Repo {
                         // TODO: CONFIRM
                         hasConflict = true;
                         createConflictFile(currBlob, givenBlob);
+                        if (mergeMap.containsKey(SPFileName)) {
+                            mergeMap.remove(SPFileName);
+                        }
 //                        System.out.println("Inside condition 10.2, found conflict!");
                     }
                 }
@@ -1046,6 +1071,9 @@ public class Repo {
                         hasConflict = true;
                         // replace & staged (using line separator)
                         createConflictFile(currBlob, givenBlob);
+                        if (mergeMap.containsKey(SPFileName)) {
+                            mergeMap.remove(SPFileName);
+                        }
 //                        System.out.println("Inside condition 10.1, found conflict!");
                     }
                 }
@@ -1070,6 +1098,9 @@ public class Repo {
                         // TODO: HAS BUG
                         hasConflict = true;
                         createConflictFile(currBlob, givenBlob);
+                        if (mergeMap.containsKey(givenFileName)) {
+                            mergeMap.remove(givenFileName);
+                        }
 //                        System.out.println("Inside condition 10, found conflict!");
                     }
                 }
@@ -1094,6 +1125,7 @@ public class Repo {
             }
 
             if (currBlobFile != null && givenBlobFile != null) {
+
                 Blob currBlobObj = Utils.readObject(currBlobFile, Blob.class);
                 Blob givenBlobObj = Utils.readObject(givenBlobFile, Blob.class);
 
@@ -1104,7 +1136,7 @@ public class Repo {
                         StandardCharsets.UTF_8);
                 String givenContent = new String(givenBlobObj.getFileContent(),
                         StandardCharsets.UTF_8);
-
+//
 //                System.out.println("creating conflict file.....");
                 Utils.writeContents(conflictFile,
                         "<<<<<<< HEAD\n",
