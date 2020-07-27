@@ -792,16 +792,17 @@ public class Repo {
 
             boolean hasConflict = false;
 
+            stagingArea.save();
+            commitMerge(branchName, originalBranchName);
+
+            // TODO: Restore files
+            restoreFilesAtMerge(mergeMap, deletedAtOne, bothDeleted);
+
+            // TODO: Create conflict files
             if (condition8And9(sp, given, curr, deletedAtOne)
                     || condition10(sp, given, curr, mergeMap)) {
                 hasConflict = true;
             }
-
-            // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
-            stagingArea.save();
-            commitMerge(branchName, originalBranchName);
-
-            restoreFilesAtMerge(mergeMap, deletedAtOne, bothDeleted);
 
             if (hasConflict) {
                 Main.exitWithError("Encountered a merge conflict.");
