@@ -32,7 +32,7 @@ public class SimpleNameMap {
     public boolean containsKey(String key) {
         int index = getIndex(key);
         List<Entry> linkedList = this.map[index];
-        boolean found = false;
+//        boolean found = false;
 
         Iterator<Entry> iter = linkedList.iterator();
 
@@ -41,11 +41,13 @@ public class SimpleNameMap {
 
             System.out.println("=====> " + key + " " + entry.value);
             if (entry.key.equals(key)) {
-                found = true;
+                return true;
+//                found = true;
             }
         }
 
-        return found;
+//        return found;
+        return false;
     }
 
     /* Returns the value for the specified KEY. If KEY is not found, return
@@ -65,7 +67,8 @@ public class SimpleNameMap {
             }
         }
 
-        return "Not found";
+//        return "Not found";
+        return null;
     }
 
     /* Puts a (KEY, VALUE) pair into this map. If the KEY already exists in the
@@ -83,8 +86,9 @@ public class SimpleNameMap {
 
             if (entry.equals(key)) {
                 found = true;
-                entry.value = value;
+//                entry.value = value;
             }
+            value = entry.value;
         }
 
         if (!found) {
@@ -100,20 +104,28 @@ public class SimpleNameMap {
     public String remove(String key) {
         int index = getIndex(key);
         List<Entry> linkedList = this.map[index];
-        Iterator<Entry> iter = linkedList.iterator();
-
+//        Iterator<Entry> iter = linkedList.iterator();
+//
         String value = null;
-
-        while (iter.hasNext()) {
-            Entry entry = iter.next();
-
+//
+//        while (iter.hasNext()) {
+//            Entry entry = iter.next();
+//
+//            if (entry.key.equals(key)) {
+//                value = entry.value;
+//                System.out.println("found ======> " + entry.key + " " + entry.value);
+//               linkedList.remove(entry.key);
+//            }
+//        }
+//
+//        this.count--;
+//        return value;
+        for (Entry entry : linkedList) {
             if (entry.key.equals(key)) {
                 value = entry.value;
-                System.out.println("found ======> " + entry.key + " " + entry.value);
-                linkedList.remove(key);
+                linkedList.remove(entry);
             }
         }
-
         this.count--;
         return value;
     }
