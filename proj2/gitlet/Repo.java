@@ -502,12 +502,6 @@ public class Repo {
     public void reset(String[] args) {
         String commitId = args[1];
 
-        Commit commit = Head.getGlobalHEAD();
-//        if (hasUntrackedFilesForCheckoutBranch(commit)) {
-//            Main.exitWithError("There is an untracked file in the way;" +
-//                    " delete it or add it first.");
-//        }
-
         File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
         String[] commits = commitDir.list();
 
@@ -529,6 +523,11 @@ public class Repo {
             if (commitId.equals(commitFileNames)) {
                 targetCommit = Commit.load(commitFileNames);
             }
+        }
+
+        if (hasUntrackedFilesForReset(targetCommit)) {
+            Main.exitWithError("There is an untracked file in the way;" +
+                    " delete it or add it first.");
         }
 
         Map<String, String> checkoutSnapshot = targetCommit.getSnapshot();
@@ -606,21 +605,33 @@ public class Repo {
     }
 
     /**
-     * Returns if there are untracked files in CWD.
+     * Find untracked files for reset
+     * 1. there exists some file (we’ll call it hi.txt) in the working
+     * directory that is untracked in the most recent commit (a file
+     * called hi.txt does not exist in the most recent commit’s snapshot)
+     * AND
+     * 2. The given commit (passed in as sha1) has a file called hi.txt
+     *  that is tracked (it exists in that commit’s snapshot) — for checkout,
+     *  this condition
+     *  could be modified to be in reference to the latest commit on the
+     *  given branch (rather than a given commit ID)
      * */
-    public boolean hasUntrackedFiles() {
-
-        // TODO: HAS BUGS
-
+    public boolean hasUntrackedFilesForReset(Commit givenBranchHEAD) {
+        List<String> untrackedFiles = new ArrayList<String>();
         stagingArea = stagingArea.load();
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
+
         for (String fileName : fileInCWD) {
-            if (!stagingArea.containsFileForAddition(fileName)
-                    && !stagingArea.containsFileForRemoval(fileName)) {
-                return true;
+            if (!fileName.equals(".DS_Store") && !fileName.equals(".gitignore") && !fileName.equals(
+                    "proj2.iml")) {
+                if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
+                        && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
+                    untrackedFiles.add(fileName);
+                }
             }
         }
-        return false;
+
+        return untrackedFiles.size() > 0;
     }
 
     public void restoreFilesAtCommit(Commit currCommit, Commit checkoutCommit) {
