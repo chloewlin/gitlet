@@ -534,12 +534,6 @@ public class Repo {
         Map<String, String> currSnapshot = Head.getGlobalHEAD().getSnapshot();
         Map<String, String> restore = new HashMap<>();
 
-//        System.out.println("==== checkoutSnapshot ===== ");
-//        checkoutSnapshot.forEach((k, v) -> System.out.println(k + " : " + v));
-//
-//        System.out.println("==== currSnapshot ===== ");
-//        currSnapshot.forEach((k, v) -> System.out.println(k + " : " + v));
-
         checkoutSnapshot.forEach((fileName, blobSHA1) -> {
             restore.put(fileName, blobSHA1);
         });
