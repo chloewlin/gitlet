@@ -1065,8 +1065,8 @@ public class Repo {
             for (String givenFileName : given.keySet()) {
                 String givenBlob = given.get(givenFileName);
                 String currBlob = curr.get(givenFileName);
-                if (curr.containsKey(givenFileName)) {
-                    if (!SP.containsKey(givenFileName) && !currBlob.equals(givenBlob)) { //TODO: NUll
+                if (curr.containsKey(givenFileName) && !SP.containsKey(givenFileName)) {
+                    if (!givenBlob.equals(currBlob)) { //TODO: NUll
                         // POINTER EXCEPTION
                         // replace & staged (using line separator)
                         // TODO: HAS BUG
