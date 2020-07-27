@@ -527,7 +527,7 @@ public class Repo {
 
         if (hasUntrackedFilesForReset(targetCommit)) {
             Main.exitWithError("There is an untracked file in the way;" +
-                    " delete it or add it first.");
+                    " delete it, or add and commit it first.");
         }
 
         Map<String, String> checkoutSnapshot = targetCommit.getSnapshot();
