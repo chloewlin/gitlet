@@ -792,16 +792,14 @@ public class Repo {
 
             boolean hasConflict = false;
 
-
-            // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
-            stagingArea.save();
-            commitMerge(branchName, originalBranchName);
-
             if (condition8And9(sp, given, curr, deletedAtOne)
                     || condition10(sp, given, curr, mergeMap)) {
                 hasConflict = true;
             }
 
+            // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
+            stagingArea.save();
+            commitMerge(branchName, originalBranchName);
             restoreFilesAtMerge(mergeMap, deletedAtOne, bothDeleted);
 
             if (hasConflict) {
@@ -1066,7 +1064,7 @@ public class Repo {
                 String givenBlob = given.get(givenFileName);
                 String currBlob = curr.get(givenFileName);
                 if (curr.containsKey(givenFileName) && !SP.containsKey(givenFileName)) {
-                    if (!givenBlob.equals(currBlob)) { //TODO: NUll
+                    if (!currBlob.equals(givenBlob)) { //TODO: NUll
                         // POINTER EXCEPTION
                         // replace & staged (using line separator)
                         // TODO: HAS BUG
@@ -1107,6 +1105,7 @@ public class Repo {
                 String givenContent = new String(givenBlobObj.getFileContent(),
                         StandardCharsets.UTF_8);
 
+//                System.out.println("creating conflict file.....");
                 Utils.writeContents(conflictFile,
                         "<<<<<<< HEAD\n",
                         currContent,
@@ -1114,6 +1113,8 @@ public class Repo {
                         givenContent,
                         ">>>>>>>",
                         System.lineSeparator());
+//                System.out.println("currContent: " + currContent);
+//                System.out.println("givenContent " + givenContent);
 
                 Blob conflictFileBlob = new Blob(currBlobObj.getFileName());
                 conflictFileBlob.save();
