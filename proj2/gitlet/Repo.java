@@ -679,6 +679,8 @@ public class Repo {
      */
     public void merge(String[] args) throws IOException {
         String givenBranch = args[1];
+
+        merge.failureCases(givenBranch);
         merge.merge(givenBranch);
     }
 
@@ -700,9 +702,6 @@ public class Repo {
 
             //failure case
             //print error msg and error out
-//            if (failureCases(branchName)) {
-//                return;
-//            }
 
             Map<String, String> mergeMap = new HashMap<>();
             Map<String, String> bothDeleted = new HashMap<>();
@@ -1291,14 +1290,6 @@ public class Repo {
         }
 
 
-        public void findMergeConflicts() {
-
-        }
-
-        public void commitMerge() {
-
-        }
-
         public void exitWithMessage(String message) {
             System.out.println(message);
             System.exit(0);
@@ -1309,31 +1300,26 @@ public class Repo {
         //2. given branch name does not exit
         //3. attempting to merge the branch it self
         //4. untracked files in the way
-        public boolean failureCases(String branchName) {
-            Commit branchHEAD = Head.getBranchHEAD(branchName);
-
-            if (!stagingArea.isEmpty()) {
+        public void failureCases(String branchName) {
+            if (stagingArea.load().hasUncommitedChanges()) {
                 exitWithMessage("You have uncommitted changes.");
-                return true;
             }
 
-            if (Branch.hasBranch(branchName)) {
+            if (!Branch.hasBranch(branchName)) {
                 exitWithMessage("A branch with that name does not exist.");
-                return true;
             }
 
             if (branchName.equals(currentBranchName())) {
                 exitWithMessage("Cannot merge a branch with itself.");
-                return true;
             }
 
+            Commit givenBranchHead = Head.getBranchHEAD(branchName);
+//
             // TODO: FIX hasUntrackedFilesForCheckoutBranch
-            if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
+            if (hasUntrackedFilesForCheckoutBranch(givenBranchHead)) {
                 exitWithMessage("There is an untracked file in the way; delete it, " +
                         "or add and commit it first.");
-                return true;
             }
-            return false;
         }
     }
 

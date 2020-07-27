@@ -60,6 +60,10 @@ public class Staging implements Serializable {
         return this.stagedForAddition.isEmpty() && this.stagedForRemoval.isEmpty();
     }
 
+    public boolean hasUncommitedChanges() {
+        return !this.stagedForAddition.isEmpty() || !this.stagedForRemoval.isEmpty();
+    }
+
     public Blob getBlobOfFile(String fileName) {
         String blobSHA1 = this.stagedForAddition.get(fileName);
         File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
