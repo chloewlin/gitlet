@@ -1107,7 +1107,6 @@ public class Repo {
                 String givenContent = new String(givenBlobObj.getFileContent(),
                         StandardCharsets.UTF_8);
 
-//                System.out.println("creating conflict file.....");
                 Utils.writeContents(conflictFile,
                         "<<<<<<< HEAD\n",
                         currContent,
@@ -1115,8 +1114,6 @@ public class Repo {
                         givenContent,
                         ">>>>>>>",
                         System.lineSeparator());
-//                System.out.println("currContent: " + currContent);
-//                System.out.println("givenContent " + givenContent);
 
                 Blob conflictFileBlob = new Blob(currBlobObj.getFileName());
                 conflictFileBlob.save();
