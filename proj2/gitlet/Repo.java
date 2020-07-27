@@ -86,8 +86,8 @@ public class Repo {
         String CWD = System.getProperty("user.dir");
         File currentFile = new File(CWD, currFileName);
 
-        Commit lastCommit = Head.getGlobalHEAD();
-        String blobSHA1 = lastCommit.getSnapshot().get(currFileName);
+        Commit currCommit = Head.getGlobalHEAD();
+        String blobSHA1 = currCommit.getSnapshot().get(currFileName);
 
         if (blobSHA1 == null) {
             return false;
@@ -353,7 +353,7 @@ public class Repo {
      * */
     public boolean findMatchId(String commitSHA1, String commitId) {
 //        return commitSHA1.equals(commitId) ||
-         return commitSHA1.substring(0, commitId.length()).equals(commitId);
+        return commitSHA1.substring(0, commitId.length()).equals(commitId);
     }
 
     /**
@@ -546,9 +546,9 @@ public class Repo {
         });
 
         currSnapshot.forEach((fileName, blobSHA1) -> {
-           if (!checkoutSnapshot.containsKey(fileName)) {
-               Utils.restrictedDelete(fileName);
-           }
+            if (!checkoutSnapshot.containsKey(fileName)) {
+                Utils.restrictedDelete(fileName);
+            }
         });
 
 //        System.out.println("==== restore ===== ");
@@ -597,8 +597,8 @@ public class Repo {
 //                    && !stagingArea.getFilesStagedForAddition().containsKey(fileName)
 //                    && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
                 if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
-                    && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
-                      untrackedFiles.add(fileName);
+                        && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
+                    untrackedFiles.add(fileName);
                 }
             }
         }
@@ -744,7 +744,7 @@ public class Repo {
 //            bothDeleted.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
 
             condition4(sp, given, curr, mergeMap);
-//
+
 //            System.out.println();
 //            System.out.println("************* condition 4 ******************");
 //            System.out.println("===== merge map ======");
@@ -756,7 +756,7 @@ public class Repo {
 
             condition5(sp, given, curr, mergeMap, bothDeleted);
 
-
+//
 //            System.out.println();
 //            System.out.println("************* condition 5 ******************");
 //            System.out.println("===== merge map ======");
@@ -768,7 +768,7 @@ public class Repo {
 
 
             condition6(sp, curr, mergeMap);
-//
+
 //            System.out.println();
 //            System.out.println("************* condition 6 ******************");
 //            System.out.println("===== merge map ======");
@@ -788,30 +788,7 @@ public class Repo {
 //            deletedAtOne.forEach((k, v) -> System.out.println(k + ": " + v  + " ==> " + printBlob(v)));
 //            System.out.println("===== both deleted ======");
 //            bothDeleted.forEach((k, v) -> System.out.println(k + ": " + v + " ==> " + printBlob(v)));
-//
-//
-//            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-//            System.out.println("=========== merge map =========");
-//            mergeMap.forEach((k, v) -> {
-//                System.out.println(k + " : " + v);
-//            });
-//            System.out.println();
-//
-//            System.out.println("=========== both deleted =========");
-//            bothDeleted.forEach((k, v) -> {
-//                System.out.println(k + " : " + v);
-//            });
-//
-//            System.out.println("=========== deleted at one =========");
-//            deletedAtOne.forEach((k, v) -> {
-//                System.out.println(k + " : " + v);
-//            });
 
-            // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
-            stagingArea.save();
-            commitMerge(branchName, originalBranchName);
-
-            restoreFilesAtMerge(mergeMap, deletedAtOne, bothDeleted);
 
             boolean hasConflict = false;
 
@@ -819,6 +796,12 @@ public class Repo {
                     || condition10(sp, given, curr, mergeMap)) {
                 hasConflict = true;
             }
+
+            // TODO: Create a custom commit to store mergeMap and delete and deleteAtOne
+            stagingArea.save();
+            commitMerge(branchName, originalBranchName);
+
+            restoreFilesAtMerge(mergeMap, deletedAtOne, bothDeleted);
 
             if (hasConflict) {
                 Main.exitWithError("Encountered a merge conflict.");
@@ -858,9 +841,9 @@ public class Repo {
         // givenBranch: modified && currBranch: unmodified (=SP)
         // -> copy givenBranch key-value pair, add into hashmap (stageToBeAdded), and auto staged
         public void condition3(Map<String, String> SP,
-                                                  Map<String, String> given,
-                                                  Map<String, String> curr,
-                                                  Map<String, String> mergeMap) {
+                               Map<String, String> given,
+                               Map<String, String> curr,
+                               Map<String, String> mergeMap) {
             HashMap<String, String> sameOnCurrAndSP = new HashMap<>();
             HashMap<String, String> diffOnGivenAndSP = new HashMap<>();
 
@@ -1011,9 +994,9 @@ public class Repo {
         // File in SP && given: unmodified && curr: absent (treat like modified)
         // -> remain absent (unchanged?)
         public boolean condition8And9(Map<String, String> SP,
-                                   Map<String, String> given,
-                                   Map<String, String> curr,
-                                   Map<String, String> deletedAtOne) throws IOException {
+                                      Map<String, String> given,
+                                      Map<String, String> curr,
+                                      Map<String, String> deletedAtOne) throws IOException {
             boolean hasConflict = false;
             for (String SPFileName : SP.keySet()) {
                 boolean insideCurr = curr.containsKey(SPFileName);
@@ -1074,19 +1057,21 @@ public class Repo {
 
         // 10.4 Conflict: File not in SP && Curr != given
         public boolean condition10(Map<String, String> SP,
-                               Map<String, String> given,
-                               Map<String, String> curr,
-                               Map<String, String> mergeMap) {
+                                   Map<String, String> given,
+                                   Map<String, String> curr,
+                                   Map<String, String> mergeMap) {
             boolean hasConflict = false;
             for (String givenFileName : given.keySet()) {
                 String givenBlob = given.get(givenFileName);
                 String currBlob = curr.get(givenFileName);
-
-                // TODO: Changed
                 if (curr.containsKey(givenFileName) && !SP.containsKey(givenFileName)) {
-                    if (!currBlob.equals(givenBlob)) {
+                    if (!currBlob.equals(givenBlob)) { //TODO:
+                        // POINTER EXCEPTION
+                        // replace & staged (using line separator)
+                        // TODO: HAS BUG
                         hasConflict = true;
                         createConflictFile(currBlob, givenBlob);
+//                        System.out.println("Inside condition 10, found conflict!");
                     }
                 }
             }
@@ -1124,11 +1109,11 @@ public class Repo {
 //                System.out.println("creating conflict file.....");
                 Utils.writeContents(conflictFile,
                         "<<<<<<< HEAD\n",
-                                currContent,
-                                "=======\n",
-                                givenContent,
-                                ">>>>>>>",
-                                System.lineSeparator());
+                        currContent,
+                        "=======\n",
+                        givenContent,
+                        ">>>>>>>",
+                        System.lineSeparator());
 //                System.out.println("currContent: " + currContent);
 //                System.out.println("givenContent " + givenContent);
 
@@ -1153,10 +1138,10 @@ public class Repo {
             if (absentBranch.equals("curr")) {
                 Utils.writeContents(conflictFile,
                         "<<<<<<< HEAD\n",
-                                "=======\n",
-                                presentContent,
-                                ">>>>>>>",
-                                System.lineSeparator());
+                        "=======\n",
+                        presentContent,
+                        ">>>>>>>",
+                        System.lineSeparator());
             } else {
                 Utils.writeContents(conflictFile,
                         "<<<<<<< HEAD\n" +
@@ -1174,7 +1159,7 @@ public class Repo {
 
             // TODO: Do we need to handle deleted files
             Commit mergeCommit = new Commit(commitMessage, firstParentSHA1, secondParentSHA1,
-                            false, stagingArea.getFilesStagedForAddition(),
+                    false, stagingArea.getFilesStagedForAddition(),
                     stagingArea.getFilesStagedForRemoval());
 
             mergeCommit.saveMergeCommit();
@@ -1191,18 +1176,20 @@ public class Repo {
         public Commit latestCommonAncestor(Commit currHead, Commit branchHead) {
             HashSet<String> branchPath = new HashSet<>();
             buildBranchHashSet(branchPath, branchHead);
+//            System.out.println("***** branch map *********");
+//            branchPath.forEach(b -> System.out.println(b));
 
             HashMap<Commit, Integer> ancestors = new HashMap<>();
+
             getAncestors(ancestors, branchPath, currHead, 0);
-
-
             Commit LCA = null;
             Integer minDepth = -1;
 
-
+//            System.out.println("***** ancestors *********");
             for (Map.Entry<Commit, Integer> entry : ancestors.entrySet()) {
                 Commit node = entry.getKey();
                 Integer depth = entry.getValue();
+//                System.out.println("=>" + node.getSHA() + " : " + depth);
                 if (minDepth < 0) {
                     minDepth = depth;
                     LCA = node;
@@ -1216,9 +1203,9 @@ public class Repo {
         }
 
         public void getAncestors(HashMap<Commit, Integer> ancestors,
-                           HashSet<String> branchPath,
-                           Commit currHead,
-                           Integer depth) {
+                                 HashSet<String> branchPath,
+                                 Commit currHead,
+                                 Integer depth) {
             if (currHead.getFirstParentSHA1().equals(INIT_PARENT_SHA1)) {
                 return;
             }
