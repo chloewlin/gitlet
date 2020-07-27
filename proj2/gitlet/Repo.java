@@ -1082,9 +1082,9 @@ public class Repo {
                 String givenBlob = given.get(givenFileName);
                 String currBlob = curr.get(givenFileName);
 
-                // TODO: HAS BUG
-                if (currBlob.contains(givenFileName) && SP.get(givenFileName) != null) {
-                    if (SP.get(givenFileName) == null && !currBlob.equals(givenBlob)) {
+                // TODO: Changed
+                if (curr.containsKey(givenFileName) && !SP.containsKey(givenFileName)) {
+                    if (!currBlob.equals(givenBlob)) {
                         hasConflict = true;
                         createConflictFile(currBlob, givenBlob);
                     }
