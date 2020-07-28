@@ -18,9 +18,6 @@ public class SimpleNameMap {
         for (int i = 0; i < this.map.length; i++){
             this.map[i] = new LinkedList<>();
         }
-        for (int i = 0; i < this.resizeMap.length; i++){
-            this.resizeMap[i] = new LinkedList<>();
-        }
     }
 
     /* Returns the number of items contained in this map. */
@@ -36,21 +33,13 @@ public class SimpleNameMap {
     public boolean containsKey(String key) {
         int index = getIndex(key);
         List<Entry> linkedList = this.map[index];
-//        boolean found = false;
 
-        Iterator<Entry> iter = linkedList.iterator();
-
-        while (iter.hasNext()) {
-            Entry entry = iter.next();
-
-            System.out.println("=====> " + key + " " + entry.value);
+        for (Entry entry : linkedList) {
             if (entry.key.equals(key)) {
                 return true;
-//                found = true;
             }
         }
 
-//        return found;
         return false;
     }
 
@@ -60,22 +49,19 @@ public class SimpleNameMap {
         int index = getIndex(key);
         List<Entry> linkedList = this.map[index];
 
-        Iterator<Entry> iter = linkedList.iterator();
-
-        while (iter.hasNext()) {
-
-            Entry entry = iter.next();
-
+        for (Entry entry : linkedList) {
             if (entry.key.equals(key)) {
                 return entry.value;
             }
         }
 
-//        return "Not found";
         return null;
     }
 
     public void resize() {
+        for (int i = 0; i < this.resizeMap.length; i++){
+            this.resizeMap[i] = new LinkedList<>();
+        }
         for (int i = 0; i < this.map.length; i++){
             this.resizeMap[i] = this.map[i];
         }
@@ -85,27 +71,17 @@ public class SimpleNameMap {
     /* Puts a (KEY, VALUE) pair into this map. If the KEY already exists in the
        SimpleNameMap, replace the current corresponding value with VALUE. */
     public void put(String key, String value) {
-        int index = getIndex(key);
-        List<Entry> linkedList = this.map[index];
-        Iterator<Entry> iter = linkedList.iterator();
-
-        boolean found = false;
-
-        while (iter.hasNext()) {
-            Entry entry = iter.next();
-            if (count / this.map.length < this.map.length) {
-                if (entry.equals(key)) {
-                    found = true;
-                    entry.value = value;
-                }
-            }
+        if (count / this.map.length < this.map.length) {
+            int index = getIndex(key);
+            List<Entry> linkedList = this.map[index];
+            linkedList.add(new Entry(key, value));
+        } else {
+            resize();
+            int index = getIndex(key);
+            List<Entry> linkedList = this.map[index];
+            linkedList.add(new Entry(key, value));
         }
-        if (!found) {
-            Entry newEntry = new Entry(key, value);
-            linkedList.add(newEntry);
-        }
-        this.count = this.count + 1;
-
+        count++;
     }
 
     /* Removes a single entry, KEY, from this table and return the VALUE if
@@ -113,22 +89,9 @@ public class SimpleNameMap {
     public String remove(String key) {
         int index = getIndex(key);
         List<Entry> linkedList = this.map[index];
-//        Iterator<Entry> iter = linkedList.iterator();
-//
+
         String value = null;
-//
-//        while (iter.hasNext()) {
-//            Entry entry = iter.next();
-//
-//            if (entry.key.equals(key)) {
-//                value = entry.value;
-//                System.out.println("found ======> " + entry.key + " " + entry.value);
-//               linkedList.remove(entry.key);
-//            }
-//        }
-//
-//        this.count--;
-//        return value;
+
         for (Entry entry : linkedList) {
             if (entry.key.equals(key)) {
                 value = entry.value;
@@ -176,18 +139,14 @@ public class SimpleNameMap {
 
         map.put("Christal", "Huang");
         map.put("Chloe", "Lin");
-        System.out.println(Christal.equals(Christal2)); // true
-        System.out.println(Christal.hashCode()); // 1406718218
         System.out.println(map.containsKey("Christal")); // true
         System.out.println(map.containsKey("Chloe")); // true
         System.out.println(map.containsKey("Cat")); // false
         System.out.println(map.size()); // 2
 
-        System.out.println(map.remove("Chloe"));
-
+        System.out.println(map.remove("Chloe")); // Lin
         System.out.println(map.containsKey("Chloe")); // false
         System.out.println(map.size()); // 1
-//
         System.out.println(map.get("Christal")); // Huang
     }
 }
