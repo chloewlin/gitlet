@@ -71,16 +71,25 @@ public class SimpleNameMap {
     /* Puts a (KEY, VALUE) pair into this map. If the KEY already exists in the
        SimpleNameMap, replace the current corresponding value with VALUE. */
     public void put(String key, String value) {
-        if (count / this.map.length < this.map.length) {
+        if (containsKey(key)) {
             int index = getIndex(key);
             List<Entry> linkedList = this.map[index];
-            linkedList.add(new Entry(key, value));
-        } else {
-            resize();
-            int index = getIndex(key);
-            List<Entry> linkedList = this.map[index];
-            linkedList.add(new Entry(key, value));
+
+            for (Entry entry : linkedList) {
+                if (entry.key.equals(key)) {
+                    entry.value = value;
+                    return;
+                }
+            }
         }
+
+        if (count / this.map.length > this.map.length) {
+            resize();
+        }
+
+        int index = getIndex(key);
+        List<Entry> linkedList = this.map[index];
+        linkedList.add(new Entry(key, value));
         count++;
     }
 
@@ -98,6 +107,7 @@ public class SimpleNameMap {
                 linkedList.remove(entry);
             }
         }
+
         this.count--;
         return value;
     }
@@ -138,15 +148,19 @@ public class SimpleNameMap {
         SimpleNameMap map = new SimpleNameMap();
 
         map.put("Christal", "Huang");
+        map.put("Chloe", "Forrester");
         map.put("Chloe", "Lin");
+        map.put("Parth", "Gupta");
         System.out.println(map.containsKey("Christal")); // true
         System.out.println(map.containsKey("Chloe")); // true
         System.out.println(map.containsKey("Cat")); // false
-        System.out.println(map.size()); // 2
+        System.out.println(map.size()); // 3
 
         System.out.println(map.remove("Chloe")); // Lin
         System.out.println(map.containsKey("Chloe")); // false
-        System.out.println(map.size()); // 1
+        System.out.println(map.size()); // 2
         System.out.println(map.get("Christal")); // Huang
+        System.out.println(map.containsKey("Parth")); // true
+
     }
 }
