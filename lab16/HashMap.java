@@ -1,22 +1,36 @@
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 public class HashMap<K, V> implements Map61BL<K, V> {
     /* TODO: Instance variables here */
-    private List<HashMap.Entry<K, V>>[] map = new List[26];
-    private List<HashMap.Entry<K, V>>[] resizeMap = new List[map.length * 2];
+    private LinkedList<Entry<K, V>>[] map;
     private Integer count;
+    private double loadFactor;
 
-//    public int hash(String key) {
-//        return key.charAt(0) - 'A';
-//    }
-
+    /* Creates a new hash map with a default array of size 16 and a maximum load factor of 0.75. */
     public HashMap() {
+        this(16, 0.75);
+    }
+
+    /* Creates a new hash map with an array of size INITIALCAPACITY and a maximum load factor of 0.75. */
+    public HashMap(int initialCapacity) {
+        this(initialCapacity, 0.75);
+    }
+
+    /* Creates a new hash map with INITIALCAPACITY and LOADFACTOR. */
+    public HashMap(int initialCapacity, double loadFactor) {
         this.count = 0;
+        this.map = new LinkedList[initialCapacity];
         for (int i = 0; i < this.map.length; i++){
-            this.map[i] = new LinkedList<>();
+            this.map[i] = new LinkedList<Entry<K, V>>();
         }
+        this.loadFactor = loadFactor;
+    }
+
+    /* Returns the length of this HashMap's internal array. */
+    public int capacity() {
+        return this.map.length;
     }
 
     /* Returns the number of items contained in this map. */
@@ -24,16 +38,16 @@ public class HashMap<K, V> implements Map61BL<K, V> {
         return this.count;
     }
 
-    public int getIndex(K key) {
-        return Math.floorMod(key.hashCode(), this.map.length);
+    public int getIndex(K key, int arrayLength) {
+        return Math.floorMod(key.hashCode(), arrayLength);
     }
 
     /* Returns true if the map contains the KEY. */
     public boolean containsKey(K key) {
-        int index = getIndex(key);
-        List<HashMap.Entry<K, V>> linkedList = this.map[index];
+        int index = getIndex(key, capacity());
+        LinkedList<Entry<K, V>> linkedList = this.map[index];
 
-        for (HashMap.Entry<K, V> entry : linkedList) {
+        for (Entry<K, V> entry : linkedList) {
             if (entry.key.equals(key)) {
                 return true;
             }
@@ -45,8 +59,8 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     /* Returns the value for the specified KEY. If KEY is not found, return
        null. */
     public V get(K key) {
-        int index = getIndex(key);
-        List<HashMap.Entry<K, V>> linkedList = this.map[index];
+        int index = getIndex(key, capacity());
+        LinkedList<HashMap.Entry<K, V>> linkedList = this.map[index];
 
         for (HashMap.Entry<K, V> entry : linkedList) {
             if (entry.key.equals(key)) {
@@ -58,38 +72,57 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     }
 
     public void resize() {
-        for (int i = 0; i < this.resizeMap.length; i++){
-            this.resizeMap[i] = new LinkedList<>();
+        int newSize = this.map.length * 2;
+        LinkedList<Entry<K, V>>[] resizedMap = new LinkedList[newSize];
+
+        for (int i = 0; i < resizedMap.length; i++){
+            resizedMap[i] = new LinkedList<Entry<K, V>>();
         }
+
         for (int i = 0; i < this.map.length; i++){
-            this.resizeMap[i] = this.map[i];
+            for (HashMap.Entry<K, V> entry : this.map[i]) {
+                 int newKey = getIndex(entry.key, newSize);
+                 LinkedList<Entry<K, V>> linkedList = resizedMap[newKey];
+                 linkedList.add(entry);
+            }
         }
-        this.map = this.resizeMap;
+
+        this.map = resizedMap;
     }
 
     /* Puts a (KEY, VALUE) pair into this map. If the KEY already exists in the
        SimpleNameMap, replace the current corresponding value with VALUE. */
     public void put(K key, V value) {
-        if (count / this.map.length < this.map.length) {
-            int index = getIndex(key);
-            List<HashMap.Entry<K, V>> linkedList = this.map[index];
-            linkedList.add(new HashMap.Entry<K, V>(key, value));
-        } else {
-            resize();
-            int index = getIndex(key);
-            List<HashMap.Entry<K, V>> linkedList = this.map[index];
-            linkedList.add(new HashMap.Entry<K, V>(key, value));
+
+        if (containsKey(key)) {
+            int index = getIndex(key, this.map.length);
+            LinkedList<Entry<K, V>> linkedList = this.map[index];
+            for (HashMap.Entry<K, V> entry : linkedList) {
+                if (entry.key.equals(key)) {
+                    entry.value = value;
+                    return;
+                }
+            }
         }
+
         count++;
+        double currLoadFactor = (double)count / this.map.length;
+        if (currLoadFactor > this.loadFactor) {
+            resize();
+        }
+
+        int index = getIndex(key, capacity());
+        LinkedList<Entry<K, V>> linkedList = this.map[index];
+        linkedList.add(new HashMap.Entry<K, V>(key, value));
     }
 
     /* Removes a single entry, KEY, from this table and return the VALUE if
        successful or NULL otherwise. */
     @Override
     public V remove(K key) {
-        int index = getIndex(key);
-        List<HashMap.Entry<K, V>> linkedList = this.map[index];
-
+        count--;
+        int index = getIndex(key, capacity());
+        LinkedList<Entry<K, V>> linkedList = this.map[index];
         V removedValue = null;
 
         for (HashMap.Entry<K, V> entry : linkedList) {
@@ -99,19 +132,17 @@ public class HashMap<K, V> implements Map61BL<K, V> {
             }
         }
 
-        this.count--;
         return removedValue;
     }
 
     @Override
     public boolean remove(K key, V value) {
-        int index = getIndex(key);
-        List<HashMap.Entry<K, V>> linkedList = this.map[index];
-
+        count--;
+        int index = getIndex(key, capacity());
+        LinkedList<Entry<K, V>> linkedList = this.map[index];
 
         for (HashMap.Entry<K, V> entry : linkedList) {
             if (entry.key.equals(key)) {
-                this.count--;
                 linkedList.remove(entry);
                 return true;
             }
@@ -121,7 +152,11 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     }
 
     public void clear() {
-
+        this.map = new LinkedList[this.capacity()];
+        for (int i = 0; i < this.map.length; i++){
+            this.map[i] = new LinkedList<Entry<K, V>>();
+        }
+        this.count = 0;
     }
 
     public Iterator<K> iterator() {
@@ -156,5 +191,4 @@ public class HashMap<K, V> implements Map61BL<K, V> {
             return super.hashCode();
         }
     }
-
 }
