@@ -161,7 +161,7 @@ public class HashMapTest {
         assertTrue(studentIDs.containsKey("jay"));
 
         // ensure that containsKey does not always return true
-        assertFalse(studentIDs.containsKey("jay"));
+//        assertFalse(studentIDs.containsKey("jay"));
         assertFalse(studentIDs.containsKey("travis"));
         assertFalse(studentIDs.containsKey("ryan"));
         studentIDs.put("ryan", 162);
