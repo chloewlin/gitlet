@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 /* A MinHeap class of Comparable elements backed by an ArrayList. */
@@ -7,8 +8,7 @@ public class MinHeap<E extends Comparable<E>> {
     /* An ArrayList that stores the elements in this MinHeap. */
     private ArrayList<E> contents;
     private int size;
-    // TODO: YOUR CODE HERE (no code should be needed here if not 
-    // implementing the more optimized version)
+    private HashMap<E, Integer> elementPositions = new HashMap<E, Integer>();
 
     /* Initializes an empty MinHeap. */
     public MinHeap() {
@@ -122,10 +122,13 @@ public class MinHeap<E extends Comparable<E>> {
         setElement(size + 1, element);
         int currentIndex = size + 1;
         E parent = getElement(getParentOf(currentIndex));
+        elementPositions.put(element, currentIndex);
+
         while (parent != null && element.compareTo(parent) < 0) {
             bubbleUp(currentIndex);
+            elementPositions.put(parent, currentIndex);
             currentIndex = getParentOf(currentIndex);
-//            System.out.println("====> currentIndex " + currentIndex);
+            elementPositions.put(element, currentIndex);
             parent = getElement(getParentOf(currentIndex));
         }
         this.size++;
@@ -139,9 +142,13 @@ public class MinHeap<E extends Comparable<E>> {
         this.contents.remove(this.size);
         int currentIndex = 1;
         E minChild = getElement(min(getLeftOf(currentIndex), getRightOf(currentIndex)));
+        elementPositions.remove(prevMin);
+
         while (minChild != null && getElement(currentIndex).compareTo(minChild) > 0) {
             bubbleDown(currentIndex);
+            elementPositions.put(minChild, currentIndex);
             currentIndex = min(getLeftOf(currentIndex), getRightOf(currentIndex));
+            elementPositions.put(lastEl, currentIndex);
             minChild = getElement(min(getLeftOf(currentIndex), getRightOf(currentIndex)));
         }
         if (this.size == 0) return prevMin;
@@ -154,25 +161,29 @@ public class MinHeap<E extends Comparable<E>> {
        not exist in the MinHeap, throw a NoSuchElementException. Item equality
        should be checked using .equals(), not ==. */
     public void update(E element) {
-        for (int i = 0; i <= this.contents.size(); i++) {
-            if (this.contents.get(i).equals(element)) {
-                this.contents.set(i, element);
-                return;
-            }
+//        for (int i = 0; i <= this.contents.size(); i++) {
+//            if (this.contents.get(i).equals(element)) {
+//                this.contents.set(i, element);
+//                return;
+//            }
+//        }
+        if (!contains(element)) {
+            throw new NoSuchElementException();
         }
 
-        throw new NoSuchElementException();
+        int index = elementPositions.get(element);
+        this.contents.set(index, element);
     }
 
     /* Returns true if ELEMENT is contained in the MinHeap. Item equality should
        be checked using .equals(), not ==. */
     public boolean contains(E element) {
-        for (int i = 1; i <= this.contents.size(); i++) {
-            if (this.contents.get(i).equals(element)) {
-                return true;
-            }
-        }
+//        for (int i = 1; i <= this.contents.size(); i++) {
+//            if (this.contents.get(i).equals(element)) {
+//                return true;
+//            }
+//        }
 
-        return false;
+        return elementPositions.containsKey(element);
     }
 }
