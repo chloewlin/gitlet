@@ -33,33 +33,55 @@ public class Graph implements Iterable<Integer> {
        Edge already exists, replaces the current Edge with a new Edge with
        weight WEIGHT. */
     public void addEdge(int v1, int v2, int weight) {
-        // TODO: YOUR CODE HERE
+        Edge edge = new Edge(v1, v2, weight);
+        this.adjLists[v1].add(edge);
     }
 
     /* Adds an undirected Edge (V1, V2) to the graph with weight WEIGHT. If the
        Edge already exists, replaces the current Edge with a new Edge with
        weight WEIGHT. */
     public void addUndirectedEdge(int v1, int v2, int weight) {
-        // TODO: YOUR CODE HERE
+        Edge edge1 = new Edge(v1, v2, weight);
+        this.adjLists[v1].add(edge1);
+        Edge edge2 = new Edge(v2, v1, weight);
+        this.adjLists[v2].add(edge2);
     }
 
     /* Returns true if there exists an Edge from vertex FROM to vertex TO.
        Returns false otherwise. */
     public boolean isAdjacent(int from, int to) {
-        // TODO: YOUR CODE HERE
+        LinkedList<Edge> list = this.adjLists[from];
+        for (Edge edge : list) {
+            if (edge.to == to) {
+                return true;
+            }
+        }
+
         return false;
     }
 
     /* Returns a list of all the vertices u such that the Edge (V, u)
        exists in the graph. */
     public List<Integer> neighbors(int v) {
-        // TODO: YOUR CODE HERE
-        return null;
+        List<Integer> neighbors = new ArrayList<>();
+        LinkedList<Edge> list = this.adjLists[v];
+        for (Edge edge : list) {
+            neighbors.add(edge.to);
+        }
+
+        return neighbors;
     }
     /* Returns the number of incoming Edges for vertex V. */
     public int inDegree(int v) {
-        // TODO: YOUR CODE HERE
-        return 0;
+        int inDegree = 0;
+        for (LinkedList<Edge> list : this.adjLists) {
+            for (Edge edge : list) {
+                if (edge.to == v) {
+                    inDegree++;
+                }
+            }
+        }
+        return inDegree;
     }
 
     /* Returns an Iterator that outputs the vertices of the graph in topological
