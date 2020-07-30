@@ -131,6 +131,7 @@ public class MinHeap<E extends Comparable<E>> {
             elementPositions.put(element, currentIndex);
             parent = getElement(getParentOf(currentIndex));
         }
+
         this.size++;
     }
 
@@ -142,15 +143,24 @@ public class MinHeap<E extends Comparable<E>> {
         this.contents.remove(this.size);
         int currentIndex = 1;
         E minChild = getElement(min(getLeftOf(currentIndex), getRightOf(currentIndex)));
+        elementPositions.put(lastEl, currentIndex);
         elementPositions.remove(prevMin);
 
         while (minChild != null && getElement(currentIndex).compareTo(minChild) > 0) {
+            int minChildIndex = min(getLeftOf(currentIndex), getRightOf(currentIndex));
             bubbleDown(currentIndex);
             elementPositions.put(minChild, currentIndex);
-            currentIndex = min(getLeftOf(currentIndex), getRightOf(currentIndex));
+            currentIndex = minChildIndex;
             elementPositions.put(lastEl, currentIndex);
             minChild = getElement(min(getLeftOf(currentIndex), getRightOf(currentIndex)));
         }
+//
+//        System.out.println("========== after remove =======");
+//        elementPositions.forEach((e, v) -> {
+//            System.out.println(e + " : " + v);
+//        });
+
+
         if (this.size == 0) return prevMin;
         this.size--;
         return prevMin;
@@ -171,8 +181,33 @@ public class MinHeap<E extends Comparable<E>> {
             throw new NoSuchElementException();
         }
 
-        int index = elementPositions.get(element);
-        this.contents.set(index, element);
+        int currentIndex = elementPositions.get(element);
+        this.contents.set(currentIndex, element);
+
+        E parent = getElement(getParentOf(currentIndex));
+        E minChild = getElement(min(getLeftOf(currentIndex), getRightOf(currentIndex)));
+        boolean goingUp = false;
+
+        if (parent != null && element.compareTo(parent) <0) {
+            goingUp = true;
+            while (parent != null && element.compareTo(parent) < 0) {
+                bubbleUp(currentIndex);
+                elementPositions.put(parent, currentIndex);
+                currentIndex = getParentOf(currentIndex);
+                elementPositions.put(element, currentIndex);
+                parent = getElement(getParentOf(currentIndex));
+            }
+        } else {
+            while (minChild != null && getElement(currentIndex).compareTo(minChild) > 0) {
+                int minChildIndex = min(getLeftOf(currentIndex), getRightOf(currentIndex));
+                bubbleDown(currentIndex);
+                elementPositions.put(minChild, currentIndex);
+                currentIndex = minChildIndex;
+                elementPositions.put(element, currentIndex);
+                minChild = getElement(min(getLeftOf(currentIndex), getRightOf(currentIndex)));
+            }
+        }
+
     }
 
     /* Returns true if ELEMENT is contained in the MinHeap. Item equality should
