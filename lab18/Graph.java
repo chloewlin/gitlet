@@ -1,9 +1,4 @@
-import java.util.LinkedList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
-import java.util.Stack;
-import java.util.HashSet;
+import java.util.*;
 
 public class Graph implements Iterable<Integer> {
 
@@ -157,19 +152,88 @@ public class Graph implements Iterable<Integer> {
         return result;
     }
 
-    /* Returns true iff there exists a path from START to STOP. Assumes both
+    /* Returns true if there exists a path from START to STOP. Assumes both
        START and STOP are in this graph. If START == STOP, returns true. */
     public boolean pathExists(int start, int stop) {
-        // TODO: YOUR CODE HERE
+        List<Integer> visited = dfs(start);
+
+        if (start == stop) {
+            return true;
+        }
+
+        if (visited.contains(stop)) {
+            return true;
+        }
+
         return false;
     }
 
 
-    /* Returns the path from START to STOP. If no path exists, returns an empty
-       List. If START == STOP, returns a List with START. */
+    /** Returns the path from START to STOP. If no path exists, returns an empty
+     * List. If START == STOP, returns a List with START.
+
+       Hint: Base your method on dfs, with the following differences. First,
+       add code to stop calling next when you encounter the finish vertex.
+       Then, trace back from the finish vertex to the start, by first
+       finding a visited vertex u for which (u, finish) is an edge,
+       then a vertex v visited earlier than u for which (v, u) is an
+       edge, and so on, finally finding a vertex w for which (start, w)
+       is an edge (isAdjacent may be useful here!). Collecting all these
+       vertices in the correct sequence produces the desired path.
+       We recommend that you try this by hand with a graph or two
+       to see that it works.
+     */
     public List<Integer> path(int start, int stop) {
-        // TODO: YOUR CODE HERE
-        return null;
+        List<Integer> path = new ArrayList<>();
+
+        if (!pathExists(start, stop)) {
+            return path;
+        }
+
+        if (start == stop) {
+            path.add(start);
+            return path;
+        }
+
+        DFSIterator iter = new DFSIterator(start);
+
+        while (iter.hasNext()) {
+            Integer next = iter.next();
+            if (next == stop) {
+                break;
+            }
+        }
+
+        Stack<Integer> pathStack = new Stack<>();
+        HashSet<Integer> visitedPath = new HashSet<>();
+        visitedPath.add(stop);
+        Integer currentNode = stop;
+        pathStack.push(stop);
+
+        while (currentNode != start) {
+            boolean foundAdjacency = false;
+
+            for (int v : iter.visited) {
+                if (isAdjacent(v, currentNode) && !visitedPath.contains(v)) {
+                    pathStack.push(v);
+                    visitedPath.add(v);
+                    currentNode = v;
+                    foundAdjacency = true;
+                    break;
+                }
+            }
+
+            if (foundAdjacency == false) {
+                pathStack.pop();
+                currentNode = pathStack.peek();
+            }
+        }
+
+        while (!pathStack.isEmpty()) {
+            path.add(pathStack.pop());
+        }
+
+        return path;
     }
 
     public List<Integer> topologicalSort() {
