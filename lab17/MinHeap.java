@@ -125,7 +125,8 @@ public class MinHeap<E extends Comparable<E>> {
         while (parent != null && element.compareTo(parent) < 0) {
             bubbleUp(currentIndex);
             currentIndex = getParentOf(currentIndex);
-            parent = getElement(currentIndex);
+//            System.out.println("====> currentIndex " + currentIndex);
+            parent = getElement(getParentOf(currentIndex));
         }
         this.size++;
     }
@@ -141,7 +142,7 @@ public class MinHeap<E extends Comparable<E>> {
         while (minChild != null && getElement(currentIndex).compareTo(minChild) > 0) {
             bubbleDown(currentIndex);
             currentIndex = min(getLeftOf(currentIndex), getRightOf(currentIndex));
-            minChild = getElement(currentIndex);
+            minChild = getElement(min(getLeftOf(currentIndex), getRightOf(currentIndex)));
         }
         if (this.size == 0) return prevMin;
         this.size--;
