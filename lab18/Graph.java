@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class Graph implements Iterable<Integer> {
@@ -248,22 +249,43 @@ public class Graph implements Iterable<Integer> {
     private class TopologicalIterator implements Iterator<Integer> {
 
         private Stack<Integer> fringe;
-
-        // TODO: Instance variables here!
+        private int[] currentInDegree;
+        private HashSet<Integer> visited;
 
         TopologicalIterator() {
             fringe = new Stack<Integer>();
-            // TODO: YOUR CODE HERE
+            this.currentInDegree = new int[vertexCount];
+            this.visited = new HashSet<>();
+            for (int i = 0; i < this.currentInDegree.length; i++) {
+                if (inDegree(i) == 0) {
+                    fringe.push(i);
+                }
+                this.currentInDegree[i] = inDegree(i);
+            }
         }
 
         public boolean hasNext() {
-            // TODO: YOUR CODE HERE
-            return false;
+            return !fringe.isEmpty();
         }
 
         public Integer next() {
-            // TODO: YOUR CODE HERE
-            return 0;
+            int removed = fringe.pop();
+            visited.add(removed);
+
+            for (int i : neighbors(removed)) {
+                this.currentInDegree[i]--;
+            }
+
+            for (int i = 0; i < this.currentInDegree.length; i++) {
+                if (this.currentInDegree[i] == 0) {
+                    if (!visited.contains(i)) {
+                        fringe.push(i);
+                        visited.add(i);
+                    }
+                }
+            }
+
+            return removed;
         }
 
         public void remove() {
