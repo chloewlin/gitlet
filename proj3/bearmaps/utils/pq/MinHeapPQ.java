@@ -1,3 +1,5 @@
+package bearmaps.utils.pq;
+
 /* A PriorityQueue class that uses a min heap to maintain ordering. */
 public class MinHeapPQ<T> implements PriorityQueue<T> {
 

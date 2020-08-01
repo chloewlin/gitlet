@@ -1,7 +1,5 @@
 package bearmaps;
 
-import bearmaps.utils.graph.AStarSolver;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
