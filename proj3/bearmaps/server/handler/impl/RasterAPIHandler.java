@@ -86,18 +86,54 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
     public Map<String, Object> processRequest(Map<String, Double> requestParams, Response response) {
         System.out.println(requestParams);
         Map<String, Object> results = new HashMap<>();
-        double lowerRightLon = requestParams.get("lrlon");
-        double upperLeftLon = requestParams.get("ullon");
-        double upperLeftLat = requestParams.get("ullat");
-        double lowerRightLat = requestParams.get("lrlat");
-        double width = requestParams.get("w");
-        double height = requestParams.get("h");
-        System.out.println("lowerRightLon " + lowerRightLon);
-        System.out.println("upperLeftLon " + upperLeftLon);
-        System.out.println("upperLeftLat " + upperLeftLat);
-        System.out.println("lowerRightLat " + lowerRightLat);
+        double queryBoxUpperLeftLon = requestParams.get("ullon");
+        double queryBoxUpperLeftLat = requestParams.get("ullat");
+        double queryBoxLowerRightLon = requestParams.get("lrlon");
+        double queryBoxLowerRightLat = requestParams.get("lrlat");
+        double queryBoxWidth = requestParams.get("w");
+        double queryBoxHeight = requestParams.get("h");
+        double longitudinalDistancePerPixel =
+                (queryBoxLowerRightLon - queryBoxUpperLeftLon) / queryBoxWidth;
+        double longitudinalDistancePerTile = longitudinalDistancePerPixel * Constants.TILE_SIZE;
+        System.out.println("longitudinalDistancePerTile: " + longitudinalDistancePerTile);
+        double resultUpperLeftLon =
+                (queryBoxUpperLeftLon - Constants.ROOT_ULLON) / longitudinalDistancePerTile;
+        double resultLowerRightLon =
+                (queryBoxLowerRightLon - queryBoxUpperLeftLon) / longitudinalDistancePerTile;
+
+        System.out.println("resultUpperLeftLon: " + resultUpperLeftLon);
+        System.out.println("resultLowerRightLon: " + resultLowerRightLon);
+
+        int startingTile = 1 + (int) Math.ceil(resultUpperLeftLon);
+        int endingTile = startingTile + 1 + (int) Math.ceil(resultLowerRightLon);
+
+        System.out.println("startingTile: " + startingTile);
+        System.out.println("endingTile: " + endingTile);
+
+        int depth = endingTile - startingTile;
+
+        System.out.println("depth: " + depth);
 
 
+        File imagesFile = new File(Constants.BASE_DIR_PATH, "d0_x0_y0.png");
+
+        String[][] filesToDisplay = new String[depth][depth];
+
+        for (int r = 0; r < depth; r++) {
+            for (int c = 0; c < depth; c++) {
+                String image = "d" + depth + "_x10_y3.png";
+
+            }
+        }
+
+
+        results.put("render_grid", filesToDisplay);
+        results.put("raster_ul_lon", queryBoxUpperLeftLon);
+        results.put("raster_ul_lat", queryBoxUpperLeftLat);
+        results.put("raster_lr_lon", queryBoxLowerRightLon);
+        results.put("raster_lr_lat", queryBoxLowerRightLat);
+        results.put("depth", depth);
+        results.put("query_success", true);
 
 
         return results;
@@ -119,11 +155,11 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
     private Map<String, Object> queryFail() {
         Map<String, Object> results = new HashMap<>();
         results.put("render_grid", null);
-        results.put("raster_ul_lon", 0);
-        results.put("raster_ul_lat", 0);
-        results.put("raster_lr_lon", 0);
-        results.put("raster_lr_lat", 0);
-        results.put("depth", 0);
+        results.put("raster_ul_lon", 0.0);
+        results.put("raster_ul_lat", 0.0);
+        results.put("raster_lr_lon", 0.0);
+        results.put("raster_lr_lat", 0.0);
+        results.put("depth", 0.0);
         results.put("query_success", false);
         return results;
     }
