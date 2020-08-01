@@ -84,11 +84,22 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
      */
     @Override
     public Map<String, Object> processRequest(Map<String, Double> requestParams, Response response) {
-        //System.out.println("yo, wanna know the parameters given by the web browser? They are:");
-        //System.out.println(requestParams);
+        System.out.println(requestParams);
         Map<String, Object> results = new HashMap<>();
-        System.out.println("Since you haven't implemented RasterAPIHandler.processRequest, nothing is displayed in "
-                + "your browser.");
+        double lowerRightLon = requestParams.get("lrlon");
+        double upperLeftLon = requestParams.get("ullon");
+        double upperLeftLat = requestParams.get("ullat");
+        double lowerRightLat = requestParams.get("lrlat");
+        double width = requestParams.get("w");
+        double height = requestParams.get("h");
+        System.out.println("lowerRightLon " + lowerRightLon);
+        System.out.println("upperLeftLon " + upperLeftLon);
+        System.out.println("upperLeftLat " + upperLeftLat);
+        System.out.println("lowerRightLat " + lowerRightLat);
+
+
+
+
         return results;
     }
 
