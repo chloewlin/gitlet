@@ -1,3 +1,5 @@
+package bearmaps.utils.pq;
+
 import java.util.ArrayList;
 
 /* A MinHeap class of Comparable elements backed by an ArrayList. */
