@@ -17,8 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static bearmaps.utils.Constants.SEMANTIC_STREET_GRAPH;
-import static bearmaps.utils.Constants.ROUTE_LIST;
+import static bearmaps.utils.Constants.*;
 
 /**
  * Handles requests from the web browser for map images. These images
@@ -49,6 +48,10 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
     @Override
     protected Map<String, Double> parseRequestParams(Request request) {
         return getRequestParams(request, REQUIRED_RASTER_REQUEST_PARAMS);
+    }
+
+    double ldpp(double lonDist, double width) {
+        return lonDist / width;
     }
 
     /**
@@ -82,13 +85,91 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
      * "query_success" : Boolean, whether the query was able to successfully complete; don't
      *                    forget to set this to true on success! <br>
      */
+
     @Override
     public Map<String, Object> processRequest(Map<String, Double> requestParams, Response response) {
-        //System.out.println("yo, wanna know the parameters given by the web browser? They are:");
-        //System.out.println(requestParams);
+        // System.out.println(requestParams);
         Map<String, Object> results = new HashMap<>();
-        System.out.println("Since you haven't implemented RasterAPIHandler.processRequest, nothing is displayed in "
-                + "your browser.");
+        double queryBoxUpperLeftLon = requestParams.get("ullon");
+        double queryBoxUpperLeftLat = requestParams.get("ullat");
+        double queryBoxLowerRightLon = requestParams.get("lrlon");
+        double queryBoxLowerRightLat = requestParams.get("lrlat");
+        double queryBoxWidth = requestParams.get("w");
+
+        if (queryBoxLowerRightLon < ROOT_ULLON
+                || queryBoxLowerRightLat > ROOT_ULLAT
+                || queryBoxUpperLeftLon > ROOT_LRLON
+                || queryBoxUpperLeftLat < ROOT_LRLAT
+                || queryBoxLowerRightLon < queryBoxUpperLeftLon
+                || queryBoxUpperLeftLat < queryBoxLowerRightLat) {
+            return queryFail();
+        }
+
+        double requestLdpp = ldpp(queryBoxLowerRightLon - queryBoxUpperLeftLon,
+                queryBoxWidth);
+
+        int rasterDepth = 7;
+        double lonDist = ROOT_LRLON - ROOT_ULLON;
+        for (int i = 0; i < 8; i++) {
+            if (ldpp(lonDist, TILE_SIZE) <= requestLdpp) {
+                rasterDepth = i;
+                break;
+            }
+            lonDist = lonDist / 2;
+        }
+        int tileSpan = (int) Math.pow(2, rasterDepth);
+        double tileLon = (ROOT_LRLON - ROOT_ULLON) / tileSpan;
+        double tileLat = (ROOT_ULLAT - ROOT_LRLAT) / tileSpan;
+        // System.out.println("just right: " + ldpp(lonDist, TILE_SIZE) + " depth: " + rasterDepth);
+        // System.out.println("full map lon: " + (ROOT_LRLON - ROOT_ULLON) + "full map lat: " +
+        // (ROOT_ULLAT - ROOT_LRLAT));
+        // System.out.println("tileLon: " + tileLon + " tileLat: " + tileLat);
+
+        int tileXIndexStart = 0;
+        double rasterUpperLeftLon = ROOT_ULLON;
+        int tileYIndexStart = 0;
+        double rasterUpperLeftLat = ROOT_ULLAT;
+        int tileXIndexEnd = tileSpan - 1;
+        double rasterLowerRightLon = ROOT_LRLON;
+        int tileYIndexEnd = tileSpan - 1;
+        double rasterLowerRightLat = ROOT_LRLAT;
+
+        if (queryBoxUpperLeftLon > ROOT_ULLON) {
+            tileXIndexStart = (int) Math.floor((queryBoxUpperLeftLon - ROOT_ULLON) / tileLon);
+            rasterUpperLeftLon = tileXIndexStart * tileLon + ROOT_ULLON;
+        }
+        if (queryBoxUpperLeftLat > ROOT_LRLAT) {
+            tileYIndexStart = (int) Math.floor((ROOT_ULLAT - queryBoxUpperLeftLat) / tileLat);
+            rasterUpperLeftLat = -(tileYIndexStart * tileLat) + ROOT_ULLAT;
+        }
+        if (queryBoxLowerRightLon < ROOT_LRLON) {
+            tileXIndexEnd = (int) Math.floor((queryBoxLowerRightLon - ROOT_ULLON) / tileLon);
+            rasterLowerRightLon = (tileXIndexEnd + 1) * tileLon + ROOT_ULLON;
+        }
+        if (queryBoxLowerRightLat < ROOT_ULLAT) {
+            tileYIndexEnd = (int) Math.floor((ROOT_ULLAT - queryBoxLowerRightLat) / tileLat);
+            rasterLowerRightLat = -(tileYIndexEnd + 1) * tileLat + ROOT_ULLAT;
+        }
+
+        int numTilesWidth = tileXIndexEnd - tileXIndexStart + 1;
+        int numTilesHeight = tileYIndexEnd - tileYIndexStart + 1;
+
+        String[][] renderGrid = new String[numTilesHeight][numTilesWidth];
+        for (int x = tileXIndexStart; x <= tileXIndexEnd; x++) {
+            for (int y = tileYIndexStart; y <= tileYIndexEnd; y++) {
+                String image = "d" + rasterDepth + "_x" + x + "_y" + y + ".png";
+                renderGrid[y - tileYIndexStart][x - tileXIndexStart] = image;
+            }
+        }
+
+        results.put("render_grid", renderGrid);
+        results.put("raster_ul_lon", rasterUpperLeftLon);
+        results.put("raster_ul_lat", rasterUpperLeftLat);
+        results.put("raster_lr_lon", rasterLowerRightLon);
+        results.put("raster_lr_lat", rasterLowerRightLat);
+        results.put("depth", rasterDepth);
+        results.put("query_success", true);
+
         return results;
     }
 
@@ -108,11 +189,11 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
     private Map<String, Object> queryFail() {
         Map<String, Object> results = new HashMap<>();
         results.put("render_grid", null);
-        results.put("raster_ul_lon", 0);
-        results.put("raster_ul_lat", 0);
-        results.put("raster_lr_lon", 0);
-        results.put("raster_lr_lat", 0);
-        results.put("depth", 0);
+        results.put("raster_ul_lon", 0.0);
+        results.put("raster_ul_lat", 0.0);
+        results.put("raster_lr_lon", 0.0);
+        results.put("raster_lr_lat", 0.0);
+        results.put("depth", 0.0);
         results.put("query_success", false);
         return results;
     }
