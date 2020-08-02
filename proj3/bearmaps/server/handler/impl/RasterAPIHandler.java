@@ -88,14 +88,13 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
 
     @Override
     public Map<String, Object> processRequest(Map<String, Double> requestParams, Response response) {
-        System.out.println(requestParams);
+        // System.out.println(requestParams);
         Map<String, Object> results = new HashMap<>();
         double queryBoxUpperLeftLon = requestParams.get("ullon");
         double queryBoxUpperLeftLat = requestParams.get("ullat");
         double queryBoxLowerRightLon = requestParams.get("lrlon");
         double queryBoxLowerRightLat = requestParams.get("lrlat");
         double queryBoxWidth = requestParams.get("w");
-        double queryBoxHeight = requestParams.get("h");
 
         if (queryBoxLowerRightLon < ROOT_ULLON
                 || queryBoxLowerRightLat > ROOT_ULLAT
@@ -108,7 +107,6 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
 
         double requestLdpp = ldpp(queryBoxLowerRightLon - queryBoxUpperLeftLon,
                 queryBoxWidth);
-        System.out.println(requestLdpp);
 
         int rasterDepth = 7;
         double lonDist = ROOT_LRLON - ROOT_ULLON;
@@ -117,15 +115,15 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
                 rasterDepth = i;
                 break;
             }
-            System.out.println("too big: " + ldpp(lonDist, TILE_SIZE));
             lonDist = lonDist / 2;
         }
         int tileSpan = (int) Math.pow(2, rasterDepth);
         double tileLon = (ROOT_LRLON - ROOT_ULLON) / tileSpan;
         double tileLat = (ROOT_ULLAT - ROOT_LRLAT) / tileSpan;
-        System.out.println("just right: " + ldpp(lonDist, TILE_SIZE) + " depth: " + rasterDepth);
-        System.out.println("full map lon: " + (ROOT_LRLON - ROOT_ULLON) + "full map lat: " + (ROOT_ULLAT - ROOT_LRLAT));
-        System.out.println("tileLon: " + tileLon + " tileLat: " + tileLat);
+        // System.out.println("just right: " + ldpp(lonDist, TILE_SIZE) + " depth: " + rasterDepth);
+        // System.out.println("full map lon: " + (ROOT_LRLON - ROOT_ULLON) + "full map lat: " +
+        // (ROOT_ULLAT - ROOT_LRLAT));
+        // System.out.println("tileLon: " + tileLon + " tileLat: " + tileLat);
 
         int tileXIndexStart = 0;
         double rasterUpperLeftLon = ROOT_ULLON;
@@ -135,6 +133,7 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
         double rasterLowerRightLon = ROOT_LRLON;
         int tileYIndexEnd = tileSpan - 1;
         double rasterLowerRightLat = ROOT_LRLAT;
+
         if (queryBoxUpperLeftLon > ROOT_ULLON) {
             tileXIndexStart = (int) Math.floor((queryBoxUpperLeftLon - ROOT_ULLON) / tileLon);
             rasterUpperLeftLon = tileXIndexStart * tileLon + ROOT_ULLON;
@@ -154,6 +153,7 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
 
         int numTilesWidth = tileXIndexEnd - tileXIndexStart + 1;
         int numTilesHeight = tileYIndexEnd - tileYIndexStart + 1;
+
         String[][] renderGrid = new String[numTilesHeight][numTilesWidth];
         for (int x = tileXIndexStart; x <= tileXIndexEnd; x++) {
             for (int y = tileYIndexStart; y <= tileYIndexEnd; y++) {
@@ -161,77 +161,14 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
                 renderGrid[y - tileYIndexStart][x - tileXIndexStart] = image;
             }
         }
+
         results.put("render_grid", renderGrid);
-        results.put("raster_ul_lon", rasterUpperLeftLon); // -122.244873047
+        results.put("raster_ul_lon", rasterUpperLeftLon);
         results.put("raster_ul_lat", rasterUpperLeftLat);
         results.put("raster_lr_lon", rasterLowerRightLon);
         results.put("raster_lr_lat", rasterLowerRightLat);
         results.put("depth", rasterDepth);
         results.put("query_success", true);
-
-//        System.out.println("============================");
-//
-//        double longitudinalDistancePerTile = requestLdpp * Constants.TILE_SIZE;
-////        System.out.println("longitudinalDistancePerTile: " + longitudinalDistancePerTile);
-//
-//        double latitudinalDistancePerPixel =
-//                (queryBoxUpperLeftLat - queryBoxLowerRightLat) / queryBoxHeight;
-////        System.out.println("** latitudinalDistancePerPixel: " + latitudinalDistancePerPixel);
-//        double latitudinalDistancePerTile = latitudinalDistancePerPixel * Constants.TILE_SIZE;
-//
-////        System.out.println("** latitudinalDistancePerTile: " + latitudinalDistancePerTile);
-//
-//        double resultUpperLeftLon =
-//                (queryBoxUpperLeftLon - Constants.ROOT_ULLON) / longitudinalDistancePerTile;
-//        double resultLowerRightLon =
-//                (queryBoxLowerRightLon - queryBoxUpperLeftLon) / longitudinalDistancePerTile;
-//        double resultUpperLeftLat =
-//                (Constants.ROOT_ULLAT - queryBoxUpperLeftLat) / longitudinalDistancePerTile;
-//        double resultLowerRightLat =
-//                (queryBoxUpperLeftLat - queryBoxLowerRightLat) / longitudinalDistancePerTile;
-//
-//        System.out.println("resultUpperLeftLon: " + resultUpperLeftLon);
-//        System.out.println("resultLowerRightLon: " + resultLowerRightLon);
-////        System.out.println("resultUpperLeftLat: " + resultUpperLeftLat);
-////        System.out.println("resultLowerRightLat: " + resultLowerRightLat);
-//
-//        int startingLonTile = 1 + (int) Math.ceil(resultUpperLeftLon);
-//        int endingLonTile = startingLonTile + 1 + (int) Math.ceil(resultLowerRightLon);
-//        int startingLatTile = 1 + (int) resultUpperLeftLat;
-//        int endingLatTile = startingLatTile + 1 + (int) startingLatTile;
-//
-//        System.out.println("startingTile: " + startingLonTile);
-//        System.out.println("endingTile: " + endingLonTile);
-//        System.out.println("startingLatTile: " + startingLatTile);
-//        System.out.println("endingLatTile: " + endingLatTile);
-//
-//        int depth = endingLonTile - startingLonTile;
-//        int matrixLen = depth + 1;
-//
-//        System.out.println("depth: " + depth);
-//
-//        String[][] filesToDisplay = new String[matrixLen][matrixLen];
-//        for (int y = 0; y < matrixLen; y++) {
-//            for (int x = 0; x < matrixLen; x++) {
-//                int xVal = startingLonTile + x;
-//                int yVal = startingLatTile + y;
-//                String image = "d" + depth + "_x" + xVal + "_y" + yVal + ".png";
-//                filesToDisplay[y][x] = image;
-//            }
-//        }
-//
-//        double rasterUpperLeftLon =
-//                Constants.ROOT_ULLON + (longitudinalDistancePerTile * startingLonTile);
-//
-//        results.put("render_grid", filesToDisplay);
-//        results.put("raster_ul_lon", rasterUpperLeftLon); // -122.244873047
-//        results.put("raster_ul_lat", queryBoxUpperLeftLat);
-//        results.put("raster_lr_lon", queryBoxLowerRightLon);
-//        results.put("raster_lr_lat", queryBoxLowerRightLat);
-//        results.put("depth", depth);
-//        results.put("query_success", true);
-
-
 
         return results;
     }
