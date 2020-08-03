@@ -1,3 +1,6 @@
+import org.junit.Assert;
+import org.junit.Test;
+
 public class UnionFind {
     public int[] disjointedSet;
 
@@ -51,7 +54,7 @@ public class UnionFind {
        with itself or vertices that are already connected should not change the
        structure. */
     public void union(int v1, int v2) {
-        if (connected(v1, v2)) {
+        if (connected(v1, v2) || v1 == v2) {
             return;
         }
         if (sizeOf(v1) > sizeOf(v2)) {
