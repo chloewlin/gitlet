@@ -1,6 +1,3 @@
-import org.junit.Assert;
-import org.junit.Test;
-
 public class UnionFind {
     public int[] disjointedSet;
 
