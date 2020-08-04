@@ -15,13 +15,16 @@ import java.util.*;
 public class StreetMapGraph implements AStarGraph<Long> {
     private Map<Long, Node> nodes = new HashMap<>();
     private Map<Long, Set<WeightedEdge<Long>>> neighbors = new HashMap<>();
+    private List<Node> allNodes;
 
     private StreetMapGraph() {
+        allNodes = new ArrayList<>();
     }
 
     public StreetMapGraph(String filename) {
         StreetMapGraph smg = StreetMapGraph.readFromXML(filename);
         this.nodes = smg.nodes;
+        this.allNodes = smg.allNodes;
         this.neighbors = smg.neighbors;
     }
 
@@ -80,7 +83,7 @@ public class StreetMapGraph implements AStarGraph<Long> {
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
-
+        smg.allNodes = new ArrayList<>(smg.nodes.values());
         smg.clean();
         return smg;
     }
@@ -109,22 +112,22 @@ public class StreetMapGraph implements AStarGraph<Long> {
         }
     }
 
-    /**
-     * Removes vertices with 0 out-degree from graph. Note that this will
-     * cause issues if edges are not bidirectional.
-     **/
-    private void clean() {
-        List<Long> toRemove = new ArrayList<>();
-        for (long id : nodes.keySet()) {
-            if (neighbors(id).size() == 0 && nodes.get(id).name() == null) {
-                toRemove.add(id);
-            }
+    /** 
+     * Removes vertices with 0 out-degree from graph. Note that this will   
+     * cause issues if edges are not bidirectional. 
+     **/    
+    private void clean() {  
+        List<Long> toRemove = new ArrayList<>();    
+        for (long id : nodes.keySet()) {    
+            if (neighbors(id).size() == 0) {    
+                toRemove.add(id);   
+            }   
         }
 
-        for (long id : toRemove) {
-            nodes.remove(id);
-            neighbors.remove(id);
-        }
+        for (long id : toRemove) {  
+            nodes.remove(id);   
+            neighbors.remove(id);   
+        }   
     }
     
     /**
@@ -242,5 +245,9 @@ public class StreetMapGraph implements AStarGraph<Long> {
             nodes.add(nodeEntry.getValue());
         }
         return nodes;
+    }
+
+    protected List<Node> getAllNodes() {    
+        return new ArrayList<>(allNodes);   
     }
 }

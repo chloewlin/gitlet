@@ -1,5 +1,6 @@
 package bearmaps;
 
+import bearmaps.utils.Constants;
 import bearmaps.utils.graph.streetmap.StreetMapGraph;
 
 import java.util.List;
@@ -30,7 +31,39 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
      * @return The id of the node in the graph closest to the target.
      */
     public long closest(double lon, double lat) {
+        double x = projectToX(lon, lat);
+        double y = projectToY(lon, lat);
         return 0;
+    }
+
+    /**
+     * Return the Euclidean x-value for some point, p, in Berkeley. Found by computing the
+     * Transverse Mercator projection centered at Berkeley.
+     * @param lon The longitude for p.
+     * @param lat The latitude for p.
+     * @return The flattened, Euclidean x-value for p.
+     * @source https://en.wikipedia.org/wiki/Transverse_Mercator_projection
+     */
+    static double projectToX(double lon, double lat) {
+        double dlon = Math.toRadians(lon - ROOT_LON);
+        double phi = Math.toRadians(lat);
+        double b = Math.sin(dlon) * Math.cos(phi);
+        return (K0 / 2) * Math.log((1 + b) / (1 - b));
+    }
+
+    /**
+     * Return the Euclidean y-value for some point, p, in Berkeley. Found by computing the
+     * Transverse Mercator projection centered at Berkeley.
+     * @param lon The longitude for p.
+     * @param lat The latitude for p.
+     * @return The flattened, Euclidean y-value for p.
+     * @source https://en.wikipedia.org/wiki/Transverse_Mercator_projection
+     */
+    static double projectToY(double lon, double lat) {
+        double dlon = Math.toRadians(lon - ROOT_LON);
+        double phi = Math.toRadians(lat);
+        double con = Math.atan(Math.tan(phi) / Math.cos(dlon));
+        return K0 * (con - Math.toRadians(ROOT_LAT));
     }
 
 
@@ -73,5 +106,16 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
     private static String cleanString(String s) {
         return s.replaceAll("[^a-zA-Z ]", "").toLowerCase();
     }
+
+        
+    /**
+     * Scale factor at the natural origin, Berkeley. Prefer to use 1 instead of 0.9996 as in UTM.
+     * @source https://gis.stackexchange.com/a/7298
+     */
+    private static final double K0 = 1.0;
+    /** Latitude centered on Berkeley. */
+    private static final double ROOT_LAT = (Constants.ROOT_ULLAT + Constants.ROOT_LRLAT) / 2;
+    /** Longitude centered on Berkeley. */
+    private static final double ROOT_LON = (Constants.ROOT_ULLON + Constants.ROOT_LRLON) / 2;
 
 }
