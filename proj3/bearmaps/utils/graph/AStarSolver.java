@@ -2,10 +2,7 @@ package bearmaps.utils.graph;
 
 import bearmaps.utils.pq.MinHeapPQ;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
     private int numPolls = 0;
@@ -16,58 +13,70 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
     private AStarGraph<Vertex> aStarGraph;
     private SolverOutcome outcome = SolverOutcome.UNSOLVABLE;
     private ArrayList<Vertex> path;
+    private double timeSpent = 0.0;
 
     private double aStarPriority(Vertex v, Vertex goal) {
-        return distTo.get(v) + aStarGraph.estimatedDistanceToGoal(v, goal);
+        return this.distTo.get(v) + this.aStarGraph.estimatedDistanceToGoal(v, goal);
     }
     public AStarSolver(AStarGraph<Vertex> input, Vertex start, Vertex end, double timeout) {
-        aStarGraph = input;
-        pq = new MinHeapPQ<Vertex>();
-        distTo.put(start, 0.0);
-        edgeTo.put(start, null);
-        pq.insert(start, aStarPriority(start, end));
-        path = new ArrayList<Vertex>();
+        this.aStarGraph = input;
+        this.pq = new MinHeapPQ<Vertex>();
+        this.distTo = new HashMap<Vertex, Double>();
+        this.edgeTo = new HashMap<Vertex, Vertex>();
+        this.distTo.put(start, 0.0);
+        this.edgeTo.put(start, null);
+        this.pq.insert(start, aStarPriority(start, end));
+        this.path = new ArrayList<Vertex>();
 
-        while(pq.size() > 0) {
-            Vertex curr = pq.poll();
+        Date date= new Date();
+        long startTime = date.getTime();
+
+        while (this.pq.size() > 0) {
+            this.timeSpent = (date.getTime() - startTime) / 1000.0;
+            if (this.timeSpent > timeout) {
+                this.outcome = SolverOutcome.TIMEOUT;
+                break;
+            }
+            Vertex curr = this.pq.poll();
+            this.numPolls++;
             if (curr.equals(end)) {
-                outcome = SolverOutcome.SOLVED;
+                this.outcome = SolverOutcome.SOLVED;
                 Stack<Vertex> stack = new Stack<Vertex>();
                 do {
                     stack.push(curr);
-                    curr = edgeTo.get(curr);
+                    curr = this.edgeTo.get(curr);
                 } while (curr != null);
                 while (!stack.isEmpty()) {
-                    path.add(stack.pop());
+                    this.path.add(stack.pop());
                 }
                 break;
             }
-            for (WeightedEdge<Vertex> edge : aStarGraph.neighbors(curr)) {
-                if (!pq.contains(edge.to())) {
-                    distTo.put(edge.to(), distTo.get(curr) + edge.weight());
-                    edgeTo.put(edge.to(), curr);
-                    pq.insert(edge.to(), aStarPriority(edge.to(), end));
-                } else if (distTo.get(curr) + edge.weight() < distTo.get(edge.to())) {
-                    distTo.put(edge.to(), distTo.get(curr) + edge.weight());
-                    edgeTo.put(edge.to(), curr);
-                    pq.changePriority(edge.to(), aStarPriority(edge.to(), end));
+            for (WeightedEdge<Vertex> edge : this.aStarGraph.neighbors(curr)) {
+                if (!this.pq.contains(edge.to())) {
+                    this.distTo.put(edge.to(), this.distTo.get(curr) + edge.weight());
+                    this.edgeTo.put(edge.to(), curr);
+                    this.pq.insert(edge.to(), aStarPriority(edge.to(), end));
+                } else if (this.distTo.get(curr) + edge.weight() < this.distTo.get(edge.to())) {
+                    this.distTo.put(edge.to(), this.distTo.get(curr) + edge.weight());
+                    this.edgeTo.put(edge.to(), curr);
+                    this.pq.changePriority(edge.to(), aStarPriority(edge.to(), end));
                 }
             }
         }
     }
     public SolverOutcome outcome() {
-        return outcome;
+        return this.outcome;
     }
     public List<Vertex> solution() {
-        return path;
+        return this.path;
     }
     public double solutionWeight() {
-        return currTotalWeight;
+        return this.currTotalWeight;
     }
     public int numStatesExplored() {
-        return numPolls;
+        return this.numPolls;
     }
     public double explorationTime() {
-        return 0;
+        return this.timeSpent;
     }
 }
