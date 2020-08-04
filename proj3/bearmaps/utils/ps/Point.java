@@ -21,21 +21,15 @@ public class Point {
     }
 
     /**
-     * Returns the great-circle (haversine) distance between geographic coordinates
-     * (LATV, LONV) and (LATW, LONW).
-     *
-     * @source Kevin Lowe & Antares Chen, and https://www.movable-type.co.uk/scripts/latlong.html
-     **/
-    private static double distance(double lonV, double lonW, double latV, double latW) {
-        double phi1 = Math.toRadians(latV);
-        double phi2 = Math.toRadians(latW);
-        double dphi = Math.toRadians(latW - latV);
-        double dlambda = Math.toRadians(lonW - lonV);
-
-        double a = Math.sin(dphi / 2.0) * Math.sin(dphi / 2.0);
-        a += Math.cos(phi1) * Math.cos(phi2) * Math.sin(dlambda / 2.0) * Math.sin(dlambda / 2.0);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return 3963 * c;
+     * Returns the squared Euclidean distance between (x1, y1) and (x2, y2).
+     * @param x1 The x-coordinate of the first point.
+     * @param x2 The x-coordinate of the second point.
+     * @param y1 The y-coordinate of the first point.
+     * @param y2 The y-coordinate of the second point.
+     * @return The squared Euclidean distance between (x1, y1) and (x2, y2).
+     */
+    private static double distance(double x1, double x2, double y1, double y2) {
+        return Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2);
     }
 
     /**
