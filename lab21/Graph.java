@@ -1,15 +1,11 @@
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.HashSet;
-import java.util.HashMap;
+import jdk.nashorn.api.tree.Tree;
+
+import java.util.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.io.BufferedReader;
 import java.nio.charset.Charset;
 import java.io.IOException;
-import java.util.Random;
-import java.util.Queue;
-import java.util.ArrayDeque;
 
 /* A mutable and finite Graph object. Edge labels are stored via a HashMap
    where labels are mapped to a key calculated by the following. The graph is
@@ -130,13 +126,61 @@ public class Graph {
     }
 
     public Graph prims(int start) {
-        // TODO: YOUR CODE HERE
-        return null;
+        HashSet<Integer> visited = new HashSet<>();
+        int[] distTo = new int[this.neighbors.size()];
+        HashMap<Integer, Integer> edgeTo = new HashMap<Integer, Integer>();
+        distTo[start] = 0;
+
+        Graph result = new Graph();
+        int maxEdges = this.neighbors.size() - 1;
+        int resultEdges = 0;
+
+        PriorityQueue<Integer> fringe =
+                new PriorityQueue<Integer>((a, b) -> distTo[a] - distTo[b]);
+        fringe.offer(start);
+        while (resultEdges < maxEdges) {
+            int curr = fringe.poll();
+            visited.add(curr);
+            result.addVertex(curr);
+            if (curr != start) {
+                result.addEdge(edgeTo.get(curr), curr, distTo[curr]); // TODO: Check order
+                resultEdges++;
+            }
+            for (Edge e : getEdges(curr)) {
+                if (!visited.contains(e.getDest())) {
+                    if (!edgeTo.containsKey(e.getDest())) {
+                        distTo[e.getDest()] = e.getWeight();
+                        edgeTo.put(e.getDest(), curr);
+                        fringe.offer(e.getDest());
+                    } else if (e.getWeight() < distTo[e.getDest()]) {
+                        fringe.remove(e.getDest());
+                        distTo[e.getDest()] = e.getWeight();
+                        edgeTo.put(e.getDest(), curr);
+                        fringe.offer(e.getDest());
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     public Graph kruskals() {
-        // TODO: YOUR CODE HERE
-        return null;
+        Graph MST = new Graph();
+        UnionFind djs = new UnionFind(this.neighbors.size());
+
+        for (int v : getAllVertices()) {
+            MST.addVertex(v);
+        }
+
+        for (Edge e : getAllEdges()) {
+            if (!djs.connected(e.getSource(), e.getDest())) {
+                MST.addEdge(e.getSource(), e.getDest(), e.getWeight());
+                djs.union(e.getSource(), e.getDest());
+            }
+        }
+
+        return MST;
     }
 
     /* Returns a randomly generated graph with VERTICES number of vertices and
@@ -180,5 +224,48 @@ public class Graph {
             System.exit(1);
             return null;
         }
+    }
+
+    public static void main(String[] args) {
+        Graph g = new Graph();
+        for (int i = 0; i < 6; i++) {
+            g.addVertex(i);
+        }
+        g.addEdge(0, 2, 1);
+        g.addEdge(0, 1, 2);
+        g.addEdge(1, 2, 2);
+        g.addEdge(2, 3, 2);
+        g.addEdge(1, 3, 1);
+        g.addEdge(3, 5, 4);
+        g.addEdge(3, 4, 3);
+        g.addEdge(2, 4, 3);
+        g.addEdge(4, 5, 1);
+
+        Graph gPrim = g.prims(0);
+        System.out.println(gPrim.spans(g)); // true
+
+        TreeSet<Edge> gPrimEdges = gPrim.getAllEdges();
+
+        gPrimEdges.forEach(e -> System.out.println(e));
+//        {2, 0} -> 1
+//        {3, 1} -> 1
+//        {5, 4} -> 1
+//        {1, 0} -> 2
+//        {4, 2} -> 3
+
+        System.out.println("============");
+
+        Graph gKruskals = g.kruskals();
+        System.out.println(gKruskals.spans(g)); // true
+
+        TreeSet<Edge> gKruskalsEdges = gKruskals.getAllEdges();
+
+        gKruskalsEdges.forEach(e -> System.out.println(e));
+//        {0, 2} -> 1
+//        {1, 3} -> 1
+//        {4, 5} -> 1
+//        {0, 1} -> 2
+//        {3, 4} -> 3
+
     }
 }
