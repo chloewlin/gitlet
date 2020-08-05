@@ -1,3 +1,5 @@
+import jdk.nashorn.api.tree.Tree;
+
 import java.util.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -141,7 +143,7 @@ public class Graph {
             visited.add(curr);
             result.addVertex(curr);
             if (curr != start) {
-                result.addEdge(curr, edgeTo.get(curr), distTo[curr]);
+                result.addEdge(edgeTo.get(curr), curr, distTo[curr]); // TODO: Check order
                 resultEdges++;
             }
             for (Edge e : getEdges(curr)) {
@@ -164,8 +166,21 @@ public class Graph {
     }
 
     public Graph kruskals() {
-        // TODO: YOUR CODE HERE
-        return null;
+        Graph MST = new Graph();
+        UnionFind djs = new UnionFind(this.neighbors.size());
+
+        for (int v : getAllVertices()) {
+            MST.addVertex(v);
+        }
+
+        for (Edge e : getAllEdges()) {
+            if (!djs.connected(e.getSource(), e.getDest())) {
+                MST.addEdge(e.getSource(), e.getDest(), e.getWeight());
+                djs.union(e.getSource(), e.getDest());
+            }
+        }
+
+        return MST;
     }
 
     /* Returns a randomly generated graph with VERTICES number of vertices and
@@ -237,5 +252,20 @@ public class Graph {
 //        {5, 4} -> 1
 //        {1, 0} -> 2
 //        {4, 2} -> 3
+
+        System.out.println("============");
+
+        Graph gKruskals = g.kruskals();
+        System.out.println(gKruskals.spans(g)); // true
+
+        TreeSet<Edge> gKruskalsEdges = gKruskals.getAllEdges();
+
+        gKruskalsEdges.forEach(e -> System.out.println(e));
+//        {0, 2} -> 1
+//        {1, 3} -> 1
+//        {4, 5} -> 1
+//        {0, 1} -> 2
+//        {3, 4} -> 3
+
     }
 }
