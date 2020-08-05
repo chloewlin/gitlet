@@ -16,6 +16,7 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
     private double timeSpent = 0.0;
 
     private double aStarPriority(Vertex v, Vertex goal) {
+//        System.out.println("id: " + v + " weight: " + this.distTo.get(v) + " distToGoal: " + this.aStarGraph.estimatedDistanceToGoal(v, goal));
         return this.distTo.get(v) + this.aStarGraph.estimatedDistanceToGoal(v, goal);
     }
     public AStarSolver(AStarGraph<Vertex> input, Vertex start, Vertex end, double timeout) {
@@ -52,14 +53,17 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
                 break;
             }
             for (WeightedEdge<Vertex> edge : this.aStarGraph.neighbors(curr)) {
-                if (!this.pq.contains(edge.to())) {
+                if (edge.to() == start) {
+                    continue;
+                } else if (this.distTo.get(edge.to()) == null
+                        || this.distTo.get(curr) + edge.weight() < this.distTo.get(edge.to())) {
                     this.distTo.put(edge.to(), this.distTo.get(curr) + edge.weight());
                     this.edgeTo.put(edge.to(), curr);
-                    this.pq.insert(edge.to(), aStarPriority(edge.to(), end));
-                } else if (this.distTo.get(curr) + edge.weight() < this.distTo.get(edge.to())) {
-                    this.distTo.put(edge.to(), this.distTo.get(curr) + edge.weight());
-                    this.edgeTo.put(edge.to(), curr);
-                    this.pq.changePriority(edge.to(), aStarPriority(edge.to(), end));
+                    if (!this.pq.contains(edge.to())) {
+                        this.pq.insert(edge.to(), aStarPriority(edge.to(), end));
+                    } else {
+                        this.pq.changePriority(edge.to(), aStarPriority(edge.to(), end));
+                    }
                 }
             }
         }

@@ -1,5 +1,7 @@
 package bearmaps;
 
+import bearmaps.utils.graph.AStarSolver;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -24,10 +26,9 @@ public class Router {
      */
     public static List<Long> shortestPath(AugmentedStreetMapGraph g, double stlon, double stlat,
                                           double destlon, double destlat) {
-//        long src = g.closest(stlon, stlat);
-//        long dest = g.closest(destlon, destlat);
-//        return new AStarSolver<>(g, src, dest, 20).solution();
-        return null;
+        long src = g.closest(stlon, stlat);
+        long dest = g.closest(destlon, destlat);
+        return new AStarSolver<>(g, src, dest, 20).solution();
     }
 
     /**
