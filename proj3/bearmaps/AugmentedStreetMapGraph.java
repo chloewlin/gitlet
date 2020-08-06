@@ -26,17 +26,27 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
         // You might find it helpful to uncomment the line below:
         List<Node> nodes = this.getNodes();
         List<Point> points = new ArrayList<Point>();
-        pointToNode = new HashMap<Point, Node>();
+        this.pointToNode = new HashMap<Point, Node>();
+        this.trie = new Trie();
+
         for (Node n : nodes) {
             if (neighbors(n.id()).size() > 0) {
                 double x = projectToX(n.lon(), n.lat());
                 double y = projectToY(n.lon(), n.lat());
                 Point p = new Point(x, y);
-                pointToNode.put(p, n);
+                this.pointToNode.put(p, n);
                 points.add(p);
             }
         }
-        tree = new KDTree(points);
+        this.tree = new KDTree(points);
+
+        List<Node> allNodes = this.getAllNodes();
+        for (Node n : allNodes) {
+            if (n.name() != null) {
+                String name = cleanString(n.name());
+                this.trie.add(name, n.name());
+            }
+        }
     }
 
 
@@ -96,21 +106,6 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
      */
     public List<String> getLocationsByPrefix(String prefix) {
         prefix = cleanString(prefix);
-
-        prefix = prefix.substring(0, 1).toUpperCase() + prefix.substring(1);
-
-        System.out.println(prefix);
-        trie = new Trie();
-
-        List<Node> nodes = this.getAllNodes();
-
-        for (Node n : nodes) {
-            if (n.name() != null) {
-                trie.add(n.name());
-            }
-        }
-
-        this.trie.keysWithPrefix(prefix).forEach(s -> System.out.println(s));
         return this.trie.keysWithPrefix(prefix);
     }
 

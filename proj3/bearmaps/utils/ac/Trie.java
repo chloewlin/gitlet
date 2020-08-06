@@ -11,6 +11,7 @@ public class Trie {
 
     private class Node {
         private boolean isKey;
+        private String name;
         private HashMap<Character, Node> map;
 
         public Node (boolean a) {
@@ -49,7 +50,7 @@ public class Trie {
         return curr.isKey;
     }
 
-    public void add(String key) {
+    public void add(String key, String name) {
         if (key == null || key.length() < 1) {
             return; }
 //
@@ -65,6 +66,7 @@ public class Trie {
             curr = curr.map.get(c);
         }
         curr.isKey = true;
+        curr.name = name;
     }
 
     public List<String> keysWithPrefix(String prefix) {
@@ -86,7 +88,7 @@ public class Trie {
 
     public void keysWithPrefixHelper(List<String> list, Node curr, String word) {
         if (curr.isKey) {
-            list.add(word);
+            list.add(curr.name);
         }
 
         curr.map.forEach((character, node) -> {
