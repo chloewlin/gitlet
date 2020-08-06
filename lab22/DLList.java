@@ -130,7 +130,7 @@ public class DLList<T extends Comparable<T>> {
         DLList<T> otherHalf = new DLList<>();
         // TODO: YOUR CODE HERE
         Node ptr = sentinel.next;
-        for (int i = 0; i < size / 2; i++) {
+        for (int i = 0; i < (size / 2); i++) {
             oneHalf.addLast(ptr.item);
             ptr = ptr.next;
         }
