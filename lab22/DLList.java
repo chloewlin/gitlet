@@ -98,7 +98,19 @@ public class DLList<T extends Comparable<T>> {
     /* Inserts ITEM into this DLList such that the values of this DLList are in
        increasing order. */
     private void insertionSortHelper(T item) {
-        // TODO: YOUR CODE HERE
+        if (sentinel.next == sentinel) {
+            addFirst(item);
+        } else {
+            Node curr = sentinel.next;
+            while (curr != sentinel && item.compareTo(curr.item) > 0) {
+                curr = curr.next;
+            }
+            Node node = new Node(item);
+            node.next = curr;
+            node.prev = curr.prev;
+            curr.prev.next = node;
+            curr.prev = node;
+        }
     }
 
     /* Returns a copy of this DLList sorted using selection sort. Does not
