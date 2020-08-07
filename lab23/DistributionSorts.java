@@ -5,7 +5,25 @@ public class DistributionSorts {
     /* Destructively sorts ARR using counting sort. Assumes that ARR contains
        only 0, 1, ..., 9. */
     public static void countingSort(int[] arr) {
-        // TODO: YOUR CODE HERE
+        int[] counts = new int[10];
+        int[] positions = new int[10];
+        int[] sorted = new int[arr.length];
+
+        for (int i = 0; i < arr.length; i++) {
+            counts[arr[i]]++;
+        }
+        for (int i = 1; i < counts.length; i++) {
+            positions[i] = counts[i - 1] + positions[i - 1];
+        }
+
+        for (int i = 0; i < arr.length; i++) {
+            sorted[positions[arr[i]]] = arr[i];
+            positions[arr[i]]++;
+        }
+
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = sorted[i];
+        }
     }
 
     /* Destructively sorts ARR using LSD radix sort. */
@@ -50,6 +68,10 @@ public class DistributionSorts {
         for (int i = 0; i < arr1.length; i++) {
             arr1[i] = randomDigit();
         }
+
+//        int[] arr1 = {0, 0, 1, 0, 1, 2, 0, 2, 2};
+//        String[] arr1 = {"cat", "cat", "dog", "cat", "dog", "person", "cat", "person", "person"};
+
         System.out.println("Original array: " + Arrays.toString(arr1));
         countingSort(arr1);
         if (arr1 != null) {
@@ -70,7 +92,7 @@ public class DistributionSorts {
 
     public static void main(String[] args) {
         runCountingSort(20);
-        runLSDRadixSort(3);
-        runLSDRadixSort(30);
+//        runLSDRadixSort(3);
+//        runLSDRadixSort(30);
     }
 }
