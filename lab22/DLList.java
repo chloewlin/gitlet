@@ -203,9 +203,11 @@ public class DLList<T extends Comparable<T>> {
             ptr = ptr.next;
         }
         DLList<T> toReturn = new DLList<>();
-        toReturn.append(smallElements.quicksort());
-        toReturn.addLast(pivot);
-        toReturn.append(largeElements.quicksort());
+        smallElements = smallElements.quicksort();
+        largeElements = largeElements.quicksort();
+        toReturn.append(smallElements);
+        toReturn.append(equalElements);
+        toReturn.append(largeElements);
         return toReturn;
     }
 
@@ -236,13 +238,16 @@ public class DLList<T extends Comparable<T>> {
         for (int k = 0; k < N; k++) {
             toReturn.addLast((int) (100 * Math.random()));
         }
+//        toReturn.addLast(0);
 //        toReturn.addLast(3);
 //        toReturn.addLast(1);
+//        toReturn.addLast(4);
 //        toReturn.addLast(4);
 //        toReturn.addLast(5);
 //        toReturn.addLast(9);
 //        toReturn.addLast(2);
 //        toReturn.addLast(8);
+//        toReturn.addLast(7);
 //        toReturn.addLast(6);
         return toReturn;
     }
@@ -276,7 +281,7 @@ public class DLList<T extends Comparable<T>> {
         values = generateRandomIntegerDLList(10);
         System.out.println(values);
         sortedValues = values.quicksort();
-        System.out.print("After quicksort: ");
+        System.out.print("After quicksort : ");
         System.out.println(sortedValues);
     }
 }
