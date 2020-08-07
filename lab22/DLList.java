@@ -140,7 +140,16 @@ public class DLList<T extends Comparable<T>> {
         DLList<T> oneHalf = new DLList<>();
         DLList<T> otherHalf = new DLList<>();
         // TODO: YOUR CODE HERE
-        return null;
+        Node ptr = sentinel.next;
+        for (int i = 0; i < (size / 2); i++) {
+            oneHalf.addLast(ptr.item);
+            ptr = ptr.next;
+        }
+        while (ptr != sentinel) {
+            otherHalf.addLast(ptr.item);
+            ptr = ptr.next;
+        }
+        return merge(otherHalf.mergeSort());
     }
 
     /* Returns the result of merging this DLList with LST. Does not modify the
@@ -162,7 +171,7 @@ public class DLList<T extends Comparable<T>> {
             toReturn.addLast(thisPtr.item);
             thisPtr = thisPtr.next;
         }
-        while (lstPtr != lst.sentinel) {
+        while (lstPtr != sentinel) {
             toReturn.addLast(lstPtr.item);
             lstPtr = lstPtr.next;
         }
@@ -180,8 +189,24 @@ public class DLList<T extends Comparable<T>> {
         DLList<T> equalElements = new DLList<>();
         DLList<T> largeElements = new DLList<>();
         T pivot = sentinel.next.item;
+        Node ptr = sentinel.next;
+        while (ptr != sentinel) {
+            if (ptr.item.compareTo(pivot) < 0) {
+                smallElements.addLast(ptr.item);
+            } else if (ptr.item.compareTo(pivot) > 0) {
+                largeElements.addLast(ptr.item);
+            } else {
+                equalElements.addLast(ptr.item);
+            }
+            ptr = ptr.next;
+        }
+        DLList<T> toReturn = new DLList<>();
+        toReturn.append(smallElements.quicksort());
+        toReturn.addLast(pivot);
+        toReturn.append(largeElements.quicksort());
+//        toReturn.append(equalElements.quicksort());
+        return toReturn;
         // TODO: YOUR CODE HERE
-        return null;
     }
 
     /* Appends LST to the end of this DLList. */
@@ -218,19 +243,19 @@ public class DLList<T extends Comparable<T>> {
         DLList values;
         DLList sortedValues;
 
-        System.out.print("Before insertion sort: ");
-        values = generateRandomIntegerDLList(10);
-        System.out.println(values);
-        sortedValues = values.insertionSort();
-        System.out.print("After insertion sort: ");
-        System.out.println(sortedValues);
+//        System.out.print("Before insertion sort: ");
+//        values = generateRandomIntegerDLList(10);
+//        System.out.println(values);
+//        sortedValues = values.insertionSort();
+//        System.out.print("After insertion sort: ");
+//        System.out.println(sortedValues);
 
-        System.out.print("Before selection sort: ");
-        values = generateRandomIntegerDLList(10);
-        System.out.println(values);
-        sortedValues = values.selectionSort();
-        System.out.print("After selection sort: ");
-        System.out.println(sortedValues);
+//        System.out.print("Before selection sort: ");
+//        values = generateRandomIntegerDLList(10);
+//        System.out.println(values);
+//        sortedValues = values.selectionSort();
+//        System.out.print("After selection sort: ");
+//        System.out.println(sortedValues);
 
         System.out.print("Before merge sort: ");
         values = generateRandomIntegerDLList(10);
@@ -239,11 +264,11 @@ public class DLList<T extends Comparable<T>> {
         System.out.print("After merge sort: ");
         System.out.println(sortedValues);
 
-        System.out.print("Before quicksort: ");
-        values = generateRandomIntegerDLList(10);
-        System.out.println(values);
-        sortedValues = values.quicksort();
-        System.out.print("After quicksort: ");
-        System.out.println(sortedValues);
+//        System.out.print("Before quicksort: ");
+//        values = generateRandomIntegerDLList(10);
+//        System.out.println(values);
+//        sortedValues = values.quicksort();
+//        System.out.print("After quicksort: ");
+//        System.out.println(sortedValues);
     }
 }
