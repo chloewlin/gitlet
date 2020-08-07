@@ -98,7 +98,19 @@ public class DLList<T extends Comparable<T>> {
     /* Inserts ITEM into this DLList such that the values of this DLList are in
        increasing order. */
     private void insertionSortHelper(T item) {
-        // TODO: YOUR CODE HERE
+        if (sentinel.next == sentinel) {
+            addFirst(item);
+        } else {
+            Node curr = sentinel.next;
+            while (curr != sentinel && item.compareTo(curr.item) > 0) {
+                curr = curr.next;
+            }
+            Node node = new Node(item);
+            node.next = curr;
+            node.prev = curr.prev;
+            curr.prev.next = node;
+            curr.prev = node;
+        }
     }
 
     /* Returns a copy of this DLList sorted using selection sort. Does not
@@ -127,8 +139,19 @@ public class DLList<T extends Comparable<T>> {
         }
         DLList<T> oneHalf = new DLList<>();
         DLList<T> otherHalf = new DLList<>();
-        // TODO: YOUR CODE HERE
-        return null;
+
+        Node ptr = sentinel.next;
+        for (int i = 0; i < (size / 2); i++) {
+            oneHalf.addLast(ptr.item);
+            ptr = ptr.next;
+        }
+        while (ptr != sentinel) {
+            otherHalf.addLast(ptr.item);
+            ptr = ptr.next;
+        }
+        oneHalf = oneHalf.mergeSort();
+        otherHalf = otherHalf.mergeSort();
+        return oneHalf.merge(otherHalf);
     }
 
     /* Returns the result of merging this DLList with LST. Does not modify the
@@ -168,8 +191,22 @@ public class DLList<T extends Comparable<T>> {
         DLList<T> equalElements = new DLList<>();
         DLList<T> largeElements = new DLList<>();
         T pivot = sentinel.next.item;
-        // TODO: YOUR CODE HERE
-        return null;
+        Node ptr = sentinel.next;
+        while (ptr != sentinel) {
+            if (ptr.item.compareTo(pivot) < 0) {
+                smallElements.addLast(ptr.item);
+            } else if (ptr.item.compareTo(pivot) > 0) {
+                largeElements.addLast(ptr.item);
+            } else {
+                equalElements.addLast(ptr.item);
+            }
+            ptr = ptr.next;
+        }
+        DLList<T> toReturn = new DLList<>();
+        toReturn.append(smallElements.quicksort());
+        toReturn.addLast(pivot);
+        toReturn.append(largeElements.quicksort());
+        return toReturn;
     }
 
     /* Appends LST to the end of this DLList. */
@@ -199,6 +236,14 @@ public class DLList<T extends Comparable<T>> {
         for (int k = 0; k < N; k++) {
             toReturn.addLast((int) (100 * Math.random()));
         }
+//        toReturn.addLast(3);
+//        toReturn.addLast(1);
+//        toReturn.addLast(4);
+//        toReturn.addLast(5);
+//        toReturn.addLast(9);
+//        toReturn.addLast(2);
+//        toReturn.addLast(8);
+//        toReturn.addLast(6);
         return toReturn;
     }
 
