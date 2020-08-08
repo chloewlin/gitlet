@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DistributionSorts {
@@ -20,7 +21,6 @@ public class DistributionSorts {
             sorted[positions[arr[i]]] = arr[i];
             positions[arr[i]]++;
         }
-
         for (int i = 0; i < arr.length; i++) {
             arr[i] = sorted[i];
         }
@@ -39,6 +39,27 @@ public class DistributionSorts {
        rightmost digit of each number. */
     private static void countingSortOnDigit(int[] arr, int digit) {
         // TODO: YOUR CODE HERE
+        int[] counts = new int[10];
+        int[] positions = new int[10];
+        int[] sorted = new int[arr.length];
+
+        for (int i = 0; i < arr.length; i++) {
+            int d = arr[i] / (int)  Math.pow(10, digit) % 10;
+//            System.out.println(d);
+            counts[d]++;
+        }
+        for (int i = 1; i < counts.length; i++) {
+            positions[i] = counts[i - 1] + positions[i - 1];
+        }
+
+        for (int i = 0; i < arr.length; i++) {
+            int d = arr[i] / (int)Math.pow(10, digit) % 10;
+            sorted[positions[d]] = arr[i];
+            positions[d]++;
+        }
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = sorted[i];
+        }
     }
 
     /* Returns the largest number of digits that any integer in ARR has. */
@@ -84,6 +105,9 @@ public class DistributionSorts {
         for (int i = 0; i < arr2.length; i++) {
             arr2[i] = randomDigit();
         }
+
+//        int[] arr2 = {356, 112, 904, 294, 209, 820, 394, 810};
+
         System.out.println("Original array: " + Arrays.toString(arr2));
         lsdRadixSort(arr2);
         System.out.println("Should be sorted: " + Arrays.toString(arr2));
@@ -92,7 +116,7 @@ public class DistributionSorts {
 
     public static void main(String[] args) {
         runCountingSort(20);
-//        runLSDRadixSort(3);
-//        runLSDRadixSort(30);
+        runLSDRadixSort(3);
+        runLSDRadixSort(30);
     }
 }
