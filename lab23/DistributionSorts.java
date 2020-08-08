@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DistributionSorts {
@@ -43,7 +42,7 @@ public class DistributionSorts {
         int[] sorted = new int[arr.length];
 
         for (int i = 0; i < arr.length; i++) {
-            int d = arr[i] / (int)  Math.pow(10, digit) % 10;
+            int d = arr[i] / (int) Math.pow(10, digit) % 10;
             counts[d]++;
         }
         for (int i = 1; i < counts.length; i++) {
@@ -51,7 +50,7 @@ public class DistributionSorts {
         }
 
         for (int i = 0; i < arr.length; i++) {
-            int d = arr[i] / (int)Math.pow(10, digit) % 10;
+            int d = arr[i] / (int) Math.pow(10, digit) % 10;
             sorted[positions[d]] = arr[i];
             positions[d]++;
         }
