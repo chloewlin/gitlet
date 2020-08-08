@@ -38,14 +38,12 @@ public class DistributionSorts {
        DIGIT-th digit. When DIGIT is equal to 0, sort the numbers by the
        rightmost digit of each number. */
     private static void countingSortOnDigit(int[] arr, int digit) {
-        // TODO: YOUR CODE HERE
         int[] counts = new int[10];
         int[] positions = new int[10];
         int[] sorted = new int[arr.length];
 
         for (int i = 0; i < arr.length; i++) {
             int d = arr[i] / (int)  Math.pow(10, digit) % 10;
-//            System.out.println(d);
             counts[d]++;
         }
         for (int i = 1; i < counts.length; i++) {
@@ -106,7 +104,8 @@ public class DistributionSorts {
             arr2[i] = randomDigit();
         }
 
-//        int[] arr2 = {356, 112, 904, 294, 209, 820, 394, 810};
+        // Uncomment this to run tests from spec
+        // int[] arr2 = {356, 112, 904, 294, 209, 820, 394, 810};
 
         System.out.println("Original array: " + Arrays.toString(arr2));
         lsdRadixSort(arr2);
