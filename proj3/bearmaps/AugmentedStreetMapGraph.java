@@ -44,7 +44,12 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
         for (Node n : allNodes) {
             if (n.name() != null) {
                 String name = cleanString(n.name());
-                this.trie.add(name, n.name());
+                HashMap<String, Object> location = new HashMap<String, Object>();
+                location.put("lat", n.lat());
+                location.put("lon", n.lon());
+                location.put("name", n.name());
+                location.put("id", n.id());
+                this.trie.add(name, n.name(), location);
             }
         }
     }
@@ -123,7 +128,8 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
      * "id" -> Number, The id of the node. <br>
      */
     public List<Map<String, Object>> getLocations(String locationName) {
-        return new LinkedList<>();
+        locationName = cleanString(locationName);
+        return this.trie.exactMatches(locationName);
     }
 
 

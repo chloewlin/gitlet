@@ -5,6 +5,7 @@ import bearmaps.AugmentedStreetMapGraph;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Trie {
     private Node root;
@@ -12,10 +13,12 @@ public class Trie {
     private class Node {
         private boolean isKey;
         private String name;
+        private List<Map<String, Object>> locations;
         private HashMap<Character, Node> map;
 
         public Node (boolean a) {
             this.isKey = a;
+            locations = new ArrayList<Map<String, Object>>();
             map = new HashMap<>();
         }
     }
@@ -33,9 +36,6 @@ public class Trie {
         if (key == null || key.length() < 1) {
             return false;
         }
-//        System.out.println("inside contains..." + key);
-//
-//        key = key.toLowerCase();
 
         Node curr = root;
         for (int i = 0; i < key.length(); i++) {
@@ -50,11 +50,9 @@ public class Trie {
         return curr.isKey;
     }
 
-    public void add(String key, String name) {
+    public void add(String key, String name, HashMap<String, Object> location) {
         if (key == null || key.length() < 1) {
             return; }
-//
-//        key = key.toLowerCase();
 
         Node curr = root;
         for (int i = 0, n = key.length(); i < n; i++) {
@@ -67,6 +65,7 @@ public class Trie {
         }
         curr.isKey = true;
         curr.name = name;
+        curr.locations.add(location);
     }
 
     public List<String> keysWithPrefix(String prefix) {
@@ -82,17 +81,36 @@ public class Trie {
             curr = curr.map.get(c);
         }
 
-        keysWithPrefixHelper(list, curr, prefix);
+        keysWithPrefixHelper(list, curr);
         return list;
     }
 
-    public void keysWithPrefixHelper(List<String> list, Node curr, String word) {
+    public void keysWithPrefixHelper(List<String> list, Node curr) {
         if (curr.isKey) {
             list.add(curr.name);
         }
 
         curr.map.forEach((character, node) -> {
-            keysWithPrefixHelper(list, node, word + character);
+            keysWithPrefixHelper(list, node);
         });
+    }
+
+    public List<Map<String, Object>> exactMatches(String word) {
+        Node curr = root;
+        List<Map<String, Object>> empty = new ArrayList<>();
+
+        for (int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+
+            if (!curr.map.containsKey(c)) {
+                return empty;
+            }
+            curr = curr.map.get(c);
+        }
+
+        if (curr.isKey) {
+            return curr.locations;
+        }
+        return empty;
     }
 }
