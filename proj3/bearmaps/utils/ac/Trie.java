@@ -48,9 +48,6 @@ public class Trie {
     }
 
     public void add(String key, HashMap<String, Object> location) {
-        if (key == null || key.length() < 1) {
-            return; }
-
         Node curr = root;
         for (int i = 0, n = key.length(); i < n; i++) {
             char c = key.charAt(i);
