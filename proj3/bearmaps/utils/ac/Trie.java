@@ -11,13 +11,10 @@ public class Trie {
     private Node root;
 
     private class Node {
-        private boolean isKey;
-        private String name;
         private List<Map<String, Object>> locations;
         private HashMap<Character, Node> map;
 
         public Node (boolean a) {
-            this.isKey = a;
             locations = new ArrayList<Map<String, Object>>();
             map = new HashMap<>();
         }
@@ -47,10 +44,10 @@ public class Trie {
             curr = curr.map.get(c);
         }
 
-        return curr.isKey;
+        return !curr.locations.isEmpty();
     }
 
-    public void add(String key, String name, HashMap<String, Object> location) {
+    public void add(String key, HashMap<String, Object> location) {
         if (key == null || key.length() < 1) {
             return; }
 
@@ -63,8 +60,6 @@ public class Trie {
             }
             curr = curr.map.get(c);
         }
-        curr.isKey = true;
-        curr.name = name;
         curr.locations.add(location);
     }
 
@@ -86,8 +81,8 @@ public class Trie {
     }
 
     public void keysWithPrefixHelper(List<String> list, Node curr) {
-        if (curr.isKey) {
-            list.add(curr.name);
+        for (Map<String, Object> location : curr.locations) {
+            list.add((String)location.get("name"));
         }
 
         curr.map.forEach((character, node) -> {
@@ -97,20 +92,16 @@ public class Trie {
 
     public List<Map<String, Object>> exactMatches(String word) {
         Node curr = root;
-        List<Map<String, Object>> empty = new ArrayList<>();
 
         for (int i = 0; i < word.length(); i++) {
             char c = word.charAt(i);
 
             if (!curr.map.containsKey(c)) {
-                return empty;
+                return new ArrayList<>();
             }
             curr = curr.map.get(c);
         }
 
-        if (curr.isKey) {
-            return curr.locations;
-        }
-        return empty;
+        return curr.locations;
     }
 }

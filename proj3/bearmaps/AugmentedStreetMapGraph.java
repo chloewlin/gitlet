@@ -49,7 +49,7 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
                 location.put("lon", n.lon());
                 location.put("name", n.name());
                 location.put("id", n.id());
-                this.trie.add(name, n.name(), location);
+                this.trie.add(name, location);
             }
         }
     }
