@@ -28,8 +28,8 @@ public class RegexPuzzles {
 
     public static List<String> findStartupName(String[] names) {
         List<String> result = new ArrayList<>();
-        Pattern pattern = Pattern.compile("(Data|App|my|on|un)[^i&&\\w]+(ly|sy|ify|\\.io|\\.fm|\\" +
-                ".tv)");
+        Pattern pattern = Pattern.compile(
+                "(Data|App|my|on|un)[^.i&&]+(ly|sy|ify|\\.io|\\.fm|\\.tv)");
 
         for (int i = 0; i < names.length; i++) {
             Matcher match = pattern.matcher(names[i]);
@@ -116,7 +116,8 @@ public class RegexPuzzles {
         }
 
         String[] startupNames = {
-                "Data", "DataDog.io", "Apply", "MyAppify", "myApp.fm", "onTop.tv"};
+                "Data", "DataDog.io", "Apply", "MyAppify",
+                "myApp.fm", "onTop.tv", "myhlsp..tv", "Datacvdexlk..tv"};
         List<String> validNames = findStartupName(startupNames);
 
         for (int i = 0; i < validNames.size(); i++) {
