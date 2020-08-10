@@ -34,7 +34,7 @@ public class RegexPuzzles {
         for (int i = 0; i < names.length; i++) {
             Matcher match = pattern.matcher(names[i]);
             if (match.matches()) {
-                result.add(names[i]);
+                result.add(match.group());
             }
         }
         return result;
