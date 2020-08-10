@@ -49,24 +49,43 @@ public class RegexPuzzles {
         }
 
         // Initialize both Patterns and 3-d array
-        Pattern pattern = Pattern.compile("");
-        int[][][] arr = new int[1][1][1];
+        Pattern rgbPattern = Pattern.compile("\\[(\\d{1,3}), (\\d{1,3}), (\\d{1,3})\\]");
+        Pattern coorPattern = Pattern.compile("\\((\\d+), (\\d+)\\)");
+        int[][][] arr = new int[height][width][3];
 
         try {
             String line;
             while ((line = br.readLine()) != null) {
                 // Initialize both Matchers and find() for each
-                Matcher match = pattern.matcher(line);
+                Matcher rgbMatch = rgbPattern.matcher(line);
+                Matcher coorMatch = coorPattern.matcher(line);
+                int x = 0;
+                int y = 0;
+                int R = 0;
+                int G = 0;
+                int B = 0;
                 // Parse each group as an Integer
-
-                // Store in array
+                if (rgbMatch.find() && coorMatch.find()) {
+//                    System.out.println(rgbMatch);
+//                    System.out.println(coorMatch);
+                    x = Integer.parseInt(coorMatch.group(1));
+                    y = Integer.parseInt(coorMatch.group(2));
+//                    System.out.println("rgbMatch: ");
+//                    System.out.println(Integer.parseInt(rgbMatch.group(1)));
+//                    System.out.println(Integer.parseInt(rgbMatch.group(2)));
+//                    System.out.println(Integer.parseInt(rgbMatch.group(3)));
+                    // Store in array
+                    arr[x][y][0] = Integer.parseInt(rgbMatch.group(1));
+                    arr[x][y][1] = Integer.parseInt(rgbMatch.group(2));
+                    arr[x][y][2] = Integer.parseInt(rgbMatch.group(3));
+                }
             }
         } catch (IOException e) {
             System.err.printf("Input error: %s%n", e.getMessage());
             System.exit(1);
         }
         // Return the BufferedImage of the array
-        return null;
+        return arrayToBufferedImage(arr);
     }
 
     public static BufferedImage arrayToBufferedImage(int[][][] arr) {
