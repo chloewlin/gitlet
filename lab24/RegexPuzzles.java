@@ -27,8 +27,17 @@ public class RegexPuzzles {
     }
 
     public static List<String> findStartupName(String[] names) {
-        // Create a String pattern to fill return array
-        return null;
+        List<String> result = new ArrayList<>();
+        Pattern pattern = Pattern.compile("(Data|App|my|on|un)[^i&&\\w]+(ly|sy|ify|\\.io|\\.fm|\\" +
+                ".tv)");
+
+        for (int i = 0; i < names.length; i++) {
+            Matcher match = pattern.matcher(names[i]);
+            if (match.matches()) {
+                result.add(names[i]);
+            }
+        }
+        return result;
     }
 
     public static BufferedImage imageRegex(String filename, int width, int height) {
@@ -84,14 +93,22 @@ public class RegexPuzzles {
             System.out.println(validUrls.get(i));
         }
 
+        String[] startupNames = {
+                "Data", "DataDog.io", "Apply", "MyAppify", "myApp.fm", "onTop.tv"};
+        List<String> validNames = findStartupName(startupNames);
+
+        for (int i = 0; i < validNames.size(); i++) {
+            System.out.println(validNames.get(i));
+        }
+
         /* For testing image regex */
-//        BufferedImage img = imageRegex("mystery.txt", 400, 400);
-//
-//        File outputfile = new File("output_img.jpg");
-//        try {
-//            ImageIO.write(img, "jpg", outputfile);
-//        } catch (IOException e) {
-//            System.out.println("Error writing file: " + e.getMessage());
-//        }
+        BufferedImage img = imageRegex("mystery.txt", 400, 400);
+
+        File outputfile = new File("output_img.jpg");
+        try {
+            ImageIO.write(img, "jpg", outputfile);
+        } catch (IOException e) {
+            System.out.println("Error writing file: " + e.getMessage());
+        }
     }
 }
