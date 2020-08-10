@@ -6,14 +6,24 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegexPuzzles {
     public static List<String> urlRegex(String[] urls) {
-        // Create a String pattern to fill return array
-        return null;
+        List<String> result = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\(\\w*https?://(\\w+\\.)+[a-z]{2,3}/\\w+\\" +
+                ".html\\w*\\)");
+
+        for (int i = 0; i < urls.length; i++) {
+            Matcher match = pattern.matcher(urls[i]);
+            if (match.matches()) {
+                result.add(urls[i]);
+            }
+        }
+        return result;
     }
 
     public static List<String> findStartupName(String[] names) {
@@ -64,14 +74,24 @@ public class RegexPuzzles {
     }
 
     public static void main(String[] args) {
-        /* For testing image regex */
-        BufferedImage img = imageRegex("mystery.txt", 400, 400);
+        String[] urls = {
+                "(randomstuff1234https://www.eecs.berkeley.edu/blah.htmlyoullneverfindyourextracredit)",
+                "(http://www.cs61bl.github.io/yolo.html)",
+                "(https://en.wikipedia.org/greed.htmltry23andfindmenow)"};
+        List<String> validUrls = urlRegex(urls);
 
-        File outputfile = new File("output_img.jpg");
-        try {
-            ImageIO.write(img, "jpg", outputfile);
-        } catch (IOException e) {
-            System.out.println("Error writing file: " + e.getMessage());
+        for (int i = 0; i < validUrls.size(); i++) {
+            System.out.println(validUrls.get(i));
         }
+
+        /* For testing image regex */
+//        BufferedImage img = imageRegex("mystery.txt", 400, 400);
+//
+//        File outputfile = new File("output_img.jpg");
+//        try {
+//            ImageIO.write(img, "jpg", outputfile);
+//        } catch (IOException e) {
+//            System.out.println("Error writing file: " + e.getMessage());
+//        }
     }
 }
