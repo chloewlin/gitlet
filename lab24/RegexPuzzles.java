@@ -49,11 +49,14 @@ public class RegexPuzzles {
         }
 
         // Initialize both Patterns and 3-d array
+        Pattern pattern = Pattern.compile("");
+        int[][][] arr = new int[1][1][1];
+
         try {
             String line;
             while ((line = br.readLine()) != null) {
                 // Initialize both Matchers and find() for each
-
+                Matcher match = pattern.matcher(line);
                 // Parse each group as an Integer
 
                 // Store in array
