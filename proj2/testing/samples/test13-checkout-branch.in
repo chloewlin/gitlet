@@ -1,0 +1,46 @@
+> init
+<<<
+
++ f.txt f.txt
++ g.txt g.txt
+
+> add f.txt
+<<<
+
+> add g.txt
+<<<
+
+> branch other
+<<<
+
+> add f.txt
+<<<
+
+> add g.txt
+<<<
+
+> commit "add f and g"
+<<<
+
+> checkout other
+<<<
+
++ f.txt hey.txt
+
+> add f.txt
+<<<
+
+> commit "add new version of f (content is now wug)"
+<<<
+
+> checkout master
+<<<
+
+= g.txt g.txt
+= f.txt f.txt
+
+> checkout other
+<<<
+
+= f.txt hey.txt
+* g.txt
