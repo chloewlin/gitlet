@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Driver class for Gitlet, the tiny stupid version-control system.
+ * Driver class for Gitlet, a Github-like version-control system.
  *
- * @author Chloe Lin, Christal Huang
+ * @author Chloe Lin
  */
 public class Main {
 
@@ -74,13 +74,7 @@ public class Main {
             validateInitialization();
 
             switch (command) {
-    //        case "init":
-    //            validateGitlet();
-    //            setupPersistence();
-    //            repo.initialize();
-    //            break;
                 case "add":
-    //            validateInitialization();
                     validateFileToBeAdded(args);
                     repo.add(args);
                     break;
@@ -214,19 +208,18 @@ public class Main {
             exitWithError("A Gitlet version-control system "
                     + "already exists in the current directory.");
         }
-//        else {
-//            exitWithError("Not in an initialized Gitlet directory.");
-//        }
     }
 
     /**
-     *  print the message if a user inputs a command that doesn’t exist.
+     *  print the message if a user inputs a command that does not exist.
      */
     private static void validateCommand() {
         exitWithError("No command with that name exists.");
     }
-
-
+    
+    /**
+     *  print the message if a file does not exist.
+     */
     private static void validateFileToBeAdded(String[] args) {
         String fileName = args[1];
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
@@ -242,6 +235,7 @@ public class Main {
             exitWithError("File does not exist.");
         }
     }
+
     /**
      *  print the message if a commit has a blank message.
      */
