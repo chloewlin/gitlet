@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * A Repo class represents a gitlet repository.
  *
- * @author Chloe Lin, Christal Huang
+ * @author Chloe Lin
  */
 public class Repo {
 
@@ -17,7 +17,6 @@ public class Repo {
     static Staging stagingArea = new Staging();
     Head head = new Head();
     Merge merge = new Merge();
-
 
     /**
      * Create initial commit and set up branch and HEAD pointer.
@@ -46,7 +45,14 @@ public class Repo {
      * Java program. Writing back: When you Java program is finished,
      * at the very end, since you had loaded that list of files and
      * may have modified it, write it back to your file system.
-     */
+     *
+     * Add a file to the staging area.
+     * If the current working version of the file is identical
+     * to the version in the current commit, do not stage it to
+     * be added, and remove it from the staging area if it is
+     * already there (as can happen when a file is changed,
+     * added, and then changed back).
+     * */
     public void add(String[] args) throws IOException {
         Main.validateNumArgs(args);
         String fileName = args[1];
@@ -65,13 +71,8 @@ public class Repo {
     }
 
     /**
-     * Add a file to the staging area.
-     * If the current working version of the file is identical
-     * to the version in the current commit, do not stage it to
-     * be added, and remove it from the staging area if it is
-     * already there (as can happen when a file is changed,
-     * added, and then changed back).
-     * */
+    * Stage a file in the staging area
+    */
     private void stage(String fileName, Blob blob) throws IOException {
         stagingArea = stagingArea.load();
         stagingArea.add(fileName, blob.getBlobSHA1());
@@ -92,6 +93,7 @@ public class Repo {
         if (blobSHA1 == null) {
             return false;
         }
+
         File blobOfPrevVersion = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
 
         return hasSameContent(currentFile, blobOfPrevVersion);
@@ -101,7 +103,7 @@ public class Repo {
      * Compares the byte array of the file in CWD and the byte array
      * saved in the last commit/blob.
      * @param currVersion file in CWD
-     * @blob blob the blob of the same file saved in current commit
+     * @param blobOfPrevVersion the blob of the same file saved in current commit
      * */
     public boolean hasSameContent(File currVersion, File blobOfPrevVersion) {
         Blob blob = Blob.load(blobOfPrevVersion);
@@ -115,6 +117,7 @@ public class Repo {
      *  into files inside /object directory, add the
      *  file-blob mapping to index(staging), update
      *  HEAD pointer
+     *  @param args user's input of commands and operands
      */
     public void commit(String[] args) throws IOException {
         Main.validateNumArgs(args);
@@ -175,6 +178,7 @@ public class Repo {
      * the current commit, stage it for removal and remove the file
      * from the working directory if the user has not already done so
      * (do not remove it unless it is tracked in the current commit).
+     * @param args filename
      */
     public void remove(String[] args) {
         String fileName = args[1];
@@ -196,6 +200,7 @@ public class Repo {
 
     /**
      * Check if a file is tracked by current commit (HEAD)
+     * @param args filename
      * */
     public boolean trackedByCurrCommit(String fileName) {
         Commit HEAD = Head.getGlobalHEAD();
@@ -256,6 +261,7 @@ public class Repo {
 
     /**
      * Search for commits that have the given commit message.
+     * @param args commit message
      */
     public void find(String[] args) {
         String commitMessage = args[1];
@@ -289,7 +295,7 @@ public class Repo {
      * the front of the current branch, and puts it in the working
      * directory, overwriting the version of the file that’s already
      * there if there is one. The new version of the file is not staged.
-     * @return
+     * @param filename filename
      */
     public void checkoutFile(String filename) throws IOException {
         Map<String, String> snapshot = Head.getGlobalHEAD().getSnapshot();
@@ -309,7 +315,8 @@ public class Repo {
      * and puts it in the working directory, overwriting the version of the file
      * that’s already there if there is one.
      * The new version of the file is not staged.
-     * @return
+     * @param commitId the commit id
+     * @param filename filename
      */
     public void checkoutCommit(String commitId, String fileName) throws IOException {
         Commit commit = Head.getGlobalHEAD();
@@ -331,7 +338,10 @@ public class Repo {
         restoreFileInCWD(blob);
     }
 
-    /** check if a commit id exists in our repo */
+    /** 
+     * check if a commit id exists in our repo 
+     * @param targetCommitId the commit id to search
+     */
     public boolean containsCommitId(String targetCommitId) {
         Boolean found = false;
         File commitDir = Utils.join(Main.OBJECTS_FOLDER, "commits");
@@ -352,16 +362,14 @@ public class Repo {
      * @param commitId a given commitId we want to search
      * */
     public boolean findMatchId(String commitSHA1, String commitId) {
-//        return commitSHA1.equals(commitId) ||
         return commitSHA1.substring(0, commitId.length()).equals(commitId);
     }
 
     /**
      * Update the global HEAD pointer to point to branch HEAD.
+     * @param branchName branch to check out to
      */
     public void checkoutBranch(String branchName) {
-
-        // TODO: FIND BUG
         String currBranchName = currentBranchName();
         Commit branchHEAD = Head.getBranchHEAD(branchName);
         Commit currHEAD = Head.getGlobalHEAD();
@@ -369,7 +377,6 @@ public class Repo {
         if (currBranchName.equals(branchName)) {
             Main.exitWithError("No need to checkout the current branch.");
         }
-        // TODO: FIX BUG
         if (hasUntrackedFilesForCheckoutBranch(branchHEAD)) {
             Main.exitWithError("There is an untracked file in the way; " +
                     "delete it, or add and commit it first.");
@@ -386,6 +393,7 @@ public class Repo {
      * Restore file from blob, put it in current working directory,
      * and overwriting the version of the file that’s already
      * there if there is one.
+     * @param blob file blob
      */
     public void restoreFileInCWD(Blob blob) throws IOException {
         String CWD = System.getProperty("user.dir");
@@ -409,8 +417,6 @@ public class Repo {
         Map<String, String> overwrite = new HashMap<>();
         Map<String, String> delete = new HashMap<>();
 
-
-        // TODO: FIX BUGS
         // Takes all files in the commit at the head of the
         // given branch, and puts them in the working directory,
         // overwriting the versions of the files that are already
@@ -430,7 +436,6 @@ public class Repo {
                 overwrite.put(fileName, blobSHA1);
             }
         });
-
 
         overwrite.forEach((file, blobSHA1) -> {
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
@@ -453,6 +458,7 @@ public class Repo {
 
     /**
      * Create a new reference for current commit node.
+     * @param args branch name
      */
     public void branch(String[] args) throws IOException {
         String branchName = args[1];
@@ -466,10 +472,10 @@ public class Repo {
 
     /**
      * Remove the branch reference.
+     * @param args branch name
      */
     public void rmBranch(String[] args) {
         String branchNameToRemove = args[1];
-
         String currBranchName = currentBranchName();
 
         if (currBranchName.equals(branchNameToRemove)) {
@@ -544,9 +550,6 @@ public class Repo {
             }
         });
 
-//        System.out.println("==== restore ===== ");
-//        restore.forEach((k, v) -> System.out.println(k + " : " + v));
-
         restore.forEach((file, blobSHA1) -> {
             File blobFile = Utils.join(Main.BLOBS_FOLDER, blobSHA1);
             Blob blob = Blob.load(blobFile);
@@ -560,13 +563,9 @@ public class Repo {
             }
             Utils.writeContents(newFile, blob.getFileContent());
         });
-//
-//        System.out.println("curr branch is " + currentBranchName());
-//        System.out.println("reset curr head " + currentBranchName() + " to.... ");
+
         Head.setGlobalHEAD(currentBranchName(), targetCommit);
         Head.setBranchHEAD(currentBranchName(), targetCommit);
-//
-//        System.out.println("after reset, curr branch head is at " + targetCommit.getMessage());
 
         stagingArea = new Staging();
         stagingArea.save();
@@ -575,6 +574,7 @@ public class Repo {
     /**
      * Checks if a working file is untracked in the HEAD of current branch
      * and would be overwritten by the checkout.
+     * @param givenBranchHEAD name of the checkout branch
      * */
     public boolean hasUntrackedFilesForCheckoutBranch(Commit givenBranchHEAD) {
         List<String> untrackedFiles = new ArrayList<String>();
@@ -582,13 +582,9 @@ public class Repo {
         List<String> fileInCWD = Utils.plainFilenamesIn("./");
 
         for (String fileName : fileInCWD) {
-            if (!fileName.equals(".DS_Store") && !fileName.equals(".gitignore") && !fileName.equals(
-                    "proj2.iml")) {
-
-//            if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
-//                    // TODO: CHECK WHICH, OR BOTH, CONDITION IS CORRECT **
-//                    && !stagingArea.getFilesStagedForAddition().containsKey(fileName)
-//                    && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
+            if (!fileName.equals(".DS_Store")
+                && !fileName.equals(".gitignore")
+                && !fileName.equals("proj2.iml")) {
                 if (!Head.getGlobalHEAD().getSnapshot().containsKey(fileName)
                         && givenBranchHEAD.getSnapshot().containsKey(fileName)) {
                     untrackedFiles.add(fileName);
@@ -609,6 +605,7 @@ public class Repo {
      *  this condition
      *  could be modified to be in reference to the latest commit on the
      *  given branch (rather than a given commit ID)
+     *  @param givenBranchHEAD name of the checkout branch
      * */
     public boolean hasUntrackedFilesForReset(Commit givenBranchHEAD) {
         List<String> untrackedFiles = new ArrayList<String>();
@@ -628,6 +625,11 @@ public class Repo {
         return untrackedFiles.size() > 0;
     }
 
+    /**
+     * Restore files saved at a commit node.
+     * @param currCommit current commit node 
+     * @param checkoutCommit checkout commit node
+     * */
     public void restoreFilesAtCommit(Commit currCommit, Commit checkoutCommit) {
         Map<String, String> currSnapshot = currCommit.getSnapshot();
         Map<String, String> checkoutSnapshot = checkoutCommit.getSnapshot();
@@ -661,6 +663,10 @@ public class Repo {
         delete.forEach((file, blobSHA1) -> Utils.restrictedDelete(file));
     }
 
+    /**
+     * Print blob
+     * @param blobSHA the SHA id of a blob
+     * */
     public String printBlob(String blobSHA) {
         File blobDir = Utils.join(Main.OBJECTS_FOLDER, "blobs");
         String[] blobsFileNames = blobDir.list();
@@ -681,6 +687,7 @@ public class Repo {
 
     /**
      * Merge given branch into current branch.
+     * @param args name of branch to merge into
      */
     public void merge(String[] args) throws IOException {
         String givenBranch = args[1];
@@ -689,6 +696,10 @@ public class Repo {
         merge.merge(givenBranch);
     }
 
+    /**
+     * A Merge Class for comparing commit nodes and handling merge conflicts.
+     * @param branchName the name of branch to merge into
+     */
     private class Merge {
 
         public void merge(String branchName) throws IOException {
@@ -699,14 +710,12 @@ public class Repo {
                     .getName();
 
             stagingArea = stagingArea.load();
+
             Commit SP = latestCommonAncestor(currHEAD, givenHEAD);
 
             Map<String, String> curr = currHEAD.getSnapshot();
             Map<String, String> given = givenHEAD.getSnapshot();
             Map<String, String> sp = SP.getSnapshot();
-
-            //failure case
-            //print error msg and error out
 
             Map<String, String> mergeMap = new HashMap<>();
             Map<String, String> bothDeleted = new HashMap<>();
